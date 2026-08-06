@@ -1,0 +1,17 @@
+<odoo>
+    <record id="action_notification_accounts" model="ir.actions.act_window"><field name="name">Accounts</field><field name="res_model">midvex.notification.account</field><field name="view_mode">list,form</field></record>
+    <record id="action_notification_recipients" model="ir.actions.act_window"><field name="name">Recipients</field><field name="res_model">midvex.notification.recipient</field><field name="view_mode">list,form</field></record>
+    <record id="action_notification_templates" model="ir.actions.act_window"><field name="name">Templates</field><field name="res_model">midvex.notification.template</field><field name="view_mode">list,form</field></record>
+    <record id="action_notification_rules" model="ir.actions.act_window"><field name="name">Rules</field><field name="res_model">midvex.notification.rule</field><field name="view_mode">list,form</field></record>
+    <record id="action_notification_messages" model="ir.actions.act_window"><field name="name">Message Queue</field><field name="res_model">midvex.notification.message</field><field name="view_mode">list,form</field></record>
+    <record id="action_notification_logs" model="ir.actions.act_window"><field name="name">Delivery Logs</field><field name="res_model">midvex.notification.log</field><field name="view_mode">list,form</field></record>
+
+    <menuitem id="menu_notification_root" name="Notifications" sequence="90" groups="midvex_o_notification_foundry.group_notification_user"/>
+    <menuitem id="menu_notification_messages" name="Message Queue" parent="menu_notification_root" action="action_notification_messages" sequence="10"/>
+    <menuitem id="menu_notification_logs" name="Delivery Logs" parent="menu_notification_root" action="action_notification_logs" sequence="20"/>
+    <menuitem id="menu_notification_recipients" name="Recipients" parent="menu_notification_root" action="action_notification_recipients" sequence="30"/>
+    <menuitem id="menu_notification_config" name="Configuration" parent="menu_notification_root" sequence="90" groups="midvex_o_notification_foundry.group_notification_manager"/>
+    <menuitem id="menu_notification_accounts" name="Accounts" parent="menu_notification_config" action="action_notification_accounts" sequence="10"/>
+    <menuitem id="menu_notification_rules" name="Rules" parent="menu_notification_config" action="action_notification_rules" sequence="20"/>
+    <menuitem id="menu_notification_templates" name="Templates" parent="menu_notification_config" action="action_notification_templates" sequence="30"/>
+</odoo>

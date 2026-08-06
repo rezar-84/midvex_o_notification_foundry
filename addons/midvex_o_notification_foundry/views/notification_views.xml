@@ -1,0 +1,207 @@
+<odoo>
+    <record id="view_notification_account_list" model="ir.ui.view">
+        <field name="name">midvex.notification.account.list</field>
+        <field name="model">midvex.notification.account</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="channel_id"/>
+                <field name="company_id"/>
+                <field name="state"/>
+                <field name="recipient_count"/>
+                <field name="message_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notification_account_form" model="ir.ui.view">
+        <field name="name">midvex.notification.account.form</field>
+        <field name="model">midvex.notification.account</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_test_connection" type="object" string="Test Connection" class="btn-primary" groups="midvex_o_notification_foundry.group_notification_manager"/>
+                    <button name="action_register_webhook" type="object" string="Register Webhook" groups="midvex_o_notification_foundry.group_notification_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_recipients" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="recipient_count" widget="statinfo" string="Recipients"/>
+                        </button>
+                        <button name="action_view_messages" type="object" class="oe_stat_button" icon="fa-envelope">
+                            <field name="message_count" widget="statinfo" string="Messages"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="channel_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="last_test_at" readonly="1"/>
+                            <field name="last_error" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Credentials" groups="midvex_o_notification_foundry.group_notification_admin">
+                            <group>
+                                <field name="api_key" password="True"/>
+                                <field name="api_secret" password="True"/>
+                            </group>
+                        </page>
+                        <page string="Webhook">
+                            <group>
+                                <field name="webhook_url"/>
+                                <field name="webhook_secret" password="True" groups="midvex_o_notification_foundry.group_notification_admin"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_notification_recipient_list" model="ir.ui.view">
+        <field name="name">midvex.notification.recipient.list</field>
+        <field name="model">midvex.notification.recipient</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="user_id"/>
+                <field name="account_id"/>
+                <field name="channel_code"/>
+                <field name="state"/>
+                <field name="linked_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notification_recipient_form" model="ir.ui.view">
+        <field name="name">midvex.notification.recipient.form</field>
+        <field name="model">midvex.notification.recipient</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate_link_code" type="object" string="Generate Link Code" class="btn-primary"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="account_id"/>
+                            <field name="channel_code" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="link_code" readonly="1"/>
+                            <field name="link_code_expires_at" readonly="1"/>
+                            <field name="linked_at" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_notification_template_list" model="ir.ui.view">
+        <field name="name">midvex.notification.template.list</field>
+        <field name="model">midvex.notification.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="model_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notification_template_form" model="ir.ui.view">
+        <field name="name">midvex.notification.template.form</field>
+        <field name="model">midvex.notification.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="model_id"/>
+                        <field name="subject"/>
+                    </group>
+                    <field name="body"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_notification_rule_list" model="ir.ui.view">
+        <field name="name">midvex.notification.rule.list</field>
+        <field name="model">midvex.notification.rule</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="trigger"/>
+                <field name="template_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notification_rule_form" model="ir.ui.view">
+        <field name="name">midvex.notification.rule.form</field>
+        <field name="model">midvex.notification.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="model_id"/>
+                            <field name="trigger"/>
+                            <field name="trigger_domain"/>
+                            <field name="template_id"/>
+                            <field name="company_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="channel_ids" widget="many2many_tags"/>
+                            <field name="audience_group_ids" widget="many2many_tags"/>
+                            <field name="audience_user_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_notification_message_list" model="ir.ui.view">
+        <field name="name">midvex.notification.message.list</field>
+        <field name="model">midvex.notification.message</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="recipient_id"/>
+                <field name="channel_code"/>
+                <field name="state"/>
+                <field name="attempt_count"/>
+                <field name="error_message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notification_log_list" model="ir.ui.view">
+        <field name="name">midvex.notification.log.list</field>
+        <field name="model">midvex.notification.log</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="message_id"/>
+                <field name="channel_code"/>
+                <field name="status"/>
+                <field name="message"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,30 @@
+<odoo noupdate="1">
+    <record id="template_lead_created" model="midvex.notification.template">
+        <field name="name">Lead created</field>
+        <field name="code">crm_lead_created</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">New lead: {{ object.name }}</field>
+        <field name="body">A new lead was created: {{ object.name }} ({{ object.partner_name or object.contact_name or 'no contact name' }}).</field>
+    </record>
+
+    <record id="rule_lead_created_telegram" model="midvex.notification.rule">
+        <field name="name">CRM lead created -&gt; Telegram</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_create</field>
+        <field name="template_id" ref="template_lead_created"/>
+        <field name="channel_ids" eval="[(4, ref('channel_telegram'))]"/>
+    </record>
+
+    <record id="automation_lead_created" model="base.automation">
+        <field name="name">Notification: CRM lead created</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_create</field>
+    </record>
+    <record id="automation_lead_created_action" model="ir.actions.server">
+        <field name="name">Notification: CRM lead created</field>
+        <field name="base_automation_id" ref="automation_lead_created"/>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">env['midvex.notification.message'].sudo()._trigger_event('crm.lead', record, 'created')</field>
+    </record>
+</odoo>

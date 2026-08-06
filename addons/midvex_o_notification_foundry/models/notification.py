@@ -1,0 +1,325 @@
+import uuid
+from datetime import timedelta
+
+from odoo import _, api, fields, models
+from odoo.exceptions import AccessError, UserError, ValidationError
+
+
+class NotificationChannel(models.Model):
+    _name = 'midvex.notification.channel'
+    _description = 'Notification Channel'
+    _rec_name = 'name'
+
+    name = fields.Char(required=True, translate=True)
+    code = fields.Char(required=True, index=True)
+    active = fields.Boolean(default=True)
+    module_name = fields.Char()
+    documentation_url = fields.Char()
+    supports_inbound = fields.Boolean(default=False)
+    _channel_code_uniq = models.Constraint('UNIQUE (code)', 'Channel code must be unique.')
+
+
+class NotificationAccount(models.Model):
+    _name = 'midvex.notification.account'
+    _description = 'Notification Account'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _check_company_auto = True
+
+    name = fields.Char(required=True, tracking=True)
+    channel_id = fields.Many2one('midvex.notification.channel', required=True, ondelete='restrict')
+    channel_code = fields.Char(related='channel_id.code', store=True, index=True)
+    company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company, index=True)
+    active = fields.Boolean(default=True)
+    state = fields.Selection([('draft', 'Draft'), ('connected', 'Connected'), ('error', 'Error')],
+                              default='draft', required=True, tracking=True)
+    api_key = fields.Char(string='Bot Token / API Key', groups='midvex_o_notification_foundry.group_notification_admin')
+    api_secret = fields.Char(string='API Secret', groups='midvex_o_notification_foundry.group_notification_admin')
+    webhook_url = fields.Char()
+    webhook_secret = fields.Char(groups='midvex_o_notification_foundry.group_notification_admin')
+    last_test_at = fields.Datetime(readonly=True)
+    last_error = fields.Text(readonly=True)
+    recipient_ids = fields.One2many('midvex.notification.recipient', 'account_id')
+    notification_message_ids = fields.One2many('midvex.notification.message', 'account_id')
+    recipient_count = fields.Integer(compute='_compute_counts')
+    message_count = fields.Integer(compute='_compute_counts')
+
+    @api.depends('recipient_ids', 'notification_message_ids.state')
+    def _compute_counts(self):
+        for account in self:
+            account.recipient_count = len(account.recipient_ids)
+            account.message_count = len(account.notification_message_ids)
+
+    def _require_manager(self):
+        if not self.env.user.has_group('midvex_o_notification_foundry.group_notification_manager'):
+            raise AccessError(_('Notification Manager permission is required.'))
+
+    def action_test_connection(self):
+        self._require_manager()
+        from ..services.registry import get_adapter
+        for account in self:
+            adapter = get_adapter(account.channel_code)
+            try:
+                adapter.test_connection(account)
+            except Exception as error:
+                account.write({'state': 'error', 'last_error': str(error)})
+                raise
+            account.write({'state': 'connected', 'last_test_at': fields.Datetime.now(), 'last_error': False})
+        return True
+
+    def action_register_webhook(self):
+        self._require_manager()
+        from ..services.registry import get_adapter
+        for account in self:
+            if not account.webhook_url:
+                raise UserError(_('Set a webhook URL before registering it.'))
+            adapter = get_adapter(account.channel_code)
+            adapter.register_webhook(account, account.webhook_url, account.webhook_secret)
+        return True
+
+    def action_view_recipients(self):
+        return {'type': 'ir.actions.act_window', 'name': _('Recipients'),
+                'res_model': 'midvex.notification.recipient', 'view_mode': 'list,form',
+                'domain': [('account_id', '=', self.id)]}
+
+    def action_view_messages(self):
+        return {'type': 'ir.actions.act_window', 'name': _('Messages'),
+                'res_model': 'midvex.notification.message', 'view_mode': 'list,form',
+                'domain': [('account_id', '=', self.id)]}
+
+
+class NotificationRecipient(models.Model):
+    _name = 'midvex.notification.recipient'
+    _description = 'Notification Recipient'
+    _check_company_auto = True
+
+    user_id = fields.Many2one('res.users', required=True, ondelete='cascade', index=True)
+    account_id = fields.Many2one('midvex.notification.account', required=True, ondelete='cascade', index=True)
+    channel_code = fields.Char(related='account_id.channel_code', store=True, index=True)
+    company_id = fields.Many2one(related='account_id.company_id', store=True, index=True)
+    external_id = fields.Char(groups='midvex_o_notification_foundry.group_notification_manager')
+    external_username = fields.Char(groups='midvex_o_notification_foundry.group_notification_manager')
+    state = fields.Selection([('pending', 'Pending'), ('linked', 'Linked'), ('revoked', 'Revoked')],
+                              default='pending', required=True)
+    link_code = fields.Char(readonly=True, copy=False)
+    link_code_expires_at = fields.Datetime(readonly=True)
+    linked_at = fields.Datetime(readonly=True)
+    active = fields.Boolean(default=True)
+    _account_recipient_uniq = models.Constraint('UNIQUE (account_id, user_id)',
+                                                  'A user already has a recipient link for this account.')
+
+    def _check_self_or_manager(self):
+        if self.user_id != self.env.user and not self.env.user.has_group(
+                'midvex_o_notification_foundry.group_notification_manager'):
+            raise AccessError(_('You can only manage your own notification link.'))
+
+    def action_generate_link_code(self):
+        for recipient in self:
+            recipient._check_self_or_manager()
+            recipient.write({
+                'link_code': uuid.uuid4().hex[:8].upper(),
+                'link_code_expires_at': fields.Datetime.now() + timedelta(minutes=15),
+                'state': 'pending',
+            })
+        return True
+
+    @api.model
+    def get_or_create_link(self, user, channel_code):
+        account = self.env['midvex.notification.account'].search([
+            ('channel_code', '=', channel_code), ('company_id', '=', user.company_id.id),
+            ('active', '=', True), ('state', '=', 'connected')], limit=1)
+        if not account:
+            raise UserError(_('No connected %s account is configured for your company.') % channel_code)
+        recipient = self.search([('user_id', '=', user.id), ('account_id', '=', account.id)], limit=1)
+        if not recipient:
+            recipient = self.create({'user_id': user.id, 'account_id': account.id})
+        recipient.action_generate_link_code()
+        return recipient
+
+    @api.model
+    def process_link_code(self, code, external_id, external_username=None):
+        if not code or not external_id:
+            return False
+        recipient = self.sudo().search([
+            ('link_code', '=', code), ('state', '=', 'pending'),
+            ('link_code_expires_at', '>=', fields.Datetime.now())], limit=1)
+        if not recipient:
+            return False
+        recipient.write({
+            'external_id': external_id,
+            'external_username': external_username,
+            'state': 'linked',
+            'linked_at': fields.Datetime.now(),
+            'link_code': False,
+        })
+        return recipient
+
+
+class NotificationTemplate(models.Model):
+    _name = 'midvex.notification.template'
+    _description = 'Notification Template'
+
+    name = fields.Char(required=True, translate=True)
+    code = fields.Char(required=True, index=True)
+    model_id = fields.Many2one('ir.model', required=True, ondelete='cascade')
+    model_name = fields.Char(related='model_id.model', string='Technical Model Name', store=True)
+    subject = fields.Char(translate=True)
+    body = fields.Text(required=True, translate=True,
+                        help='Rendered with Odoo inline templating, e.g. {{ object.name }}.')
+    active = fields.Boolean(default=True)
+    _template_code_uniq = models.Constraint('UNIQUE (code)', 'Template code must be unique.')
+
+    def render(self, record):
+        self.ensure_one()
+        RenderMixin = self.env['mail.render.mixin']
+        body = RenderMixin._render_template(self.body, self.model_name, [record.id],
+                                             engine='inline_template')[record.id]
+        subject = False
+        if self.subject:
+            subject = RenderMixin._render_template(self.subject, self.model_name, [record.id],
+                                                     engine='inline_template')[record.id]
+        return {'subject': subject, 'body': body}
+
+
+class NotificationRule(models.Model):
+    _name = 'midvex.notification.rule'
+    _description = 'Notification Rule'
+    _check_company_auto = True
+
+    name = fields.Char(required=True)
+    model_id = fields.Many2one('ir.model', required=True, ondelete='cascade')
+    trigger = fields.Selection([('on_create', 'On Creation'), ('on_write', 'On Update')],
+                                default='on_create', required=True)
+    trigger_domain = fields.Char(help='Optional Odoo domain, evaluated against the triggering record. '
+                                       'Leave empty to always match.')
+    template_id = fields.Many2one('midvex.notification.template', required=True, ondelete='restrict')
+    channel_ids = fields.Many2many('midvex.notification.channel', required=True, string='Channels')
+    audience_group_ids = fields.Many2many('res.groups', 'notification_rule_group_rel', 'rule_id', 'group_id',
+                                           string='Audience Groups')
+    audience_user_ids = fields.Many2many('res.users', 'notification_rule_user_rel', 'rule_id', 'user_id',
+                                          string='Audience Users')
+    company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company, index=True)
+    active = fields.Boolean(default=True)
+
+
+class NotificationMessage(models.Model):
+    _name = 'midvex.notification.message'
+    _description = 'Notification Message'
+    _order = 'id desc'
+    _check_company_auto = True
+
+    name = fields.Char(required=True, default=lambda self: _('Notification'))
+    rule_id = fields.Many2one('midvex.notification.rule', ondelete='set null', index=True)
+    recipient_id = fields.Many2one('midvex.notification.recipient', required=True, ondelete='cascade', index=True)
+    account_id = fields.Many2one('midvex.notification.account', required=True, ondelete='cascade', index=True)
+    company_id = fields.Many2one(related='account_id.company_id', store=True, index=True)
+    channel_code = fields.Char(required=True, index=True)
+    res_model = fields.Char()
+    res_id = fields.Integer()
+    subject = fields.Char()
+    body = fields.Text(required=True)
+    state = fields.Selection([('pending', 'Pending'), ('sending', 'Sending'), ('sent', 'Sent'),
+                               ('failed', 'Failed'), ('quarantined', 'Quarantined')],
+                              default='pending', required=True, index=True)
+    idempotency_key = fields.Char(required=True, index=True)
+    attempt_count = fields.Integer(default=0, readonly=True)
+    max_attempts = fields.Integer(default=3, required=True)
+    next_retry_at = fields.Datetime(index=True)
+    payload = fields.Json()
+    result = fields.Json(readonly=True)
+    error_code = fields.Char()
+    error_message = fields.Text(readonly=True)
+    sent_at = fields.Datetime(readonly=True)
+    _message_key_uniq = models.Constraint('UNIQUE (idempotency_key)', 'Duplicate notification message.')
+
+    # Adapter delivery results may echo the message body back (e.g. Telegram's sendMessage
+    # response includes the sent text). Drop those keys so logs never duplicate recipient
+    # message content beyond what troubleshooting needs, per NOTIFICATION_SECURITY.md.
+    _METADATA_REDACT_KEYS = ('raw', 'body', 'text')
+
+    def _log(self, status, message_text, error_code=False, metadata=False):
+        safe_metadata = {key: value for key, value in (metadata or {}).items()
+                          if key not in self._METADATA_REDACT_KEYS}
+        self.env['midvex.notification.log'].create({
+            'message_id': self.id, 'channel_code': self.channel_code, 'status': status,
+            'message': message_text, 'error_code': error_code, 'metadata': safe_metadata,
+        })
+
+    def action_process(self):
+        from ..services.registry import get_adapter
+        for message in self.filtered(lambda item: item.state == 'pending'):
+            message.write({'state': 'sending', 'attempt_count': message.attempt_count + 1})
+            try:
+                adapter = get_adapter(message.channel_code)
+                message_dto = {
+                    'message_id': message.id,
+                    'recipient_external_id': message.recipient_id.external_id,
+                    'subject': message.subject,
+                    'body': message.body,
+                    'template_code': message.rule_id.template_id.code if message.rule_id else False,
+                    'res_model': message.res_model,
+                    'res_id': message.res_id,
+                    'variables': {},
+                }
+                result = adapter.send(message.account_id, message_dto)
+                message.write({'state': 'sent', 'result': result or {}, 'sent_at': fields.Datetime.now()})
+                message._log('success', _('Delivered.'), metadata=result)
+            except ValidationError as error:
+                message.write({'state': 'quarantined', 'error_message': str(error)})
+                message._log('warning', str(error), 'QUARANTINED')
+            except Exception as error:
+                if message.attempt_count < message.max_attempts:
+                    message.write({
+                        'state': 'pending', 'error_message': str(error),
+                        'next_retry_at': fields.Datetime.now() + timedelta(minutes=5),
+                    })
+                    message._log('warning', str(error), 'RETRY_SCHEDULED')
+                else:
+                    message.write({'state': 'failed', 'error_message': str(error)})
+                    message._log('failed', _('Delivery failed: %s') % str(error), 'DELIVERY_ERROR')
+        return True
+
+    @api.model
+    def cron_process_pending(self):
+        messages = self.search([
+            ('state', '=', 'pending'),
+            '|', ('next_retry_at', '=', False), ('next_retry_at', '<=', fields.Datetime.now()),
+        ], limit=50)
+        return messages.action_process()
+
+    @api.model
+    def _trigger_event(self, model_name, record, event_code):
+        from ..services.dispatcher import enqueue_event
+        return enqueue_event(self.env, model_name, record, event_code)
+
+
+class NotificationLog(models.Model):
+    _name = 'midvex.notification.log'
+    _description = 'Notification Delivery Log'
+    _order = 'create_date desc, id desc'
+    _check_company_auto = True
+
+    message_id = fields.Many2one('midvex.notification.message', string='Notification', ondelete='cascade', index=True)
+    company_id = fields.Many2one(related='message_id.company_id', store=True, index=True)
+    channel_code = fields.Char()
+    status = fields.Selection([('success', 'Success'), ('warning', 'Warning'), ('failed', 'Failed')], required=True)
+    message = fields.Text(required=True)
+    error_code = fields.Char()
+    metadata = fields.Json()
+
+
+class NotificationInboundEvent(models.Model):
+    _name = 'midvex.notification.inbound.event'
+    _description = 'Notification Inbound Event'
+    _order = 'create_date desc, id desc'
+    _check_company_auto = True
+
+    channel_id = fields.Many2one('midvex.notification.channel', required=True, ondelete='cascade')
+    account_id = fields.Many2one('midvex.notification.account', required=True, ondelete='cascade')
+    company_id = fields.Many2one(related='account_id.company_id', store=True, index=True)
+    event_type = fields.Char()
+    external_id = fields.Char()
+    raw_payload = fields.Json(groups='midvex_o_notification_foundry.group_notification_admin')
+    processed = fields.Boolean(default=False)
+    processed_at = fields.Datetime()
+    recipient_id = fields.Many2one('midvex.notification.recipient', ondelete='set null')
+    error_message = fields.Text()

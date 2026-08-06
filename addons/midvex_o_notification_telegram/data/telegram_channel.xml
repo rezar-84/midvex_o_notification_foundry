@@ -1,0 +1,1 @@
+<odoo noupdate="1"><record id="channel_telegram" model="midvex.notification.channel"><field name="name">Telegram</field><field name="code">telegram</field><field name="module_name">midvex_o_notification_telegram</field><field name="supports_inbound">True</field><field name="documentation_url">https://core.telegram.org/bots/api</field></record></odoo>
