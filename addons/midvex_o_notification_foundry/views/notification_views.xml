@@ -167,7 +167,9 @@
         <field name="model">midvex.notification.recipient</field>
         <field name="arch" type="xml">
             <list decoration-warning="state == 'pending'" decoration-muted="state == 'revoked' or muted">
+                <field name="kind"/>
                 <field name="user_id"/>
+                <field name="name" string="Chat"/>
                 <field name="account_id"/>
                 <field name="channel_code"/>
                 <field name="state"/>
@@ -183,6 +185,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="user_id"/>
+                <field name="name" string="Chat"/>
                 <field name="account_id"/>
                 <!-- "Who is still not linked" is the question during rollout, and an
                      unlinked recipient is skipped silently by the dispatcher. -->
@@ -190,8 +193,12 @@
                 <filter name="filter_linked" string="Linked" domain="[('state', '=', 'linked')]"/>
                 <filter name="filter_revoked" string="Revoked" domain="[('state', '=', 'revoked')]"/>
                 <separator/>
+                <filter name="filter_users" string="People" domain="[('kind', '=', 'user')]"/>
+                <filter name="filter_groups" string="Group Chats" domain="[('kind', '=', 'group')]"/>
+                <separator/>
                 <filter name="filter_muted" string="Muted" domain="[('muted', '=', True)]"/>
                 <group>
+                    <filter name="group_kind" string="Kind" context="{'group_by': 'kind'}"/>
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                     <filter name="group_channel" string="Channel" context="{'group_by': 'channel_code'}"/>
                     <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
@@ -212,7 +219,8 @@
                 <sheet>
                     <!-- The link flow was undocumented in the UI, so an admin had a
                          button, a code and no indication of what to do with either. -->
-                    <div class="alert alert-info" role="alert" invisible="state == 'linked'">
+                    <div class="alert alert-info" role="alert"
+                         invisible="state == 'linked' or kind != 'user'">
                         <strong>How to link this recipient</strong>
                         <ol class="mb-0">
                             <li>Press <strong>Generate Link Code</strong>.</li>
@@ -225,9 +233,32 @@
                         them without raising an error, so no alerts arrive and nothing
                         reports a failure.
                     </div>
+                    <!-- Different instructions, because the code must be redeemed
+                         somewhere else entirely and the bot has to be in the room
+                         before it can see the message at all. -->
+                    <div class="alert alert-info" role="alert"
+                         invisible="state == 'linked' or kind != 'group'">
+                        <strong>How to link a group chat</strong>
+                        <ol class="mb-0">
+                            <li>Add the bot to the Telegram group.</li>
+                            <li>Press <strong>Generate Link Code</strong>.</li>
+                            <li>Send the code <strong>in the group itself</strong>, as
+                                <code>/link CODE</code>. Sending it in a direct message
+                                is refused — that would link one person instead.</li>
+                        </ol>
+                        Everyone in the group sees every alert delivered here, so send
+                        only what the whole room should read. The bot's default privacy
+                        mode in BotFather is enough: it lets the bot see commands
+                        addressed to it without reading the rest of the conversation.
+                    </div>
                     <group>
                         <group>
-                            <field name="user_id"/>
+                            <field name="kind" widget="radio" options="{'horizontal': True}"
+                                   readonly="state == 'linked'"/>
+                            <field name="user_id" invisible="kind != 'user'"
+                                   required="kind == 'user'"/>
+                            <field name="name" string="Chat Name" invisible="kind != 'group'"
+                                   placeholder="e.g. Sales team room"/>
                             <field name="account_id"/>
                             <field name="channel_code" readonly="1"/>
                             <field name="active" widget="boolean_toggle"/>
@@ -367,14 +398,15 @@
                         <label for="name"/>
                         <h1><field name="name" placeholder="e.g. CRM lead created -> Telegram"/></h1>
                     </div>
-                    <!-- The dispatcher builds its user set from these two fields; when
-                         both are empty it iterates nothing and the rule is silently
-                         inert. Worth saying out loud on the form. -->
+                    <!-- The dispatcher builds its target set from these three fields;
+                         when all are empty it iterates nothing and the rule is
+                         silently inert. Worth saying out loud on the form. -->
                     <div class="alert alert-warning" role="alert"
-                         invisible="audience_group_ids or audience_user_ids">
+                         invisible="audience_group_ids or audience_user_ids or audience_recipient_ids">
                         <strong>This rule will not notify anyone.</strong>
                         No audience is set, so it matches records and then delivers to
-                        nobody — without reporting an error. Add a group or a user below.
+                        nobody — without reporting an error. Add a group, a user, or a
+                        shared chat below.
                     </div>
                     <div class="alert alert-warning" role="alert" invisible="trigger_domain">
                         <strong>This rule matches every record of the model.</strong>
@@ -394,6 +426,7 @@
                             <field name="channel_ids" widget="many2many_tags"/>
                             <field name="audience_group_ids" widget="many2many_tags"/>
                             <field name="audience_user_ids" widget="many2many_tags"/>
+                            <field name="audience_recipient_ids" widget="many2many_tags"/>
                         </group>
                     </group>
                     <group string="Filter">

@@ -4,7 +4,7 @@ from urllib import error
 
 from odoo.tests.common import TransactionCase
 
-from ..controllers.telegram_webhook import secret_token_is_valid
+from ..controllers.telegram_webhook import chat_kind, secret_token_is_valid
 from ..services import telegram_adapter as telegram_adapter_module
 from ..services.telegram_adapter import TelegramAdapter
 
@@ -200,3 +200,87 @@ class TestRecipientCommandActions(TransactionCase):
         self.recipient.action_set_muted(True)
         partner2 = self.env['res.partner'].create({'name': 'Beta'})
         self.assertFalse(enqueue_event(self.env, 'res.partner', partner2, 'created'))
+
+
+class TestChatKind(TransactionCase):
+    """Telegram tells us where a message came from; the link flow refuses a
+    code redeemed in the wrong kind of chat on the strength of it."""
+
+    def test_a_direct_message_is_a_user_chat(self):
+        self.assertEqual(chat_kind({'chat_type': 'private'}), 'user')
+
+    def test_groups_and_supergroups_are_both_rooms(self):
+        self.assertEqual(chat_kind({'chat_type': 'group'}), 'group')
+        self.assertEqual(chat_kind({'chat_type': 'supergroup'}), 'group')
+
+    def test_an_unknown_or_missing_type_is_treated_as_a_dm(self):
+        """The conservative reading: a personal code is refused in a chat we
+        cannot identify rather than granted to it."""
+        self.assertEqual(chat_kind({}), 'user')
+        self.assertEqual(chat_kind({'chat_type': 'channel'}), 'user')
+
+
+class TestParseInboundChatContext(TransactionCase):
+    def setUp(self):
+        super().setUp()
+        self.adapter = TelegramAdapter()
+
+    def test_group_message_carries_type_and_title(self):
+        event = self.adapter.parse_inbound({'message': {
+            'chat': {'id': -100999, 'type': 'supergroup', 'title': 'Sales room'},
+            'from': {'username': 'jane'}, 'text': '/link ABC12345'}})
+        self.assertEqual(event['external_id'], '-100999')
+        self.assertEqual(event['chat_type'], 'supergroup')
+        self.assertEqual(event['chat_title'], 'Sales room')
+
+    def test_direct_message_has_no_title(self):
+        event = self.adapter.parse_inbound({'message': {
+            'chat': {'id': 555, 'type': 'private'}, 'from': {}, 'text': '/status'}})
+        self.assertEqual(event['chat_type'], 'private')
+        self.assertIsNone(event['chat_title'])
+
+
+class TestGroupLinkCodes(TransactionCase):
+    def setUp(self):
+        super().setUp()
+        channel = self.env['midvex.notification.channel'].search([('code', '=', 'telegram')], limit=1)
+        self.account = self.env['midvex.notification.account'].create({
+            'name': 'Test Bot', 'channel_id': channel.id, 'state': 'connected',
+        })
+        # A group chat has no user_id, so _check_self_or_manager can never see
+        # it as "your own link" and always demands the manager group. That is
+        # the intended rule - a shared room is not one person's to manage - so
+        # the test takes the role a real admin already has.
+        self.env.user.group_ids = [(4, self.env.ref(
+            'midvex_o_notification_foundry.group_notification_manager').id)]
+        self.Recipient = self.env['midvex.notification.recipient']
+
+    def _pending(self, **values):
+        recipient = self.Recipient.create(dict({'account_id': self.account.id}, **values))
+        recipient.action_generate_link_code()
+        return recipient
+
+    def test_find_pending_by_code_does_not_redeem_it(self):
+        """The lookup has to be side-effect free, or checking which kind of
+        chat a code belongs to would consume it."""
+        room = self._pending(kind='group', name='Sales room')
+        found = self.Recipient.find_pending_by_code(room.link_code)
+        self.assertEqual(found, room)
+        self.assertEqual(room.state, 'pending')
+        self.assertTrue(room.link_code)
+
+    def test_expired_code_is_not_found(self):
+        room = self._pending(kind='group', name='Sales room')
+        room.write({'link_code_expires_at': '2020-01-01 00:00:00'})
+        self.assertFalse(self.Recipient.find_pending_by_code(room.link_code))
+
+    def test_linking_a_room_fills_a_blank_name_from_the_chat_title(self):
+        room = self._pending(kind='group')
+        self.Recipient.process_link_code(room.link_code, '-100999', 'jane', 'Sales room')
+        self.assertEqual(room.state, 'linked')
+        self.assertEqual(room.name, 'Sales room')
+
+    def test_an_existing_name_survives_linking(self):
+        room = self._pending(kind='group', name='Our name for it')
+        self.Recipient.process_link_code(room.link_code, '-100999', 'jane', 'Telegram title')
+        self.assertEqual(room.name, 'Our name for it')

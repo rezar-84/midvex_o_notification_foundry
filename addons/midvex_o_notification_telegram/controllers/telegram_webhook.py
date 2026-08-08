@@ -7,6 +7,17 @@ from odoo.addons.midvex_o_notification_foundry.services.registry import get_adap
 
 _logger = logging.getLogger(__name__)
 
+def chat_kind(event):
+    """Which recipient kind an inbound chat corresponds to.
+
+    Telegram's 'group' and 'supergroup' are the same thing to us — a room with
+    several people in it. Anything unrecognised is treated as a DM, which is
+    the conservative reading: a personal link is refused in an unknown chat
+    rather than granted to it.
+    """
+    return 'group' if event.get('chat_type') in ('group', 'supergroup') else 'user'
+
+
 def secret_token_is_valid(account, header_value):
     """Verify Telegram's X-Telegram-Bot-Api-Secret-Token webhook header against the account secret."""
     if not account.webhook_secret:
@@ -29,7 +40,10 @@ class TelegramWebhookController(Controller):
             "/unlink - disconnect this chat\n"
             "/help - show this message\n\n"
             "Generate a link code from your Recipient record in Odoo. Codes expire "
-            "after 15 minutes."
+            "after 15 minutes.\n\n"
+            "In a group: add this bot to the group first, then send /link there. A "
+            "personal code will be refused in a group, and a group's code will be "
+            "refused in a direct message."
         )
 
     def _handle_command(self, env, account, event):
@@ -45,22 +59,39 @@ class TelegramWebhookController(Controller):
         Recipient = env['midvex.notification.recipient']
 
         if command in ('start', 'help'):
-            return False, False, HELP_TEXT
+            return False, False, self._help_text()
 
         if command == 'link':
             code = event.get('command_args')
             if not code:
                 return False, False, _("Send the code with the command, like: /link ABC12345")
-            recipient = Recipient.sudo().process_link_code(
-                code, external_id, event.get('external_username'))
-            if not recipient:
+            pending = Recipient.sudo().find_pending_by_code(code)
+            if not pending:
                 return False, 'Link code was invalid, already used, or expired.', _(
                     "That code was not accepted. It may have expired (codes last 15 "
                     "minutes), already been used, or been typed differently - they are "
                     "case-sensitive. Generate a fresh one in Odoo and try again."
                 )
+            # A personal code redeemed in a room would send that person's
+            # alerts to everyone in it, and a room's code redeemed in a DM
+            # would strand the rule pointing at one inbox. Both are honest
+            # mistakes with quiet consequences, so refuse and say which.
+            if pending.kind != chat_kind(event):
+                if pending.kind == 'group':
+                    reply = _("That code belongs to a shared chat. Send it in the group "
+                              "chat itself, after adding this bot to the group.")
+                else:
+                    reply = _("That code belongs to one person's link. Send it to this "
+                              "bot in a direct message, not in a group.")
+                return False, 'Link code used in the wrong kind of chat.', reply
+            recipient = Recipient.sudo().process_link_code(
+                code, external_id, event.get('external_username'), event.get('chat_title'))
+            if not recipient:
+                return False, 'Link code could not be redeemed.', _(
+                    "That code could not be redeemed. Generate a fresh one in Odoo and "
+                    "try again.")
             return recipient, False, _(
-                "Connected. Alerts for %s will arrive here.", recipient.user_id.name)
+                "Connected. Alerts for %s will arrive here.", recipient.display_name)
 
         recipient = Recipient.find_linked(account, external_id)
         if not recipient:
@@ -71,8 +102,8 @@ class TelegramWebhookController(Controller):
         if command == 'status':
             state = _("muted") if recipient.muted else _("active")
             return recipient, False, _(
-                "Connected as %(user)s. Alerts are %(state)s.",
-                user=recipient.user_id.name, state=state)
+                "Connected as %(name)s. Alerts are %(state)s.",
+                name=recipient.display_name, state=state)
 
         if command == 'mute':
             changed = recipient.action_set_muted(True)
@@ -86,11 +117,13 @@ class TelegramWebhookController(Controller):
                 _("Alerts resumed.") if changed else _("Alerts were already active."))
 
         if command == 'unlink':
-            user_name = recipient.user_id.name
+            # Read before the unlink: it clears the chat id, and for a group
+            # the label is all that is left to name what was disconnected.
+            target_name = recipient.display_name
             recipient.action_unlink_chat()
             return recipient, False, _(
                 "Disconnected. %s will no longer receive alerts here. Use /link with a "
-                "new code to reconnect.", user_name)
+                "new code to reconnect.", target_name)
 
         return False, False, None
 

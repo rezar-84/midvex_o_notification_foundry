@@ -149,7 +149,17 @@ class NotificationRecipient(models.Model):
     _description = 'Notification Recipient'
     _check_company_auto = True
 
-    user_id = fields.Many2one('res.users', required=True, ondelete='cascade', index=True)
+    # A shared team chat has no owner, so it cannot honestly be modelled as one
+    # person's link. Giving it a user_id would also make the dispatcher treat
+    # it as that person's private destination and deliver their alerts to the
+    # whole room, so the two kinds are kept strictly apart by
+    # _check_kind_target below.
+    kind = fields.Selection([('user', 'User'), ('group', 'Group Chat')],
+                             default='user', required=True, index=True)
+    name = fields.Char(string='Chat Name',
+                        help='Label for a shared chat. Filled in from the chat title on '
+                             'linking if left empty.')
+    user_id = fields.Many2one('res.users', ondelete='cascade', index=True)
     account_id = fields.Many2one('midvex.notification.account', required=True, ondelete='cascade', index=True)
     channel_code = fields.Selection(related='account_id.channel_code', store=True, index=True)
     company_id = fields.Many2one(related='account_id.company_id', store=True, index=True)
@@ -166,10 +176,35 @@ class NotificationRecipient(models.Model):
     link_code_expires_at = fields.Datetime(readonly=True)
     linked_at = fields.Datetime(readonly=True)
     active = fields.Boolean(default=True)
+    # Still one link per user per account. Group chats leave user_id NULL, and
+    # Postgres treats NULLs as distinct, so any number of them coexist here —
+    # which is what we want: one account can serve several team chats.
     _account_recipient_uniq = models.Constraint('UNIQUE (account_id, user_id)',
                                                   'A user already has a recipient link for this account.')
 
+    @api.constrains('kind', 'user_id')
+    def _check_kind_target(self):
+        for recipient in self:
+            if recipient.kind == 'user' and not recipient.user_id:
+                raise ValidationError(_('A user recipient needs a user.'))
+            if recipient.kind == 'group' and recipient.user_id:
+                raise ValidationError(_(
+                    'A group chat must not be attached to a user. The dispatcher looks '
+                    'recipients up by user, so a group chat carrying one would receive '
+                    'that person\'s private alerts.'))
+
+    @api.depends('kind', 'name', 'user_id.name')
+    def _compute_display_name(self):
+        for recipient in self:
+            if recipient.kind == 'group':
+                recipient.display_name = recipient.name or _('Unnamed chat')
+            else:
+                recipient.display_name = recipient.user_id.name or _('Recipient')
+
     def _check_self_or_manager(self):
+        # A group chat has no user_id, so this never matches env.user and
+        # managing one always requires the manager group. That is deliberate:
+        # a shared chat is not anybody's to mute or unlink from the backend.
         if self.user_id != self.env.user and not self.env.user.has_group(
                 'midvex_o_notification_foundry.group_notification_manager'):
             raise AccessError(_('You can only manage your own notification link.'))
@@ -198,21 +233,38 @@ class NotificationRecipient(models.Model):
         return recipient
 
     @api.model
-    def process_link_code(self, code, external_id, external_username=None):
-        if not code or not external_id:
-            return False
-        recipient = self.sudo().search([
+    def find_pending_by_code(self, code):
+        """The recipient a live link code belongs to, without redeeming it.
+
+        Split out from process_link_code so a caller can tell *why* a code was
+        refused — an expired code and a code sent from the wrong kind of chat
+        need different advice, and one boolean cannot carry both.
+        """
+        if not code:
+            return self.browse()
+        return self.sudo().search([
             ('link_code', '=', code), ('state', '=', 'pending'),
             ('link_code_expires_at', '>=', fields.Datetime.now())], limit=1)
+
+    @api.model
+    def process_link_code(self, code, external_id, external_username=None, chat_title=None):
+        if not external_id:
+            return False
+        recipient = self.find_pending_by_code(code)
         if not recipient:
             return False
-        recipient.write({
+        values = {
             'external_id': external_id,
             'external_username': external_username,
             'state': 'linked',
             'linked_at': fields.Datetime.now(),
             'link_code': False,
-        })
+        }
+        # Telegram gives a title for a group chat but not for a DM. Only used
+        # to fill a blank, so an admin's own label is never overwritten.
+        if recipient.kind == 'group' and chat_title and not recipient.name:
+            values['name'] = chat_title
+        recipient.write(values)
         return recipient
 
     @api.model
@@ -303,6 +355,13 @@ class NotificationRule(models.Model):
                                            string='Audience Groups')
     audience_user_ids = fields.Many2many('res.users', 'notification_rule_user_rel', 'rule_id', 'user_id',
                                           string='Audience Users')
+    # Group chats are addressed directly rather than through res.users: they
+    # have no user to resolve, and picking one per rule is the point — a lead
+    # alert goes to the sales room, not to every room the bot has joined.
+    audience_recipient_ids = fields.Many2many(
+        'midvex.notification.recipient', 'notification_rule_recipient_rel', 'rule_id', 'recipient_id',
+        string='Audience Chats', domain="[('kind', '=', 'group')]",
+        help='Shared chats to notify, in addition to the users above.')
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company, index=True)
     active = fields.Boolean(default=True)
 

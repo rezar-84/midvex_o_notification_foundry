@@ -126,6 +126,11 @@ class TelegramAdapter:
         return {
             'external_id': str(chat['id']) if chat.get('id') is not None else None,
             'external_username': sender.get('username'),
+            # 'private' for a DM, 'group'/'supergroup' for a room. Used to
+            # refuse a link code redeemed in the wrong kind of chat, so one
+            # person's link cannot quietly become a whole room's.
+            'chat_type': chat.get('type'),
+            'chat_title': chat.get('title'),
             'text': text,
             'command': command,
             'command_args': command_args,
