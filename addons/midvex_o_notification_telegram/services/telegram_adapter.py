@@ -87,17 +87,42 @@ class TelegramAdapter:
             raise UserError('Telegram setWebhook failed: %s' % result.get('description'))
         return result
 
+    #: Commands the webhook answers. Anything else is stored as a plain message
+    #: and ignored, so an unknown command never silently looks like a failure.
+    COMMANDS = ('start', 'help', 'link', 'status', 'unlink', 'mute', 'unmute')
+
+    @classmethod
+    def _parse_command(cls, text):
+        """Split "/status" or "/link ABC123" into (command, args).
+
+        Telegram appends the bot's username to commands sent in a group
+        ("/status@vars_bot"), so that suffix is stripped — otherwise every
+        command would be unrecognised the moment the bot joined a group.
+        """
+        if not text.startswith('/'):
+            return None, None
+        parts = text.split(maxsplit=1)
+        command = parts[0][1:].split('@', 1)[0].strip().lower()
+        if command not in cls.COMMANDS:
+            return None, None
+        return command, parts[1].strip() if len(parts) > 1 else None
+
+    def send_text(self, account, chat_id, text):
+        """Send a plain reply to a chat, outside the queued-message pipeline.
+
+        Used for command responses, which are conversational rather than
+        notifications: they have no rule, no template and nothing to retry.
+        """
+        if not chat_id or not text:
+            return None
+        return self._request(account, 'sendMessage', {'chat_id': chat_id, 'text': text})
+
     def parse_inbound(self, raw_payload):
         message = raw_payload.get('message') or {}
         chat = message.get('chat') or {}
         sender = message.get('from') or {}
         text = message.get('text') or ''
-        command = None
-        command_args = None
-        if text.startswith('/link'):
-            parts = text.split(maxsplit=1)
-            command = 'link'
-            command_args = parts[1].strip() if len(parts) > 1 else None
+        command, command_args = self._parse_command(text)
         return {
             'external_id': str(chat['id']) if chat.get('id') is not None else None,
             'external_username': sender.get('username'),

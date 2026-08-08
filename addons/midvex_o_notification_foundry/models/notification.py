@@ -157,6 +157,11 @@ class NotificationRecipient(models.Model):
     external_username = fields.Char(groups='midvex_o_notification_foundry.group_notification_manager')
     state = fields.Selection([('pending', 'Pending'), ('linked', 'Linked'), ('revoked', 'Revoked')],
                               default='pending', required=True)
+    # Distinct from `active` and from state='revoked': muting is a temporary,
+    # self-service pause that keeps the link intact, so the recipient does not
+    # have to go through the link-code flow again to come back.
+    muted = fields.Boolean(default=False,
+                            help='Delivery is skipped while muted. The link itself is kept.')
     link_code = fields.Char(readonly=True, copy=False)
     link_code_expires_at = fields.Datetime(readonly=True)
     linked_at = fields.Datetime(readonly=True)
@@ -209,6 +214,46 @@ class NotificationRecipient(models.Model):
             'link_code': False,
         })
         return recipient
+
+    @api.model
+    def find_linked(self, account, external_id):
+        """The linked recipient behind an inbound chat, if any.
+
+        Scoped to the account as well as the chat id: the same person can be
+        linked to two bots, and a command sent to one must not act on the
+        other's link.
+        """
+        if not external_id:
+            return self.browse()
+        return self.sudo().search([
+            ('account_id', '=', account.id),
+            ('external_id', '=', external_id),
+            ('state', '=', 'linked'),
+        ], limit=1)
+
+    def action_set_muted(self, muted):
+        """Pause or resume delivery, keeping the link. Returns whether it changed."""
+        self.ensure_one()
+        if self.muted == muted:
+            return False
+        self.sudo().write({'muted': muted})
+        return True
+
+    def action_unlink_chat(self):
+        """Disconnect a chat at the recipient's own request.
+
+        Revoked rather than deleted so the audit trail and any delivered
+        messages keep their target, and the external id is dropped so nothing
+        can be sent to a chat that asked to be left alone.
+        """
+        self.ensure_one()
+        self.sudo().write({
+            'state': 'revoked',
+            'external_id': False,
+            'link_code': False,
+            'muted': False,
+        })
+        return True
 
 
 class NotificationTemplate(models.Model):

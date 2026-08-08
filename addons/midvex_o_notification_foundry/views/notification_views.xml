@@ -166,11 +166,12 @@
         <field name="name">midvex.notification.recipient.list</field>
         <field name="model">midvex.notification.recipient</field>
         <field name="arch" type="xml">
-            <list decoration-warning="state == 'pending'" decoration-muted="state == 'revoked'">
+            <list decoration-warning="state == 'pending'" decoration-muted="state == 'revoked' or muted">
                 <field name="user_id"/>
                 <field name="account_id"/>
                 <field name="channel_code"/>
                 <field name="state"/>
+                <field name="muted"/>
                 <field name="linked_at"/>
             </list>
         </field>
@@ -188,6 +189,8 @@
                 <filter name="filter_pending" string="Not Linked Yet" domain="[('state', '=', 'pending')]"/>
                 <filter name="filter_linked" string="Linked" domain="[('state', '=', 'linked')]"/>
                 <filter name="filter_revoked" string="Revoked" domain="[('state', '=', 'revoked')]"/>
+                <separator/>
+                <filter name="filter_muted" string="Muted" domain="[('muted', '=', True)]"/>
                 <group>
                     <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
                     <filter name="group_channel" string="Channel" context="{'group_by': 'channel_code'}"/>
@@ -232,6 +235,7 @@
                         <group>
                             <field name="link_code" readonly="1" invisible="not link_code"/>
                             <field name="link_code_expires_at" readonly="1" invisible="not link_code"/>
+                            <field name="muted" widget="boolean_toggle"/>
                             <field name="linked_at" readonly="1" invisible="state != 'linked'"/>
                             <field name="external_username" readonly="1" invisible="state != 'linked'"/>
                         </group>

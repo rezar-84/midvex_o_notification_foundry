@@ -43,6 +43,10 @@ def enqueue_event(env, model_name, record, event_code):
                     ('user_id', '=', user.id),
                     ('channel_code', '=', channel.code),
                     ('state', '=', 'linked'),
+                    # Muted is a pause, so nothing is enqueued at all rather
+                    # than queued and held: a burst of alerts should not arrive
+                    # the moment someone unmutes.
+                    ('muted', '=', False),
                 ], limit=1)
                 if not recipient:
                     continue
