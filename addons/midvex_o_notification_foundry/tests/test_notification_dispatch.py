@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from odoo import fields
 from odoo.exceptions import ValidationError
 from odoo.tests.common import TransactionCase
 
@@ -197,3 +200,155 @@ class TestGroupChatRecipients(TransactionCase):
             'res.partner', partner, 'created')
         self.assertEqual(len(created), 2)
         self.assertEqual(len(created.mapped('idempotency_key')), 2)
+
+
+class TestQuietHours(TransactionCase):
+    """Quiet hours hold delivery until the window ends; they never drop it."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.adapter = MockAdapter()
+        registry._ADAPTERS[cls.adapter.channel_code] = cls.adapter
+        cls.channel = ensure_channel(cls.env, cls.adapter.channel_code, 'Mock Channel')
+        cls.account = cls.env['midvex.notification.account'].create({
+            'name': 'Quiet account', 'channel_id': cls.channel.id, 'state': 'connected',
+        })
+        cls.room = cls.env['midvex.notification.recipient'].create({
+            'kind': 'group', 'name': 'Night room', 'account_id': cls.account.id,
+            'state': 'linked', 'external_id': '-100777',
+            'quiet_enabled': True, 'quiet_start': 22.0, 'quiet_end': 7.0,
+            'tz': 'Europe/Istanbul',
+        })
+        partner_model = cls.env['ir.model']._get('res.partner')
+        cls.template = cls.env['midvex.notification.template'].create({
+            'name': 'Partner created', 'code': 'quiet_partner_created',
+            'model_id': partner_model.id, 'body': '{{ object.name }} was created',
+        })
+        cls.rule = cls.env['midvex.notification.rule'].create({
+            'name': 'Notify the night room', 'model_id': partner_model.id,
+            'trigger': 'on_create', 'template_id': cls.template.id,
+            'channel_ids': [(4, cls.channel.id)],
+            'audience_recipient_ids': [(4, cls.room.id)],
+        })
+
+    @classmethod
+    def tearDownClass(cls):
+        registry.unregister_adapter(cls.adapter.channel_code)
+        super().tearDownClass()
+
+    def test_disabled_quiet_hours_never_hold(self):
+        self.room.quiet_enabled = False
+        self.assertFalse(self.room._quiet_release_at(datetime(2026, 6, 1, 0, 0)))
+        self.room.quiet_enabled = True
+
+    def test_inside_a_window_that_crosses_midnight(self):
+        """22:00-07:00 is the ordinary case, and the one a naive
+        start <= t < end comparison gets backwards."""
+        # 00:30 Istanbul (UTC+3) on 1 June 2026 == 21:30 UTC on 31 May.
+        release = self.room._quiet_release_at(datetime(2026, 5, 31, 21, 30))
+        self.assertTrue(release)
+        # Releases at 07:00 Istanbul the same morning == 04:00 UTC.
+        self.assertEqual(release, datetime(2026, 6, 1, 4, 0))
+
+    def test_late_evening_releases_the_next_morning(self):
+        # 23:00 Istanbul == 20:00 UTC, so the release rolls to the next day.
+        release = self.room._quiet_release_at(datetime(2026, 6, 1, 20, 0))
+        self.assertEqual(release, datetime(2026, 6, 2, 4, 0))
+
+    def test_outside_the_window_is_not_quiet(self):
+        # 12:00 Istanbul == 09:00 UTC.
+        self.assertFalse(self.room._quiet_release_at(datetime(2026, 6, 1, 9, 0)))
+
+    def test_boundaries_are_start_inclusive_and_end_exclusive(self):
+        self.assertTrue(self.room._quiet_release_at(datetime(2026, 6, 1, 19, 0)))   # 22:00 local
+        self.assertFalse(self.room._quiet_release_at(datetime(2026, 6, 1, 4, 0)))   # 07:00 local
+
+    def test_a_daytime_window_does_not_wrap(self):
+        self.room.write({'quiet_start': 9.0, 'quiet_end': 17.0})
+        self.assertTrue(self.room._quiet_release_at(datetime(2026, 6, 1, 9, 0)))    # 12:00 local
+        self.assertFalse(self.room._quiet_release_at(datetime(2026, 6, 1, 20, 0)))  # 23:00 local
+        self.room.write({'quiet_start': 22.0, 'quiet_end': 7.0})
+
+    def test_an_empty_window_means_off_not_permanently_quiet(self):
+        """Both bounds equal must not silence a recipient forever."""
+        self.room.write({'quiet_start': 8.0, 'quiet_end': 8.0})
+        self.assertFalse(self.room._quiet_release_at(datetime(2026, 6, 1, 5, 0)))
+        self.room.write({'quiet_start': 22.0, 'quiet_end': 7.0})
+
+    def test_timezone_is_the_recipients_not_the_servers(self):
+        """The same instant is quiet in one timezone and not in another."""
+        self.room.tz = 'America/Los_Angeles'
+        self.assertFalse(self.room._quiet_release_at(datetime(2026, 5, 31, 21, 30)))
+        self.room.tz = 'Europe/Istanbul'
+
+    def test_cron_holds_a_message_instead_of_sending_it(self):
+        partner = self.env['res.partner'].create({'name': 'Nightly Ltd'})
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+        self.assertEqual(len(created), 1)
+        sends_before = len(self.adapter.send_calls)
+
+        # Freeze the clock inside the window by holding the message directly:
+        # cron_process_pending reads fields.Datetime.now(), which the test
+        # cannot move, so the hold is asserted through _quiet_release_at.
+        release = self.room._quiet_release_at(datetime(2026, 5, 31, 21, 30))
+        created.hold_until = release
+        self.env['midvex.notification.message'].cron_process_pending()
+        self.assertEqual(created.state, 'pending')
+        self.assertEqual(len(self.adapter.send_calls), sends_before)
+
+    def test_a_held_message_is_sent_once_the_window_passes(self):
+        partner = self.env['res.partner'].create({'name': 'Morning Ltd'})
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+        created.hold_until = datetime(2020, 1, 1, 0, 0)  # a hold that has expired
+        self.room.quiet_enabled = False
+        self.env['midvex.notification.message'].cron_process_pending()
+        self.assertEqual(created.state, 'sent')
+        # The stale hold is cleared, so the field always reads as the plan.
+        self.assertFalse(created.hold_until)
+        self.room.quiet_enabled = True
+
+    def test_manual_retry_ignores_a_hold(self):
+        """Pressing Retry is an explicit decision to interrupt; leaving the
+        hold on would make the button look broken."""
+        partner = self.env['res.partner'].create({'name': 'Urgent Ltd'})
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+        created.write({'state': 'failed', 'hold_until': datetime(2099, 1, 1, 0, 0)})
+        created.action_retry()
+        self.assertEqual(created.state, 'sent')
+        self.assertFalse(created.hold_until)
+
+    def test_cron_sets_the_hold_and_logs_it_once(self):
+        """Covers the branch that puts a message on hold, which the tests above
+        cannot reach: the cron reads the real clock, so the window is built
+        around it — one hour either side of now, in UTC — rather than hoping
+        the suite runs at a convenient time of day."""
+        now = fields.Datetime.now()
+        minutes = now.hour * 60 + now.minute
+        self.room.write({
+            'tz': 'UTC',
+            'quiet_start': ((minutes - 60) % 1440) / 60.0,
+            'quiet_end': ((minutes + 60) % 1440) / 60.0,
+        })
+        partner = self.env['res.partner'].create({'name': 'Held Ltd'})
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+        sends_before = len(self.adapter.send_calls)
+
+        self.env['midvex.notification.message'].cron_process_pending()
+        self.assertEqual(created.state, 'pending')
+        self.assertTrue(created.hold_until, 'the cron did not put the message on hold')
+        self.assertEqual(len(self.adapter.send_calls), sends_before, 'it was sent anyway')
+
+        Log = self.env['midvex.notification.log']
+        held_logs = Log.search([('message_id', '=', created.id), ('error_code', '=', 'QUIET_HOURS')])
+        self.assertEqual(len(held_logs), 1)
+        # A second pass must not log again, or the history fills with one line
+        # per message per cron tick.
+        self.env['midvex.notification.message'].cron_process_pending()
+        self.assertEqual(len(Log.search([('message_id', '=', created.id),
+                                          ('error_code', '=', 'QUIET_HOURS')])), 1)
+        self.room.write({'quiet_start': 22.0, 'quiet_end': 7.0, 'tz': 'Europe/Istanbul'})

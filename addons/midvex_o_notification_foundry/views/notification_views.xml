@@ -271,6 +271,23 @@
                             <field name="external_username" readonly="1" invisible="state != 'linked'"/>
                         </group>
                     </group>
+                    <group string="Quiet Hours">
+                        <group>
+                            <field name="quiet_enabled" widget="boolean_toggle"/>
+                            <field name="quiet_start" widget="float_time" invisible="not quiet_enabled"/>
+                            <field name="quiet_end" widget="float_time" invisible="not quiet_enabled"/>
+                            <field name="tz" invisible="not quiet_enabled"
+                                   placeholder="Defaults to the user's timezone"/>
+                        </group>
+                        <group>
+                            <div class="text-muted" invisible="not quiet_enabled">
+                                Alerts raised inside this window are <strong>held, not
+                                dropped</strong> — they are delivered when it ends, so
+                                nothing is lost overnight. The window may cross midnight.
+                                Sending or retrying a message by hand ignores it.
+                            </div>
+                        </group>
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -444,14 +461,18 @@
         <field name="name">midvex.notification.message.list</field>
         <field name="model">midvex.notification.message</field>
         <field name="arch" type="xml">
+            <!-- A held message is pending but nothing is wrong with it, so it must
+                 not wear the same warning colour as one that is stuck. -->
             <list decoration-danger="state in ('failed', 'quarantined')"
-                  decoration-warning="state == 'pending'"
+                  decoration-info="state == 'pending' and hold_until"
+                  decoration-warning="state == 'pending' and not hold_until"
                   decoration-muted="state == 'sent'">
                 <field name="create_date"/>
                 <field name="name"/>
                 <field name="recipient_id"/>
                 <field name="channel_code"/>
                 <field name="state"/>
+                <field name="hold_until" optional="show"/>
                 <field name="attempt_count"/>
                 <field name="next_retry_at" optional="hide"/>
                 <field name="sent_at" optional="hide"/>
@@ -475,6 +496,10 @@
                 <filter name="filter_needs_attention" string="Needs Attention"
                         domain="[('state', 'in', ('failed', 'quarantined'))]"/>
                 <filter name="filter_pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <!-- Separated from Pending so "why has this not gone out" has an
+                     answer that is not "it is stuck". -->
+                <filter name="filter_held" string="Held (Quiet Hours)"
+                        domain="[('state', '=', 'pending'), ('hold_until', '!=', False)]"/>
                 <filter name="filter_sent" string="Sent" domain="[('state', '=', 'sent')]"/>
                 <separator/>
                 <filter name="filter_today" string="Today" domain="[('create_date', '&gt;=', 'today')]"/>
@@ -526,6 +551,7 @@
                         </group>
                         <group>
                             <field name="sent_at" readonly="1" invisible="state != 'sent'"/>
+                            <field name="hold_until" readonly="1" invisible="not hold_until"/>
                             <field name="next_retry_at" readonly="1" invisible="not next_retry_at"/>
                             <field name="attempt_count" readonly="1"/>
                             <field name="max_attempts"/>

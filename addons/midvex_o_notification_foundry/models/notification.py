@@ -1,8 +1,14 @@
 import uuid
-from datetime import timedelta
+from datetime import datetime, time, timedelta
+
+import pytz
 
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
+
+
+def _tz_get(self):
+    return [(name, name) for name in pytz.all_timezones]
 
 
 class NotificationChannel(models.Model):
@@ -172,6 +178,16 @@ class NotificationRecipient(models.Model):
     # have to go through the link-code flow again to come back.
     muted = fields.Boolean(default=False,
                             help='Delivery is skipped while muted. The link itself is kept.')
+    # Quiet hours hold delivery rather than dropping it: an alert that arrives
+    # late is still useful, and one silently discarded overnight is the kind of
+    # loss nobody notices until it matters.
+    quiet_enabled = fields.Boolean(string='Quiet Hours', default=False)
+    quiet_start = fields.Float(string='From', default=22.0)
+    quiet_end = fields.Float(string='Until', default=7.0)
+    tz = fields.Selection(_tz_get, string='Timezone',
+                           help='Timezone the quiet hours are read in. Defaults to the '
+                                "user's own timezone; a shared chat has no user, so set "
+                                'it here.')
     link_code = fields.Char(readonly=True, copy=False)
     link_code_expires_at = fields.Datetime(readonly=True)
     linked_at = fields.Datetime(readonly=True)
@@ -283,6 +299,52 @@ class NotificationRecipient(models.Model):
             ('state', '=', 'linked'),
         ], limit=1)
 
+    def _quiet_timezone(self):
+        """Whose clock the quiet hours are read on.
+
+        A person's own timezone is the honest default. A group chat has no
+        user, so it falls back to the company's and finally to UTC — never to
+        the server's local time, which is nobody's working day.
+        """
+        self.ensure_one()
+        return pytz.timezone(
+            self.tz or self.user_id.tz or self.company_id.partner_id.tz or 'UTC')
+
+    def _quiet_release_at(self, now=None):
+        """When quiet hours end for this recipient, or False if not quiet now.
+
+        Windows wrap midnight — 22:00 to 07:00 is the normal case, not the
+        edge case — so "inside the window" cannot be a simple start <= t < end.
+        """
+        self.ensure_one()
+        if not self.quiet_enabled:
+            return False
+        # A zero-length window is off, not permanently quiet. Without this a
+        # recipient who enabled quiet hours and left both bounds equal would
+        # never receive anything again.
+        if self.quiet_start == self.quiet_end:
+            return False
+
+        tz = self._quiet_timezone()
+        now = now or fields.Datetime.now()
+        local = pytz.utc.localize(now).astimezone(tz)
+        minutes = local.hour * 60 + local.minute
+        start = int(round(self.quiet_start * 60))
+        end = int(round(self.quiet_end * 60))
+        if start < end:
+            quiet_now = start <= minutes < end
+        else:
+            quiet_now = minutes >= start or minutes < end
+        if not quiet_now:
+            return False
+
+        release = datetime.combine(local.date(), time(hour=end // 60, minute=end % 60))
+        if release <= local.replace(tzinfo=None):
+            release += timedelta(days=1)
+        # localize() rather than replace(tzinfo=...): the offset depends on the
+        # date, and on a DST boundary the two disagree by an hour.
+        return tz.localize(release).astimezone(pytz.utc).replace(tzinfo=None)
+
     def action_set_muted(self, muted):
         """Pause or resume delivery, keeping the link. Returns whether it changed."""
         self.ensure_one()
@@ -389,6 +451,12 @@ class NotificationMessage(models.Model):
     attempt_count = fields.Integer(default=0, readonly=True)
     max_attempts = fields.Integer(default=3, required=True)
     next_retry_at = fields.Datetime(index=True)
+    # Deliberately not next_retry_at: that field means "this failed, try again
+    # later" and drives the attempt count and the failure decorations. A held
+    # message has not been attempted and nothing is wrong with it.
+    hold_until = fields.Datetime(string='Held Until', index=True, readonly=True,
+                                  help='Delivery is held until this time, because the '
+                                       'recipient is inside their quiet hours.')
     payload = fields.Json()
     result = fields.Json(readonly=True)
     error_code = fields.Char()
@@ -457,16 +525,43 @@ class NotificationMessage(models.Model):
         message loop against max_attempts on every retry.
         """
         retryable = self.filtered(lambda item: item.state in ('failed', 'quarantined'))
-        retryable.write({'state': 'pending', 'next_retry_at': False})
+        # hold_until goes too: retrying by hand is an explicit "send this now",
+        # and leaving a hold on would make the button appear to do nothing.
+        retryable.write({'state': 'pending', 'next_retry_at': False, 'hold_until': False})
         return retryable.action_process()
 
     @api.model
     def cron_process_pending(self):
+        """Send what is due, and hold back what the recipient is asleep for.
+
+        Quiet hours are enforced here rather than in action_process() so that
+        pressing Send or Retry in the backend still goes out immediately: an
+        admin acting by hand has decided the message is worth the interruption.
+        """
+        now = fields.Datetime.now()
         messages = self.search([
             ('state', '=', 'pending'),
-            '|', ('next_retry_at', '=', False), ('next_retry_at', '<=', fields.Datetime.now()),
+            '|', ('next_retry_at', '=', False), ('next_retry_at', '<=', now),
+            '|', ('hold_until', '=', False), ('hold_until', '<=', now),
         ], limit=50)
-        return messages.action_process()
+        ready = self.browse()
+        for message in messages:
+            release = message.recipient_id._quiet_release_at(now)
+            if not release:
+                # Clears a stale hold whose window has since passed or been
+                # turned off, so the field always reads as the current plan.
+                if message.hold_until:
+                    message.hold_until = False
+                ready |= message
+                continue
+            # Logged only when the hold is new. The cron runs every few
+            # minutes, and re-logging each pass would bury the real delivery
+            # history under one line per message per tick.
+            if not message.hold_until:
+                message._log('warning', _('Held until %s: the recipient is in quiet hours.')
+                              % release, 'QUIET_HOURS')
+            message.hold_until = release
+        return ready.action_process()
 
     @api.model
     def _trigger_event(self, model_name, record, event_code):
