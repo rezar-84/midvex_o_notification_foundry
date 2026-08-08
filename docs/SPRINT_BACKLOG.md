@@ -10,10 +10,10 @@
 
 - [x] Install and upgrade foundry and Telegram modules in `odoo19_dev`.
 - [x] Configure a company-scoped Telegram account and test connection (`getMe`) — done 2026-08-03, see `docs/HANDOFF_LOG.md`.
-- [ ] Link a test user's Telegram account via the `/link <code>` flow — blocked on a public webhook URL/tunnel (the single remaining prerequisite) plus re-supply of the bot token, see `docs/HANDOFF_LOG.md`.
-- [ ] Trigger a `crm.lead` creation and confirm a Telegram message is delivered — blocked on the same tunnel; the enqueue→dispatch→log path is covered by a mocked adapter test in the meantime.
+- [x] Link a test user's Telegram account via the `/link <code>` flow — done 2026-08-08 against `erp.varsco.com`. The tunnel prerequisite fell away rather than being met: production is itself a public HTTPS host, so `setWebhook` and inbound `/link` work there with no tunnel at all.
+- [ ] Trigger a `crm.lead` creation and confirm a Telegram message is delivered — no longer blocked on a tunnel. Remaining: deploy the 2026-08-08 commits to erp, repair the live account's channel (its code is `1`, so no adapter resolves and every send fails), and set an audience on the shipped rule, which ships with none.
 - [x] Demonstrate retry, redacted logs, and idempotent delivery (no duplicate sends on repeated triggers) — covered by mocked dispatch tests (`test_notification_dispatch.py`).
-- [x] Complete a fresh-database Odoo test run for both modules — 0 failed, 0 error(s) of 15 tests.
+- [x] Complete a fresh-database Odoo test run for both modules — 0 failed, 0 error(s) of 15 tests (25 as of 2026-08-08).
 
 ## Sprint 2 — Email MVP
 
