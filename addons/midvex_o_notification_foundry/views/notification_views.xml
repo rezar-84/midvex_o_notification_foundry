@@ -3,14 +3,36 @@
         <field name="name">midvex.notification.account.list</field>
         <field name="model">midvex.notification.account</field>
         <field name="arch" type="xml">
-            <list>
+            <list decoration-danger="state == 'error'" decoration-muted="state == 'draft'">
                 <field name="name"/>
                 <field name="channel_id"/>
                 <field name="company_id"/>
                 <field name="state"/>
                 <field name="recipient_count"/>
                 <field name="message_count"/>
+                <field name="last_test_at"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_notification_account_search" model="ir.ui.view">
+        <field name="name">midvex.notification.account.search</field>
+        <field name="model">midvex.notification.account</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="channel_id"/>
+                <filter name="filter_connected" string="Connected" domain="[('state', '=', 'connected')]"/>
+                <filter name="filter_error" string="In Error" domain="[('state', '=', 'error')]"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <separator/>
+                <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_channel" string="Channel" context="{'group_by': 'channel_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -33,15 +55,30 @@
                             <field name="message_count" widget="statinfo" string="Messages"/>
                         </button>
                     </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. VARS Sales Telegram Bot"/></h1>
+                    </div>
+                    <!-- Full width and only when it applies: last_error is a Text and
+                         sat in a two-column group, where it rendered badly and showed
+                         an empty box on every healthy account. -->
+                    <div class="alert alert-danger" role="alert" invisible="state != 'error'">
+                        <strong>Last error</strong>
+                        <field name="last_error" readonly="1" nolabel="1"/>
+                    </div>
+                    <div class="alert alert-info" role="alert" invisible="state != 'draft'">
+                        Add the credentials below, then press <strong>Test Connection</strong>.
+                        Recipients cannot be linked until this account reaches
+                        <strong>Connected</strong>.
+                    </div>
                     <group>
                         <group>
-                            <field name="name"/>
                             <field name="channel_id"/>
-                            <field name="company_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" widget="boolean_toggle"/>
                         </group>
                         <group>
                             <field name="last_test_at" readonly="1"/>
-                            <field name="last_error" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
@@ -50,15 +87,26 @@
                                 <field name="api_key" password="True"/>
                                 <field name="api_secret" password="True"/>
                             </group>
+                            <p class="text-muted">
+                                For Telegram this is the bot token from @BotFather. It is stored
+                                on the account and never belongs in a repository or a config file
+                                under version control.
+                            </p>
                         </page>
                         <page string="Webhook">
                             <group>
-                                <field name="webhook_url"/>
+                                <field name="webhook_url" placeholder="https://erp.example.com/notification/telegram/webhook/1"/>
                                 <field name="webhook_secret" password="True" groups="midvex_o_notification_foundry.group_notification_admin"/>
                             </group>
+                            <p class="text-muted">
+                                Inbound replies — including the link codes recipients send to the
+                                bot — arrive here. Without a registered webhook a recipient can
+                                generate a code but can never reach <strong>Linked</strong>.
+                            </p>
                         </page>
                     </notebook>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -67,13 +115,34 @@
         <field name="name">midvex.notification.recipient.list</field>
         <field name="model">midvex.notification.recipient</field>
         <field name="arch" type="xml">
-            <list>
+            <list decoration-warning="state == 'pending'" decoration-muted="state == 'revoked'">
                 <field name="user_id"/>
                 <field name="account_id"/>
                 <field name="channel_code"/>
                 <field name="state"/>
                 <field name="linked_at"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_notification_recipient_search" model="ir.ui.view">
+        <field name="name">midvex.notification.recipient.search</field>
+        <field name="model">midvex.notification.recipient</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <field name="account_id"/>
+                <!-- "Who is still not linked" is the question during rollout, and an
+                     unlinked recipient is skipped silently by the dispatcher. -->
+                <filter name="filter_pending" string="Not Linked Yet" domain="[('state', '=', 'pending')]"/>
+                <filter name="filter_linked" string="Linked" domain="[('state', '=', 'linked')]"/>
+                <filter name="filter_revoked" string="Revoked" domain="[('state', '=', 'revoked')]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_channel" string="Channel" context="{'group_by': 'channel_code'}"/>
+                    <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -87,16 +156,33 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <!-- The link flow was undocumented in the UI, so an admin had a
+                         button, a code and no indication of what to do with either. -->
+                    <div class="alert alert-info" role="alert" invisible="state == 'linked'">
+                        <strong>How to link this recipient</strong>
+                        <ol class="mb-0">
+                            <li>Press <strong>Generate Link Code</strong>.</li>
+                            <li>Send the code below to the bot as a direct message,
+                                from the account that should receive alerts.</li>
+                            <li>The status becomes <strong>Linked</strong> automatically.</li>
+                        </ol>
+                        The code expires 15 minutes after it is generated — regenerate it
+                        if that passes. Until this recipient is Linked the dispatcher skips
+                        them without raising an error, so no alerts arrive and nothing
+                        reports a failure.
+                    </div>
                     <group>
                         <group>
                             <field name="user_id"/>
                             <field name="account_id"/>
                             <field name="channel_code" readonly="1"/>
+                            <field name="active" widget="boolean_toggle"/>
                         </group>
                         <group>
-                            <field name="link_code" readonly="1"/>
-                            <field name="link_code_expires_at" readonly="1"/>
-                            <field name="linked_at" readonly="1"/>
+                            <field name="link_code" readonly="1" invisible="not link_code"/>
+                            <field name="link_code_expires_at" readonly="1" invisible="not link_code"/>
+                            <field name="linked_at" readonly="1" invisible="state != 'linked'"/>
+                            <field name="external_username" readonly="1" invisible="state != 'linked'"/>
                         </group>
                     </group>
                 </sheet>
@@ -117,19 +203,61 @@
         </field>
     </record>
 
+    <record id="view_notification_template_search" model="ir.ui.view">
+        <field name="name">midvex.notification.template.search</field>
+        <field name="model">midvex.notification.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="model_id"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_model" string="Model" context="{'group_by': 'model_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="view_notification_template_form" model="ir.ui.view">
         <field name="name">midvex.notification.template.form</field>
         <field name="model">midvex.notification.template</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Lead created"/></h1>
+                    </div>
                     <group>
-                        <field name="name"/>
-                        <field name="code"/>
-                        <field name="model_id"/>
-                        <field name="subject"/>
+                        <group>
+                            <field name="code" placeholder="crm_lead_created"/>
+                            <field name="model_id"/>
+                        </group>
+                        <group>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
                     </group>
-                    <field name="body"/>
+                    <group>
+                        <field name="subject" placeholder="New lead: {{ object.name }}"/>
+                    </group>
+                    <field name="body" placeholder="Rendered with inline templating, e.g. {{ object.name }}"/>
+                    <!-- body is a bare Text field; without this the syntax and the
+                         useful crm.lead fields are only discoverable by reading code. -->
+                    <div class="alert alert-info mt-3" role="alert">
+                        <strong>Templating</strong> — inline syntax, e.g.
+                        <code>{{ object.name }}</code>, with <code>object</code> being the
+                        record that triggered the rule. Guard optional values with
+                        <code>{{ object.phone or '—' }}</code>.
+                        <br/>
+                        Useful on <code>crm.lead</code>: <code>object.name</code> (already a
+                        readable subject such as "Quote — Olive Flounder — Acme Ltd"),
+                        <code>contact_name</code>, <code>partner_name</code>,
+                        <code>email_from</code>, <code>phone</code>,
+                        <code>source_id.name</code>, <code>country_id.name</code>,
+                        <code>campaign_id.name</code>, and <code>object.id</code> for a
+                        deep link.
+                    </div>
                 </sheet>
             </form>
         </field>
@@ -144,8 +272,33 @@
                 <field name="model_id"/>
                 <field name="trigger"/>
                 <field name="template_id"/>
+                <field name="channel_ids" widget="many2many_tags"/>
                 <field name="active"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_notification_rule_search" model="ir.ui.view">
+        <field name="name">midvex.notification.rule.search</field>
+        <field name="model">midvex.notification.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="template_id"/>
+                <filter name="filter_on_create" string="On Creation" domain="[('trigger', '=', 'on_create')]"/>
+                <filter name="filter_on_write" string="On Update" domain="[('trigger', '=', 'on_write')]"/>
+                <separator/>
+                <!-- A rule with no audience enqueues nothing at all, which is the
+                     single easiest misconfiguration to miss. -->
+                <filter name="filter_no_audience" string="No Audience Set"
+                        domain="[('audience_user_ids', '=', False), ('audience_group_ids', '=', False)]"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_model" string="Model" context="{'group_by': 'model_id'}"/>
+                    <filter name="group_trigger" string="Trigger" context="{'group_by': 'trigger'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -155,21 +308,44 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. CRM lead created -> Telegram"/></h1>
+                    </div>
+                    <!-- The dispatcher builds its user set from these two fields; when
+                         both are empty it iterates nothing and the rule is silently
+                         inert. Worth saying out loud on the form. -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="audience_group_ids or audience_user_ids">
+                        <strong>This rule will not notify anyone.</strong>
+                        No audience is set, so it matches records and then delivers to
+                        nobody — without reporting an error. Add a group or a user below.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="trigger_domain">
+                        <strong>This rule matches every record of the model.</strong>
+                        With no filter, manually created and imported records trigger it
+                        too, not just the ones you care about.
+                    </div>
                     <group>
                         <group>
-                            <field name="name"/>
                             <field name="model_id"/>
+                            <field name="model_name" invisible="1"/>
                             <field name="trigger"/>
-                            <field name="trigger_domain"/>
                             <field name="template_id"/>
-                            <field name="company_id"/>
-                            <field name="active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" widget="boolean_toggle"/>
                         </group>
                         <group>
                             <field name="channel_ids" widget="many2many_tags"/>
                             <field name="audience_group_ids" widget="many2many_tags"/>
                             <field name="audience_user_ids" widget="many2many_tags"/>
                         </group>
+                    </group>
+                    <group string="Filter">
+                        <!-- Was a raw Char box, so the domain had to be typed by hand
+                             and a syntax error only surfaced when a record triggered it. -->
+                        <field name="trigger_domain" widget="domain"
+                               options="{'model': 'model_name', 'in_dialog': True}" nolabel="1"/>
                     </group>
                 </sheet>
             </form>
@@ -180,14 +356,121 @@
         <field name="name">midvex.notification.message.list</field>
         <field name="model">midvex.notification.message</field>
         <field name="arch" type="xml">
-            <list>
+            <list decoration-danger="state in ('failed', 'quarantined')"
+                  decoration-warning="state == 'pending'"
+                  decoration-muted="state == 'sent'">
+                <field name="create_date"/>
                 <field name="name"/>
                 <field name="recipient_id"/>
                 <field name="channel_code"/>
                 <field name="state"/>
                 <field name="attempt_count"/>
+                <field name="next_retry_at" optional="hide"/>
+                <field name="sent_at" optional="hide"/>
                 <field name="error_message"/>
+                <button name="action_retry" type="object" string="Retry" icon="fa-repeat"
+                        invisible="state not in ('failed', 'quarantined')"
+                        groups="midvex_o_notification_foundry.group_notification_manager"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_notification_message_search" model="ir.ui.view">
+        <field name="name">midvex.notification.message.search</field>
+        <field name="model">midvex.notification.message</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="subject"/>
+                <field name="recipient_id"/>
+                <field name="channel_code"/>
+                <filter name="filter_needs_attention" string="Needs Attention"
+                        domain="[('state', 'in', ('failed', 'quarantined'))]"/>
+                <filter name="filter_pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <filter name="filter_sent" string="Sent" domain="[('state', '=', 'sent')]"/>
+                <separator/>
+                <filter name="filter_today" string="Today" domain="[('create_date', '&gt;=', 'today')]"/>
+                <filter name="filter_week" string="Last 7 Days" domain="[('create_date', '&gt;=', 'today -7d')]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_channel" string="Channel" context="{'group_by': 'channel_code'}"/>
+                    <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
+                    <filter name="group_rule" string="Rule" context="{'group_by': 'rule_id'}"/>
+                    <filter name="group_created" string="Created On" context="{'group_by': 'create_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_notification_message_form" model="ir.ui.view">
+        <field name="name">midvex.notification.message.form</field>
+        <field name="model">midvex.notification.message</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_retry" type="object" string="Retry Now" class="btn-primary"
+                            invisible="state not in ('failed', 'quarantined')"
+                            groups="midvex_o_notification_foundry.group_notification_manager"/>
+                    <button name="action_process" type="object" string="Send Now"
+                            invisible="state != 'pending'"
+                            groups="midvex_o_notification_foundry.group_notification_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert" invisible="state != 'failed'">
+                        Delivery failed after <field name="attempt_count" readonly="1" nolabel="1" class="oe_inline"/>
+                        attempt(s). Fix the cause, then press <strong>Retry Now</strong>.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="state != 'quarantined'">
+                        Quarantined — the adapter rejected this as invalid rather than
+                        failing to reach the service, so retrying without changing
+                        something will reject it again.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="recipient_id"/>
+                            <field name="account_id"/>
+                            <field name="channel_code"/>
+                            <field name="rule_id"/>
+                        </group>
+                        <group>
+                            <field name="sent_at" readonly="1" invisible="state != 'sent'"/>
+                            <field name="next_retry_at" readonly="1" invisible="not next_retry_at"/>
+                            <field name="attempt_count" readonly="1"/>
+                            <field name="max_attempts"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Content">
+                            <group>
+                                <field name="subject" readonly="1"/>
+                            </group>
+                            <field name="body" readonly="1"/>
+                        </page>
+                        <page string="Source Record">
+                            <group>
+                                <field name="res_model" readonly="1"/>
+                                <field name="res_id" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Technical" groups="midvex_o_notification_foundry.group_notification_admin">
+                            <group>
+                                <field name="error_code" readonly="1"/>
+                                <field name="idempotency_key" readonly="1"/>
+                            </group>
+                            <separator string="Error"/>
+                            <field name="error_message" readonly="1"/>
+                            <separator string="Payload"/>
+                            <field name="payload" readonly="1"/>
+                            <separator string="Adapter Result"/>
+                            <field name="result" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
         </field>
     </record>
 
@@ -195,13 +478,138 @@
         <field name="name">midvex.notification.log.list</field>
         <field name="model">midvex.notification.log</field>
         <field name="arch" type="xml">
-            <list>
+            <list decoration-danger="status == 'failed'"
+                  decoration-warning="status == 'warning'"
+                  decoration-muted="status == 'success'">
+                <field name="create_date"/>
                 <field name="message_id"/>
                 <field name="channel_code"/>
                 <field name="status"/>
+                <field name="error_code" optional="show"/>
                 <field name="message"/>
-                <field name="create_date"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_notification_log_search" model="ir.ui.view">
+        <field name="name">midvex.notification.log.search</field>
+        <field name="model">midvex.notification.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="message_id"/>
+                <field name="message"/>
+                <field name="error_code"/>
+                <field name="channel_code"/>
+                <filter name="filter_failed" string="Failed" domain="[('status', '=', 'failed')]"/>
+                <filter name="filter_warning" string="Warning" domain="[('status', '=', 'warning')]"/>
+                <filter name="filter_success" string="Success" domain="[('status', '=', 'success')]"/>
+                <separator/>
+                <filter name="filter_today" string="Today" domain="[('create_date', '&gt;=', 'today')]"/>
+                <filter name="filter_week" string="Last 7 Days" domain="[('create_date', '&gt;=', 'today -7d')]"/>
+                <group>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_channel" string="Channel" context="{'group_by': 'channel_code'}"/>
+                    <filter name="group_created" string="Logged On" context="{'group_by': 'create_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_notification_log_form" model="ir.ui.view">
+        <field name="name">midvex.notification.log.form</field>
+        <field name="model">midvex.notification.log</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="message_id" readonly="1"/>
+                            <field name="channel_code" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="status" readonly="1"/>
+                            <field name="error_code" readonly="1"/>
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <separator string="Detail"/>
+                    <field name="message" readonly="1"/>
+                    <separator string="Metadata"/>
+                    <field name="metadata" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Inbound events had no view and no menu at all, which is precisely what
+         you need to read when a recipient reports sending a link code and
+         nothing happening. -->
+    <record id="view_notification_inbound_event_list" model="ir.ui.view">
+        <field name="name">midvex.notification.inbound.event.list</field>
+        <field name="model">midvex.notification.inbound.event</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="processed" decoration-danger="error_message">
+                <field name="create_date"/>
+                <field name="channel_id"/>
+                <field name="account_id"/>
+                <field name="event_type"/>
+                <field name="external_id"/>
+                <field name="recipient_id"/>
+                <field name="processed"/>
+                <field name="error_message"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_notification_inbound_event_search" model="ir.ui.view">
+        <field name="name">midvex.notification.inbound.event.search</field>
+        <field name="model">midvex.notification.inbound.event</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="external_id"/>
+                <field name="event_type"/>
+                <field name="account_id"/>
+                <filter name="filter_unprocessed" string="Unprocessed" domain="[('processed', '=', False)]"/>
+                <filter name="filter_errored" string="With Error" domain="[('error_message', '!=', False)]"/>
+                <group>
+                    <filter name="group_channel" string="Channel" context="{'group_by': 'channel_id'}"/>
+                    <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
+                    <filter name="group_type" string="Event Type" context="{'group_by': 'event_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_notification_inbound_event_form" model="ir.ui.view">
+        <field name="name">midvex.notification.inbound.event.form</field>
+        <field name="model">midvex.notification.inbound.event</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="channel_id" readonly="1"/>
+                            <field name="account_id" readonly="1"/>
+                            <field name="event_type" readonly="1"/>
+                            <field name="external_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="recipient_id" readonly="1"/>
+                            <field name="processed" readonly="1"/>
+                            <field name="processed_at" readonly="1"/>
+                            <field name="create_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-danger" role="alert" invisible="not error_message">
+                        <field name="error_message" readonly="1" nolabel="1"/>
+                    </div>
+                    <notebook groups="midvex_o_notification_foundry.group_notification_admin">
+                        <page string="Raw Payload">
+                            <field name="raw_payload" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>

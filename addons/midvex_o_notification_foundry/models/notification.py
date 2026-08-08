@@ -187,6 +187,10 @@ class NotificationRule(models.Model):
 
     name = fields.Char(required=True)
     model_id = fields.Many2one('ir.model', required=True, ondelete='cascade')
+    # Mirrors NotificationTemplate.model_name. Present so the form can offer a
+    # real domain builder for trigger_domain instead of a bare text box — the
+    # domain widget needs the target model name in a field it can read.
+    model_name = fields.Char(related='model_id.model', string='Technical Model Name', store=True)
     trigger = fields.Selection([('on_create', 'On Creation'), ('on_write', 'On Update')],
                                 default='on_create', required=True)
     trigger_domain = fields.Char(help='Optional Odoo domain, evaluated against the triggering record. '
@@ -277,6 +281,23 @@ class NotificationMessage(models.Model):
                     message.write({'state': 'failed', 'error_message': str(error)})
                     message._log('failed', _('Delivery failed: %s') % str(error), 'DELIVERY_ERROR')
         return True
+
+    def action_retry(self):
+        """Put a failed or quarantined message back in the queue and send it now.
+
+        action_process() only looks at state == 'pending', so without this a
+        message that failed its attempts could not be retried from the UI at
+        all — an admin had to go to the shell. Typical use is after fixing the
+        cause outside Odoo (a revoked bot token, a recipient who blocked the
+        bot), where the message itself was always fine.
+
+        attempt_count is deliberately not reset: it is the record of what has
+        already been tried, and zeroing it would let a permanently broken
+        message loop against max_attempts on every retry.
+        """
+        retryable = self.filtered(lambda item: item.state in ('failed', 'quarantined'))
+        retryable.write({'state': 'pending', 'next_retry_at': False})
+        return retryable.action_process()
 
     @api.model
     def cron_process_pending(self):
