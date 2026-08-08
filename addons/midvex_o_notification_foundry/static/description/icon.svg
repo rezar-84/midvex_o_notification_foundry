@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5B4B9E"/>
+      <stop offset="1" stop-color="#3D3270"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="256" height="256" rx="56" fill="url(#bg)"/>
+
+  <!-- Bell: the app is channel-agnostic, so the glyph is the notification
+       itself rather than any one provider's mark. -->
+  <path d="M128 44c-30 0-54 24-54 54v34l-16 24c-3 5 0 11 6 11h128c6 0 9-6 6-11l-16-24V98c0-30-24-54-54-54z"
+        fill="#FFFFFF"/>
+  <path d="M108 179a20 20 0 0 0 40 0z" fill="#FFFFFF"/>
+
+  <!-- Unread badge -->
+  <circle cx="190" cy="70" r="26" fill="#F0663F" stroke="#3D3270" stroke-width="8"/>
+</svg>

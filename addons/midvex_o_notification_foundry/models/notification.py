@@ -11,12 +11,33 @@ class NotificationChannel(models.Model):
     _rec_name = 'name'
 
     name = fields.Char(required=True, translate=True)
-    code = fields.Char(required=True, index=True)
+    # Selection, not Char: the only workable values are the codes adapters
+    # register themselves under, and free text let a channel be created with a
+    # code no adapter answers to. The dispatcher copies the code onto every
+    # message, so the mistake surfaced far away, at send time, as "No
+    # notification adapter is installed for channel X".
+    code = fields.Selection(selection='_selection_code', required=True, index=True)
     active = fields.Boolean(default=True)
     module_name = fields.Char()
     documentation_url = fields.Char()
     supports_inbound = fields.Boolean(default=False)
     _channel_code_uniq = models.Constraint('UNIQUE (code)', 'Channel code must be unique.')
+
+    @api.model
+    def _selection_code(self):
+        """Offer exactly the adapters this database has installed.
+
+        A stored code whose adapter module was later uninstalled is kept in the
+        list so the record still displays it rather than showing an empty field
+        and losing the value on the next save.
+        """
+        from ..services.registry import available_adapter_codes
+        codes = list(available_adapter_codes())
+        stored = self.env['midvex.notification.channel'].sudo().search([]).mapped('code')
+        for code in stored:
+            if code and code not in codes:
+                codes.append(code)
+        return [(code, code) for code in sorted(codes)]
 
 
 class NotificationAccount(models.Model):
@@ -27,13 +48,26 @@ class NotificationAccount(models.Model):
 
     name = fields.Char(required=True, tracking=True)
     channel_id = fields.Many2one('midvex.notification.channel', required=True, ondelete='restrict')
-    channel_code = fields.Char(related='channel_id.code', store=True, index=True)
+    # Selection, not Char: a related field must match the type of what it
+    # mirrors, and channel.code became a Selection so it can only offer codes
+    # an adapter actually answers to.
+    channel_code = fields.Selection(related='channel_id.code', store=True, index=True)
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company, index=True)
     active = fields.Boolean(default=True)
     state = fields.Selection([('draft', 'Draft'), ('connected', 'Connected'), ('error', 'Error')],
                               default='draft', required=True, tracking=True)
     api_key = fields.Char(string='Bot Token / API Key', groups='midvex_o_notification_foundry.group_notification_admin')
     api_secret = fields.Char(string='API Secret', groups='midvex_o_notification_foundry.group_notification_admin')
+    # Channel-specific but lives here because the account is what an adapter is
+    # handed. Blank means plain text, which is what every message sent before
+    # this field existed was — so leaving it unset changes nothing.
+    parse_mode = fields.Selection(
+        [('HTML', 'HTML'), ('MarkdownV2', 'MarkdownV2')],
+        string='Message Formatting',
+        help="Formatting applied to outgoing messages; leave empty for plain text. "
+             "Once set, every message must be valid markup - a lead named "
+             "'Smith & Co' is rejected by Telegram unless the template escapes it.",
+    )
     webhook_url = fields.Char()
     webhook_secret = fields.Char(groups='midvex_o_notification_foundry.group_notification_admin')
     last_test_at = fields.Datetime(readonly=True)
@@ -56,15 +90,38 @@ class NotificationAccount(models.Model):
     def action_test_connection(self):
         self._require_manager()
         from ..services.registry import get_adapter
+        identities = []
         for account in self:
             adapter = get_adapter(account.channel_code)
             try:
-                adapter.test_connection(account)
+                info = adapter.test_connection(account)
             except Exception as error:
                 account.write({'state': 'error', 'last_error': str(error)})
                 raise
             account.write({'state': 'connected', 'last_test_at': fields.Datetime.now(), 'last_error': False})
-        return True
+            if isinstance(info, dict):
+                identity = info.get('username') or info.get('name')
+                if identity:
+                    identities.append(identity)
+
+        # Success used to be entirely silent — it returned True, so the only
+        # signal was the statusbar quietly moving to Connected, and people
+        # reasonably read "nothing happened" as "it did not work". Failure was
+        # always loud, because the exception above propagates.
+        if identities:
+            message = _('Connected as %s', ', '.join('@%s' % name for name in identities))
+        else:
+            message = _('The channel accepted these credentials.')
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'title': _('Connection successful'),
+                'message': message,
+                'next': {'type': 'ir.actions.act_window_close'},
+            },
+        }
 
     def action_register_webhook(self):
         self._require_manager()
@@ -94,7 +151,7 @@ class NotificationRecipient(models.Model):
 
     user_id = fields.Many2one('res.users', required=True, ondelete='cascade', index=True)
     account_id = fields.Many2one('midvex.notification.account', required=True, ondelete='cascade', index=True)
-    channel_code = fields.Char(related='account_id.channel_code', store=True, index=True)
+    channel_code = fields.Selection(related='account_id.channel_code', store=True, index=True)
     company_id = fields.Many2one(related='account_id.company_id', store=True, index=True)
     external_id = fields.Char(groups='midvex_o_notification_foundry.group_notification_manager')
     external_username = fields.Char(groups='midvex_o_notification_foundry.group_notification_manager')

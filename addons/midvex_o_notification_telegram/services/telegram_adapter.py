@@ -41,10 +41,37 @@ class TelegramAdapter:
             raise UserError('Telegram getMe did not return ok=true.')
         return result.get('result')
 
+    def _record_button(self, account, message_dto):
+        """An "Open in Odoo" button on the message, when we know the record.
+
+        /mail/view is used rather than a backend URL built by hand: it is
+        model-agnostic and redirects to whatever form view applies, so this
+        keeps working for rules on models other than crm.lead.
+
+        Only offered over https — Telegram rejects a button whose URL it
+        cannot reach, which would fail the whole send on a dev instance whose
+        base URL is still localhost.
+        """
+        model, res_id = message_dto.get('res_model'), message_dto.get('res_id')
+        if not model or not res_id:
+            return None
+        base_url = account.env['ir.config_parameter'].sudo().get_param('web.base.url') or ''
+        if not base_url.startswith('https://'):
+            return None
+        url = f'{base_url}/mail/view?model={model}&res_id={res_id}'
+        return {'inline_keyboard': [[{'text': 'Open in Odoo', 'url': url}]]}
+
     def send(self, account, message_dto):
         if not message_dto.get('recipient_external_id'):
             raise UserError('Recipient has no linked Telegram chat id.')
         payload = {'chat_id': message_dto['recipient_external_id'], 'text': message_dto.get('body') or ''}
+        # Absent on the account means plain text, which is how every message
+        # behaved before the field existed.
+        if account.parse_mode:
+            payload['parse_mode'] = account.parse_mode
+        button = self._record_button(account, message_dto)
+        if button:
+            payload['reply_markup'] = button
         result = self._request(account, 'sendMessage', payload)
         if not result.get('ok'):
             raise UserError('Telegram sendMessage failed: %s' % result.get('description'))
