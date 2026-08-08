@@ -55,3 +55,4 @@
 - **Test status:** 0 failed, 0 errors of 25 tests (26 Telegram cases) on a fresh database, with both modules installed and then upgraded cleanly. Temporary databases were dropped.
 - **Not done:** four commits here are **unpushed**. Nothing from this session is deployed to `erp.varsco.com`, so the live instance still has the invisible menu, the unconstrained channel code, the silent Test Connection and the single-command bot.
 - **Next handoff:** push, deploy to erp, then close Sprint 1's last item in one pass — repair the account's channel to `telegram`, delete the messages already queued with `channel_code = 1` (they hold a plain copy and will keep failing), set an audience on the shipped rule, create a `crm.lead`, confirm delivery, and delete the test lead. Then features 7–9 as agreed: group-chat recipients, digest/quiet hours, delivery dashboard.
+##
