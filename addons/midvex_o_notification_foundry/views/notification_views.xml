@@ -463,7 +463,12 @@
         <field name="arch" type="xml">
             <!-- A held message is pending but nothing is wrong with it, so it must
                  not wear the same warning colour as one that is stuck. -->
-            <list decoration-danger="state in ('failed', 'quarantined')"
+            <!-- create="false": this is the delivery queue, filled by rules. A
+                 hand-made row could never be saved anyway - body and
+                 idempotency_key are required and not editable here - so the
+                 Create button only ever led to a dead end. -->
+            <list create="false"
+                  decoration-danger="state in ('failed', 'quarantined')"
                   decoration-info="state == 'pending' and hold_until"
                   decoration-warning="state == 'pending' and not hold_until"
                   decoration-muted="state == 'sent'">
@@ -519,7 +524,7 @@
         <field name="name">midvex.notification.message.form</field>
         <field name="model">midvex.notification.message</field>
         <field name="arch" type="xml">
-            <form>
+            <form create="false">
                 <header>
                     <button name="action_retry" type="object" string="Retry Now" class="btn-primary"
                             invisible="state not in ('failed', 'quarantined')"
@@ -544,10 +549,10 @@
                     </div>
                     <group>
                         <group>
-                            <field name="recipient_id"/>
-                            <field name="account_id"/>
-                            <field name="channel_code"/>
-                            <field name="rule_id"/>
+                            <field name="recipient_id" readonly="1"/>
+                            <field name="account_id" readonly="1"/>
+                            <field name="channel_code" readonly="1"/>
+                            <field name="rule_id" readonly="1"/>
                         </group>
                         <group>
                             <field name="sent_at" readonly="1" invisible="state != 'sent'"/>

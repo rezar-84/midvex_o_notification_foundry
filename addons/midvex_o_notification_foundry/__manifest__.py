@@ -1,6 +1,6 @@
 {
     'name': 'Midvex Notification Foundry',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'summary': 'Shared notification channels, accounts, templates, rules, queue, logs and dashboard',
     'category': 'Productivity',
     'author': 'Midvex',

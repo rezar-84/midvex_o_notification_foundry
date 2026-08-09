@@ -61,7 +61,9 @@ def enqueue_event(env, model_name, record, event_code):
                     'rule_id': rule.id,
                     'recipient_id': recipient.id,
                     'account_id': account.id,
-                    'channel_code': channel.code,
+                    # channel_code is not set here: it is now related to the
+                    # account, and writing through a related field would edit
+                    # the account's channel rather than this message.
                     'res_model': model_name,
                     'res_id': record.id,
                     'subject': rendered.get('subject'),

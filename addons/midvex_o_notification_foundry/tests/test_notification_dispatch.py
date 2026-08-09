@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from odoo import fields
 from odoo.exceptions import ValidationError
@@ -289,11 +289,12 @@ class TestQuietHours(TransactionCase):
         self.assertEqual(len(created), 1)
         sends_before = len(self.adapter.send_calls)
 
-        # Freeze the clock inside the window by holding the message directly:
-        # cron_process_pending reads fields.Datetime.now(), which the test
-        # cannot move, so the hold is asserted through _quiet_release_at.
-        release = self.room._quiet_release_at(datetime(2026, 5, 31, 21, 30))
-        created.hold_until = release
+        # A hold in the future, not one derived from a fixed date: an earlier
+        # version of this test computed the release from 31 May and passed only
+        # because the suite happened to run late at night, when the recipient's
+        # window was open. The cron reads the real clock, so anything it is
+        # asked to compare against has to be anchored to the real clock too.
+        created.hold_until = fields.Datetime.now() + timedelta(hours=2)
         self.env['midvex.notification.message'].cron_process_pending()
         self.assertEqual(created.state, 'pending')
         self.assertEqual(len(self.adapter.send_calls), sends_before)
@@ -352,3 +353,27 @@ class TestQuietHours(TransactionCase):
         self.assertEqual(len(Log.search([('message_id', '=', created.id),
                                           ('error_code', '=', 'QUIET_HOURS')])), 1)
         self.room.write({'quiet_start': 22.0, 'quiet_end': 7.0, 'tz': 'Europe/Istanbul'})
+
+    def test_channel_code_follows_the_account_and_cannot_be_typed(self):
+        """It was free text, so the queue could hold a channel no adapter
+        answers to - the live instance ended up with rows coded '1'. Deriving
+        it from the account makes that unrepresentable, and because the field
+        is stored-related it recomputes on upgrade, repairing bad rows."""
+        partner = self.env['res.partner'].create({'name': 'Coded Ltd'})
+        self.room.quiet_enabled = False
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+        self.assertEqual(created.channel_code, self.account.channel_code)
+
+        # Readonly, so the form renders it as text rather than an input and
+        # the '1' cannot be typed in again.
+        self.assertTrue(self.env['midvex.notification.message']._fields['channel_code'].readonly)
+
+        # A direct ORM write still lands on the message's own column - related
+        # does not make a field immune - but it must not reach through and
+        # rewrite the account's channel, which would break every other message
+        # sent through that account.
+        created.write({'channel_code': '1'})
+        created.invalidate_recordset()
+        self.assertEqual(self.account.channel_code, self.adapter.channel_code)
+        self.room.quiet_enabled = True

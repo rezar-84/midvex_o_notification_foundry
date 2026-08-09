@@ -439,7 +439,17 @@ class NotificationMessage(models.Model):
     recipient_id = fields.Many2one('midvex.notification.recipient', required=True, ondelete='cascade', index=True)
     account_id = fields.Many2one('midvex.notification.account', required=True, ondelete='cascade', index=True)
     company_id = fields.Many2one(related='account_id.company_id', store=True, index=True)
-    channel_code = fields.Char(required=True, index=True)
+    # Was a free-text Char, which rendered as a text box on the form and let a
+    # message be created with a channel no adapter answers to — that is how the
+    # live queue ended up with rows coded '1', failing at send time with "No
+    # notification adapter is installed for channel 1". Derived from the
+    # account now, so new messages cannot disagree with the account they are
+    # sent through. Rows that already exist are NOT fixed by this: a stored
+    # related field is only computed where it is marked for recomputation, and
+    # an already-populated column is not — verified on a real upgrade, where a
+    # poisoned row survived untouched. They are repaired by
+    # migrations/19.0.1.1.0/post-migration.py instead.
+    channel_code = fields.Selection(related='account_id.channel_code', store=True, index=True)
     res_model = fields.Char()
     res_id = fields.Integer()
     subject = fields.Char()
