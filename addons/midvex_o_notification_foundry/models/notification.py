@@ -426,6 +426,106 @@ class NotificationRule(models.Model):
         help='Shared chats to notify, in addition to the users above.')
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company, index=True)
     active = fields.Boolean(default=True)
+    automation_id = fields.Many2one('base.automation', string='Automation', readonly=True, copy=False,
+                                     help='The automation that makes this rule fire. Maintained '
+                                          'automatically; several rules on the same model share one.')
+
+    # --- Wiring -------------------------------------------------------------
+    # Nothing calls enqueue_event() by itself. A rule only fires because a
+    # base.automation on its model runs a server action that calls it, and
+    # until now the single automation that existed was hand-written in the
+    # Telegram module's data file. So a rule added through the UI - for another
+    # model, or on update - matched nothing and reported no error at all. These
+    # methods keep that plumbing in step with the rules that need it.
+
+    _AUTOMATION_CODE = (
+        "env['midvex.notification.message'].sudo()._trigger_event(%r, record, %r)")
+
+    def _automation_values(self):
+        self.ensure_one()
+        return {
+            'name': 'Notification: %s on %s' % (
+                dict(self._fields['trigger'].selection).get(self.trigger), self.model_name),
+            'model_id': self.model_id.id,
+            'trigger': self.trigger,
+        }
+
+    def _find_or_create_automation(self):
+        """One automation per (model, trigger), shared by every rule on it.
+
+        Not one per rule: enqueue_event() already walks every rule matching the
+        model and trigger, so a second automation would run the whole set a
+        second time. Existing automations are adopted rather than duplicated,
+        which matters because a hand-written one is already installed for
+        crm.lead on production.
+        """
+        self.ensure_one()
+        Automation = self.env['base.automation'].sudo()
+        automation = Automation.search([
+            ('model_id', '=', self.model_id.id),
+            ('trigger', '=', self.trigger),
+        ], limit=1)
+        if automation:
+            return automation
+        automation = Automation.create(self._automation_values())
+        event_code = 'created' if self.trigger == 'on_create' else 'updated'
+        self.env['ir.actions.server'].sudo().create({
+            'name': automation.name,
+            'base_automation_id': automation.id,
+            'model_id': self.model_id.id,
+            'state': 'code',
+            'code': self._AUTOMATION_CODE % (self.model_name, event_code),
+        })
+        return automation
+
+    def _sync_automations(self):
+        for rule in self:
+            if rule.active:
+                automation = rule._find_or_create_automation()
+                if rule.automation_id != automation:
+                    rule.with_context(skip_automation_sync=True).automation_id = automation
+        self._drop_orphan_automations()
+
+    @api.model
+    def _drop_orphan_automations(self):
+        """Remove automations this model created that no active rule needs.
+
+        Scoped to automations whose server action carries our code, so a
+        hand-written or unrelated automation on the same model is never
+        deleted out from under someone.
+        """
+        Automation = self.env['base.automation'].sudo()
+        ours = Automation.search([]).filtered(
+            lambda item: any('midvex.notification.message' in (action.code or '')
+                              for action in item.action_server_ids))
+        for automation in ours:
+            still_needed = self.sudo().search_count([
+                ('active', '=', True),
+                ('model_id', '=', automation.model_id.id),
+                ('trigger', '=', automation.trigger),
+            ])
+            if not still_needed:
+                automation.unlink()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        rules = super().create(vals_list)
+        rules._sync_automations()
+        return rules
+
+    def write(self, vals):
+        result = super().write(vals)
+        # Only the fields that decide which automation is needed. Without this
+        # guard, writing automation_id from _sync_automations would recurse.
+        if not self.env.context.get('skip_automation_sync') and (
+                {'model_id', 'trigger', 'active'} & set(vals)):
+            self._sync_automations()
+        return result
+
+    def unlink(self):
+        result = super().unlink()
+        self._drop_orphan_automations()
+        return result
 
 
 class NotificationMessage(models.Model):

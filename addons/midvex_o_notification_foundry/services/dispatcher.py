@@ -33,6 +33,14 @@ def enqueue_event(env, model_name, record, event_code):
     Account = env['midvex.notification.account']
     created = Message
     company_id = _record_company_id(record, env)
+    # An on_create rule fires once per record, so the record id alone makes the
+    # event unique. An on_write rule fires on every change, and without
+    # something that varies per change every one of them collapses onto the
+    # first key: the record would notify once, ever, and then dedupe itself
+    # into silence. write_date is that discriminator, and it is deliberately
+    # absent for on_create so those keys stay byte-identical to the ones
+    # already in the table.
+    occurrence = '' if trigger == 'on_create' else '-%s' % record.write_date
     for rule in rules:
         if not _match_domain(record, rule.trigger_domain):
             continue
@@ -52,7 +60,7 @@ def enqueue_event(env, model_name, record, event_code):
                 # every existing row. Keying on the recipient instead would
                 # make every notification ever delivered look new and re-send.
                 idempotency_key = hashlib.sha256(
-                    f'{rule.id}-{model_name}-{record.id}-{token}-{channel.code}'.encode()
+                    f'{rule.id}-{model_name}-{record.id}{occurrence}-{token}-{channel.code}'.encode()
                 ).hexdigest()
                 if Message.search([('idempotency_key', '=', idempotency_key)], limit=1):
                     continue

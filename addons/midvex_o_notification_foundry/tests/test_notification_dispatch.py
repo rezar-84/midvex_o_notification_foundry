@@ -377,3 +377,147 @@ class TestQuietHours(TransactionCase):
         created.invalidate_recordset()
         self.assertEqual(self.account.channel_code, self.adapter.channel_code)
         self.room.quiet_enabled = True
+
+
+class TestRuleWiring(TransactionCase):
+    """A rule only fires because a base.automation on its model calls the
+    dispatcher. Before this, the single automation that existed was written by
+    hand in a data file, so any rule added through the UI matched nothing and
+    said nothing about it."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.adapter = MockAdapter()
+        registry._ADAPTERS[cls.adapter.channel_code] = cls.adapter
+        cls.channel = ensure_channel(cls.env, cls.adapter.channel_code, 'Mock Channel')
+        cls.partner_model = cls.env['ir.model']._get('res.partner')
+        cls.template = cls.env['midvex.notification.template'].create({
+            'name': 'Wiring', 'code': 'wiring_partner',
+            'model_id': cls.partner_model.id, 'body': '{{ object.name }}',
+        })
+
+    @classmethod
+    def tearDownClass(cls):
+        registry.unregister_adapter(cls.adapter.channel_code)
+        super().tearDownClass()
+
+    def _rule(self, trigger='on_create', **values):
+        return self.env['midvex.notification.rule'].create(dict({
+            'name': 'R', 'model_id': self.partner_model.id, 'trigger': trigger,
+            'template_id': self.template.id, 'channel_ids': [(4, self.channel.id)],
+        }, **values))
+
+    def test_creating_a_rule_wires_an_automation(self):
+        rule = self._rule()
+        self.assertTrue(rule.automation_id, 'the rule was not wired to anything')
+        self.assertEqual(rule.automation_id.model_id, self.partner_model)
+        self.assertEqual(rule.automation_id.trigger, 'on_create')
+        action = rule.automation_id.action_server_ids
+        self.assertTrue(action)
+        self.assertIn('_trigger_event', action[0].code)
+        self.assertIn('res.partner', action[0].code)
+
+    def test_two_rules_on_one_model_share_one_automation(self):
+        """enqueue_event already walks every matching rule, so a second
+        automation would run the whole set a second time."""
+        first, second = self._rule(), self._rule()
+        self.assertEqual(first.automation_id, second.automation_id)
+
+    def test_a_different_trigger_gets_its_own_automation(self):
+        on_create, on_write = self._rule('on_create'), self._rule('on_write')
+        self.assertNotEqual(on_create.automation_id, on_write.automation_id)
+        self.assertEqual(on_write.automation_id.trigger, 'on_write')
+
+    def test_an_existing_automation_is_adopted_not_duplicated(self):
+        """Production already carries a hand-written automation for crm.lead;
+        wiring must attach to it rather than double it up."""
+        existing = self.env['base.automation'].create({
+            'name': 'Hand written', 'model_id': self.partner_model.id, 'trigger': 'on_create',
+        })
+        rule = self._rule()
+        self.assertEqual(rule.automation_id, existing)
+
+    def test_deleting_the_last_rule_removes_the_automation(self):
+        rule = self._rule()
+        automation = rule.automation_id
+        rule.unlink()
+        self.assertFalse(automation.exists())
+
+    def test_a_second_rule_keeps_the_automation_alive(self):
+        first, second = self._rule(), self._rule()
+        automation = first.automation_id
+        first.unlink()
+        self.assertTrue(automation.exists())
+        self.assertEqual(second.automation_id, automation)
+
+    def test_an_unrelated_automation_is_never_deleted(self):
+        """Cleanup is scoped to automations running our own code, so someone
+        else's automation on the same model survives."""
+        theirs = self.env['base.automation'].create({
+            'name': 'Theirs', 'model_id': self.env['ir.model']._get('res.users').id,
+            'trigger': 'on_create',
+        })
+        rule = self._rule()
+        rule.unlink()
+        self.assertTrue(theirs.exists())
+
+
+class TestOnWriteIsNotDedupedForever(TransactionCase):
+    """An on_write rule fires on every change. Keyed only on the record it
+    would notify once, ever, and then silently dedupe itself for good."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.adapter = MockAdapter()
+        registry._ADAPTERS[cls.adapter.channel_code] = cls.adapter
+        cls.channel = ensure_channel(cls.env, cls.adapter.channel_code, 'Mock Channel')
+        cls.account = cls.env['midvex.notification.account'].create({
+            'name': 'Write account', 'channel_id': cls.channel.id, 'state': 'connected',
+        })
+        cls.room = cls.env['midvex.notification.recipient'].create({
+            'kind': 'group', 'name': 'Write room', 'account_id': cls.account.id,
+            'state': 'linked', 'external_id': '-100666',
+        })
+        partner_model = cls.env['ir.model']._get('res.partner')
+        cls.template = cls.env['midvex.notification.template'].create({
+            'name': 'Changed', 'code': 'write_partner',
+            'model_id': partner_model.id, 'body': '{{ object.name }} changed',
+        })
+        cls.rule = cls.env['midvex.notification.rule'].create({
+            'name': 'On change', 'model_id': partner_model.id, 'trigger': 'on_write',
+            'template_id': cls.template.id, 'channel_ids': [(4, cls.channel.id)],
+            'audience_recipient_ids': [(4, cls.room.id)],
+        })
+
+    @classmethod
+    def tearDownClass(cls):
+        registry.unregister_adapter(cls.adapter.channel_code)
+        super().tearDownClass()
+
+    def test_each_change_notifies_again(self):
+        Message = self.env['midvex.notification.message']
+        partner = self.env['res.partner'].create({'name': 'Shifting Ltd'})
+
+        partner.write({'name': 'Shifting Ltd A'})
+        first = Message._trigger_event('res.partner', partner, 'updated')
+        self.assertEqual(len(first), 1, 'the first change did not notify')
+
+        # A distinct write_date is what separates the two events; without it
+        # both collapse onto the same key.
+        partner.write({'name': 'Shifting Ltd B', 'write_date': '2030-01-01 00:00:00'})
+        second = Message._trigger_event('res.partner', partner, 'updated')
+        self.assertEqual(len(second), 1, 'the second change was swallowed as a duplicate')
+        self.assertNotEqual(first.idempotency_key, second.idempotency_key)
+
+    def test_the_same_change_is_still_deduped(self):
+        """Replaying one event must stay idempotent - that is the whole point
+        of the key, and base.automation can fire twice in one transaction."""
+        Message = self.env['midvex.notification.message']
+        partner = self.env['res.partner'].create({'name': 'Steady Ltd'})
+        partner.write({'name': 'Steady Ltd A'})
+        first = Message._trigger_event('res.partner', partner, 'updated')
+        again = Message._trigger_event('res.partner', partner, 'updated')
+        self.assertEqual(len(first), 1)
+        self.assertEqual(len(again), 0)
