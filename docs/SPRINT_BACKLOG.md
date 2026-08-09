@@ -15,7 +15,18 @@
 - [x] Demonstrate retry, redacted logs, and idempotent delivery (no duplicate sends on repeated triggers) — covered by mocked dispatch tests (`test_notification_dispatch.py`).
 - [x] Complete a fresh-database Odoo test run for both modules — 0 failed, 0 error(s) of 15 tests (25 as of 2026-08-08).
 
-## Sprint 2 — Email MVP
+## Sprint 2 — Beyond the MVP
+
+- [x] Group-chat recipients (feature 7) — a shared chat is its own recipient `kind`, forbidden from carrying a `user_id`, and link codes are refused when redeemed in the wrong kind of chat.
+- [x] Quiet hours (half of feature 8) — delivery is held and released, never dropped; windows cross midnight and are read on the recipient's own clock.
+- [ ] Digest (the other half of feature 8) — batch a recipient's queued alerts into one message instead of a burst. Not started. Needs a second cron and a way to keep each event's row honest while only one message is delivered.
+- [ ] Delivery dashboard (feature 9) — the foundry manifest's summary still advertises a dashboard that does not exist. Either build it or stop claiming it.
+- [x] Rules wire their own `base.automation` — until 2026-08-09 a rule added in the UI matched nothing and reported no error.
+- [x] Send by hand — the compose wizard, reachable from the menu, a linked recipient, and a record's Actions menu, replacing the Message Queue's dead Create button.
+- [x] Ready-made business events — `midvex_o_notification_business` (CRM, Sales, Invoicing).
+- [ ] Migrate `template_lead_created` / `rule_lead_created_telegram` out of the Telegram adapter into the business module. They are `noupdate="1"` records already installed on production, so moving the XML ids needs a migration rather than a cut and paste. Left alone deliberately.
+
+## Sprint 3 — Email MVP
 
 - [ ] Verify requirements against Odoo's own `mail.mail`/`ir.mail_server` before implementation.
 - [ ] Implement `midvex_o_notification_email` adapter.
