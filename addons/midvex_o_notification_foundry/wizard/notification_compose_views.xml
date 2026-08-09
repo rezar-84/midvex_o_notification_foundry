@@ -1,0 +1,44 @@
+<odoo>
+
+    <record id="view_notification_compose_form" model="ir.ui.view">
+        <field name="name">midvex.notification.compose.form</field>
+        <field name="model">midvex.notification.compose</field>
+        <field name="arch" type="xml">
+            <form string="Send a Notification">
+                <div class="alert alert-info" role="alert" invisible="not record_name">
+                    Sending about <strong><field name="record_name" readonly="1" nolabel="1" class="oe_inline"/></strong>.
+                    A copy is logged in its chatter.
+                </div>
+                <group>
+                    <field name="res_model" invisible="1"/>
+                    <field name="res_id" invisible="1"/>
+                    <field name="channel_code" invisible="1"/>
+                    <field name="account_id" options="{'no_create': True}"/>
+                    <field name="recipient_ids" widget="many2many_tags"
+                           options="{'no_create': True}"
+                           placeholder="People and group chats linked to this account"/>
+                </group>
+                <field name="body" placeholder="Type the message to send…"/>
+                <!-- Said here rather than discovered afterwards: this is a plain
+                     send with no template and no rule, so nothing renders
+                     placeholders and nothing retries it on a schedule. -->
+                <div class="text-muted">
+                    Sent immediately, ignoring quiet hours. The text is sent as written —
+                    templates and their placeholders do not apply here.
+                </div>
+                <footer>
+                    <button name="action_send" type="object" string="Send" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_notification_compose" model="ir.actions.act_window">
+        <field name="name">Send Message</field>
+        <field name="res_model">midvex.notification.compose</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

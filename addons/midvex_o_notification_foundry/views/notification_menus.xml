@@ -111,6 +111,11 @@
     </record>
 
     <menuitem id="menu_notification_root" name="Notifications" sequence="90" groups="midvex_o_notification_foundry.group_notification_user"/>
+    <!-- Manager-gated: sending by hand reaches real people's chats, which is not
+         something a read-only Notification User should be able to do. -->
+    <menuitem id="menu_notification_compose" name="Send Message" parent="menu_notification_root"
+              action="action_notification_compose" sequence="5"
+              groups="midvex_o_notification_foundry.group_notification_manager"/>
     <menuitem id="menu_notification_messages" name="Message Queue" parent="menu_notification_root" action="action_notification_messages" sequence="10"/>
     <menuitem id="menu_notification_logs" name="Delivery Logs" parent="menu_notification_root" action="action_notification_logs" sequence="20"/>
     <menuitem id="menu_notification_recipients" name="Recipients" parent="menu_notification_root" action="action_notification_recipients" sequence="30"/>

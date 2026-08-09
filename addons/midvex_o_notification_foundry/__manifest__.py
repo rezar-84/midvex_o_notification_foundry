@@ -12,6 +12,7 @@
         'security/notification_security.xml',
         'security/ir.model.access.csv',
         'data/notification_cron.xml',
+        'wizard/notification_compose_views.xml',
         'views/notification_views.xml',
         'views/notification_menus.xml',
     ],

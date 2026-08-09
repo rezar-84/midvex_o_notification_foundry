@@ -214,6 +214,9 @@
             <form>
                 <header>
                     <button name="action_generate_link_code" type="object" string="Generate Link Code" class="btn-primary"/>
+                    <button name="action_open_compose" type="object" string="Send Test Message"
+                            invisible="state != 'linked'"
+                            groups="midvex_o_notification_foundry.group_notification_manager"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>

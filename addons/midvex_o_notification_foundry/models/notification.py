@@ -299,6 +299,21 @@ class NotificationRecipient(models.Model):
             ('state', '=', 'linked'),
         ], limit=1)
 
+    def action_open_compose(self):
+        """Open the send wizard already addressed to this recipient.
+
+        The quickest honest answer to "is this chat actually working?", which
+        previously meant creating a lead and hoping.
+        """
+        self.ensure_one()
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'midvex_o_notification_foundry.action_notification_compose')
+        action['context'] = {
+            'default_account_id': self.account_id.id,
+            'default_recipient_ids': [(6, 0, self.ids)],
+        }
+        return action
+
     def _quiet_timezone(self):
         """Whose clock the quiet hours are read on.
 
