@@ -82,3 +82,37 @@
 - **Do not import `tests` from a module's `__init__.py`.** The business module did, and every normal server start logged `Importing test framework, avoid importing from business modules and when not running in test mode`. Odoo's loader imports the tests subpackage itself in test mode; all 9 business tests are still collected with the import removed.
 - **New regression test:** `test_app_entry_point_is_not_a_dialog` asserts the app's first menu child is not a `target="new"` action. Clicking Notifications opened a Send Message popup instead of the module (`2ade3a1`) and every test passed throughout, because they checked the menu existed rather than what clicking the app did.
 - **Test status:** 0 failed, 0 errors of **81 tests**.
+
+## 2026-08-09 (later still) — "Adding a notify-on-contact-change rule broke saving contacts"
+
+Reported as caused by this module. **It is not.** Recorded in full so nobody investigates it a second time, because the suspicion is a natural one and the timing made it look certain.
+
+- **Symptom:** saving a contact raises `MissingError: Record does not exist or has been deleted. (Record: account.account(11270,), User: 2)`, starting right after a `res.partner` / on-update rule was added.
+- **Cause:** a contact's `property_account_receivable_id` (or `property_account_payable_id`) points at an `account.account` that has been deleted. The contact form sends that field on save; Odoo's own `account_account._compute_display_name` → `_compute_code` reads `code_store` on the missing record and raises. Nothing in the notification path is involved.
+- **How it was proven**, on `odoo19_dev` with the condition reproduced deliberately:
+
+  | write | no automation | with automation |
+  | --- | --- | --- |
+  | name only | OK | OK |
+  | including the account property | MissingError | MissingError |
+
+  Identical with the rule and its automation deleted, so the automation neither causes it nor widens it. `base_automation`'s write hook does snapshot old values (`record[field_name] for field_name in vals`), which is why it looked like a plausible culprit — but the failing read happens regardless.
+- **Find the affected contacts** (verified both ways: it returns the row when the condition exists, nothing when it does not):
+
+  ```sql
+  SELECT p.id AS partner_id, p.name AS partner, f.field, kv.key AS company_id,
+         kv.value::text AS missing_account_id
+  FROM res_partner p
+  CROSS JOIN LATERAL (VALUES
+      ('property_account_receivable_id', p.property_account_receivable_id),
+      ('property_account_payable_id',    p.property_account_payable_id)
+  ) AS f(field, val)
+  CROSS JOIN LATERAL jsonb_each(COALESCE(f.val, '{}'::jsonb)) AS kv
+  WHERE jsonb_typeof(kv.value) = 'number'
+    AND NOT EXISTS (SELECT 1 FROM account_account a WHERE a.id = (kv.value::text)::int)
+  ORDER BY p.id;
+  ```
+
+- **Fix:** drop the dangling key so the property falls back to the company default — `UPDATE res_partner SET property_account_receivable_id = property_account_receivable_id - '<company_id>' WHERE id = <partner_id>;`, after a backup. Worth asking how the account was deleted: if a chart of accounts was removed or reimported, journals, tax accounts and invoice lines may hold the same dangling references.
+- **Separately noticed:** in `odoo19_dev`, user 2 could not create a `midvex.notification.template` — `AccessError`, no Notifications/Manager group — even though `security/notification_security.xml` grants `group_notification_admin` to `base.user_admin` and the file is not `noupdate`. Not chased down; worth a look, since it means an admin may have to grant themselves the group by hand after install.
+- **Housekeeping:** the reproduction pointed contact #1 at the missing account. Its original value was recovered from `backups/odoo19_dev_pre_notif_upgrade.dump` (empty), restored, both throwaway rules and templates removed, and the scratch database dropped. Deleting the throwaway rule also removed its automation on its own, which incidentally exercised `_drop_orphan_automations` against real data.
