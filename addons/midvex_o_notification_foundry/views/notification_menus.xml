@@ -113,15 +113,16 @@
     <menuitem id="menu_notification_root" name="Notifications" sequence="90" groups="midvex_o_notification_foundry.group_notification_user"/>
     <menuitem id="menu_notification_messages" name="Message Queue" parent="menu_notification_root" action="action_notification_messages" sequence="10"/>
     <menuitem id="menu_notification_logs" name="Delivery Logs" parent="menu_notification_root" action="action_notification_logs" sequence="20"/>
-    <menuitem id="menu_notification_recipients" name="Recipients" parent="menu_notification_root" action="action_notification_recipients" sequence="30"/>
-    <!-- Never the first child of the root. Odoo opens an app by running its
-         first child action, and this one is a target="new" wizard - as
-         sequence="5" it meant clicking Notifications opened a Send Message
-         popup instead of the app. Manager-gated as well, because sending by
-         hand reaches real people's chats. -->
+    <!-- Second, never first. Odoo opens an app by running its first child
+         action, and this one is a target="new" wizard - at sequence="5" it
+         meant clicking Notifications opened a Send Message popup instead of
+         the app. Sitting under Message Queue keeps it findable without that.
+         test_app_entry_point_is_not_a_dialog guards the ordering.
+         Manager-gated, because sending by hand reaches real people's chats. -->
     <menuitem id="menu_notification_compose" name="Send Message" parent="menu_notification_root"
-              action="action_notification_compose" sequence="40"
+              action="action_notification_compose" sequence="15"
               groups="midvex_o_notification_foundry.group_notification_manager"/>
+    <menuitem id="menu_notification_recipients" name="Recipients" parent="menu_notification_root" action="action_notification_recipients" sequence="30"/>
     <menuitem id="menu_notification_config" name="Configuration" parent="menu_notification_root" sequence="90" groups="midvex_o_notification_foundry.group_notification_manager"/>
     <menuitem id="menu_notification_accounts" name="Accounts" parent="menu_notification_config" action="action_notification_accounts" sequence="10"/>
     <menuitem id="menu_notification_rules" name="Rules" parent="menu_notification_config" action="action_notification_rules" sequence="20"/>

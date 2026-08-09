@@ -1,32 +1,21 @@
 <odoo>
 
-    <!-- "Send on Telegram" in the Actions cog of each record's form.
+    <!-- "Send on Telegram" for the models this module's dependencies bring in.
 
-         Bindings are per-model in Odoo - there is no way to bind one action to
-         every model with a chatter - so each is listed explicitly. Adding
-         another model later is a copy of one record with a different
-         binding_model_id and model_id.
+         Only the two that genuinely need sale and account live here. The
+         contact and lead bindings sit in the foundry and the Telegram adapter
+         respectively, because res.partner needs nothing beyond base and
+         crm.lead needs only crm - keeping them here meant an install of
+         foundry + telegram had the composer and no way to send from a record
+         at all, gated behind Invoicing by accident.
 
-         Not noupdate: these are pure UI wiring with nothing for an admin to
-         customise, so they should follow the module on upgrade. -->
+         Bindings are per-model in Odoo; there is no way to bind one action to
+         every model with a chatter. Adding another model later is a copy of one
+         record with a different binding_model_id and model_id, placed in
+         whichever module already depends on it.
 
-    <record id="action_send_telegram_lead" model="ir.actions.server">
-        <field name="name">Send on Telegram</field>
-        <field name="model_id" ref="crm.model_crm_lead"/>
-        <field name="binding_model_id" ref="crm.model_crm_lead"/>
-        <field name="binding_view_types">form</field>
-        <field name="state">code</field>
-        <field name="code">action = env['midvex.notification.compose'].action_open_for_record('crm.lead', record.id)</field>
-    </record>
-
-    <record id="action_send_telegram_partner" model="ir.actions.server">
-        <field name="name">Send on Telegram</field>
-        <field name="model_id" ref="base.model_res_partner"/>
-        <field name="binding_model_id" ref="base.model_res_partner"/>
-        <field name="binding_view_types">form</field>
-        <field name="state">code</field>
-        <field name="code">action = env['midvex.notification.compose'].action_open_for_record('res.partner', record.id)</field>
-    </record>
+         Not noupdate: pure UI wiring with nothing for an admin to customise, so
+         it should follow the module on upgrade. -->
 
     <record id="action_send_telegram_sale" model="ir.actions.server">
         <field name="name">Send on Telegram</field>

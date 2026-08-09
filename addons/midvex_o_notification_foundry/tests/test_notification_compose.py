@@ -115,3 +115,35 @@ class TestNotificationCompose(TransactionCase):
         wizard.account_id = other
         wizard._onchange_account_id()
         self.assertFalse(wizard.recipient_ids)
+
+
+class TestAppEntryPoint(TransactionCase):
+    """Odoo opens an app by running its first child action. A target="new"
+    action there turns the whole module into a dialog - which shipped once,
+    because every test passed while nobody checked what clicking the app did."""
+
+    def test_app_entry_point_is_not_a_dialog(self):
+        root = self.env.ref('midvex_o_notification_foundry.menu_notification_root')
+        children = root.child_id.sorted(lambda menu: (menu.sequence, menu.id))
+        self.assertTrue(children, 'the app has no menu to open')
+        first = children[0]
+        self.assertTrue(first.action, 'the first menu opens nothing')
+        self.assertNotEqual(
+            getattr(first.action, 'target', False), 'new',
+            "the app's first menu is a dialog, so clicking the app opens a popup "
+            "instead of the module: %s" % first.name)
+
+    def test_send_message_is_reachable_but_not_first(self):
+        root = self.env.ref('midvex_o_notification_foundry.menu_notification_root')
+        compose = self.env.ref('midvex_o_notification_foundry.menu_notification_compose')
+        self.assertEqual(compose.parent_id, root)
+        first = root.child_id.sorted(lambda menu: (menu.sequence, menu.id))[0]
+        self.assertNotEqual(first, compose)
+
+    def test_a_contact_can_be_messaged_without_the_business_module(self):
+        """res.partner comes from base, so this binding must exist on any
+        install. It used to live in the business module, which needs sale and
+        account, leaving foundry+telegram with no way to send from a record."""
+        action = self.env.ref('midvex_o_notification_foundry.action_send_notification_partner')
+        self.assertEqual(action.binding_model_id.model, 'res.partner')
+        self.assertIn('action_open_for_record', action.code)

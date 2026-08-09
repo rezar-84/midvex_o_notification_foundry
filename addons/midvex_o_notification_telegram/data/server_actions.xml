@@ -1,0 +1,20 @@
+<odoo>
+
+    <!-- "Send on Telegram" in a lead's Actions menu.
+
+         Here rather than in the business module because crm is already a
+         dependency of this adapter — the shipped lead-created rule needs it.
+         Keeping this binding beside the sale and invoice ones meant an install
+         of foundry + telegram, which is what both the dev database and
+         production run, had no way to send from a lead. -->
+
+    <record id="action_send_telegram_lead" model="ir.actions.server">
+        <field name="name">Send on Telegram</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env['midvex.notification.compose'].action_open_for_record('crm.lead', record.id)</field>
+    </record>
+
+</odoo>

@@ -1,6 +1,6 @@
 {
     'name': 'Midvex Telegram Notifications',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'summary': 'Telegram adapter for Midvex Notification Foundry',
     'category': 'Productivity',
     'author': 'Midvex',
@@ -9,6 +9,7 @@
     'data': [
         'data/telegram_channel.xml',
         'data/notification_automation.xml',
+        'data/server_actions.xml',
     ],
     'installable': True,
 }
