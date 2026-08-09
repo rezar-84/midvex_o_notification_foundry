@@ -34,6 +34,19 @@ class NotificationCompose(models.TransientModel):
     record_name = fields.Char(readonly=True)
 
     @api.model
+    def action_open_for_record(self, res_model, res_id):
+        """Open the composer addressed about one record.
+
+        Called from the per-model server actions bound to the Actions menu, so
+        the binding records stay one line each and the context keys live here
+        rather than being retyped in every one of them.
+        """
+        action = self.env['ir.actions.act_window']._for_xml_id(
+            'midvex_o_notification_foundry.action_notification_compose')
+        action['context'] = {'default_res_model': res_model, 'default_res_id': res_id}
+        return action
+
+    @api.model
     def _default_account(self):
         return self.env['midvex.notification.account'].search(
             [('state', '=', 'connected'), ('active', '=', True)], limit=1)

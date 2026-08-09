@@ -1,0 +1,24 @@
+<odoo noupdate="1">
+
+    <record id="template_invoice_paid" model="midvex.notification.template">
+        <field name="name">Customer invoice paid</field>
+        <field name="code">account_invoice_paid</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Paid: {{ object.name }}</field>
+        <field name="body">Invoice {{ object.name }} from {{ object.partner_id.name }} is paid.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}</field>
+    </record>
+
+    <record id="rule_invoice_paid" model="midvex.notification.rule">
+        <field name="name">Customer invoice paid -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- move_type as well as payment_state: account.move covers vendor
+             bills, refunds and journal entries too, and "paid" on a vendor
+             bill is money going out, not a sale to celebrate. -->
+        <field name="trigger_domain">[('payment_state', '=', 'paid'), ('move_type', '=', 'out_invoice')]</field>
+        <field name="template_id" ref="template_invoice_paid"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+</odoo>

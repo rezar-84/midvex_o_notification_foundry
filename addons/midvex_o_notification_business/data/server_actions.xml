@@ -1,0 +1,49 @@
+<odoo>
+
+    <!-- "Send on Telegram" in the Actions cog of each record's form.
+
+         Bindings are per-model in Odoo - there is no way to bind one action to
+         every model with a chatter - so each is listed explicitly. Adding
+         another model later is a copy of one record with a different
+         binding_model_id and model_id.
+
+         Not noupdate: these are pure UI wiring with nothing for an admin to
+         customise, so they should follow the module on upgrade. -->
+
+    <record id="action_send_telegram_lead" model="ir.actions.server">
+        <field name="name">Send on Telegram</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env['midvex.notification.compose'].action_open_for_record('crm.lead', record.id)</field>
+    </record>
+
+    <record id="action_send_telegram_partner" model="ir.actions.server">
+        <field name="name">Send on Telegram</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env['midvex.notification.compose'].action_open_for_record('res.partner', record.id)</field>
+    </record>
+
+    <record id="action_send_telegram_sale" model="ir.actions.server">
+        <field name="name">Send on Telegram</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env['midvex.notification.compose'].action_open_for_record('sale.order', record.id)</field>
+    </record>
+
+    <record id="action_send_telegram_invoice" model="ir.actions.server">
+        <field name="name">Send on Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env['midvex.notification.compose'].action_open_for_record('account.move', record.id)</field>
+    </record>
+
+</odoo>

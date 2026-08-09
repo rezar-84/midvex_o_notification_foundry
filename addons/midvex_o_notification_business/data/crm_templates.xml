@@ -1,0 +1,89 @@
+<odoo noupdate="1">
+
+    <!-- Every rule here ships with no audience, which the Rule form warns about
+         in orange: a rule with nobody to notify matches records and delivers to
+         nobody. That is deliberate. Guessing an audience would either notify the
+         wrong people on install or, worse, notify a whole company. Set one per
+         rule after install. -->
+
+    <record id="template_lead_assigned" model="midvex.notification.template">
+        <field name="name">Lead assigned</field>
+        <field name="code">crm_lead_assigned</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Lead assigned: {{ object.name }}</field>
+        <field name="body">{{ object.name }} is now assigned to {{ object.user_id.name or 'nobody' }}.
+Contact: {{ object.partner_name or object.contact_name or 'unknown' }}
+Expected revenue: {{ object.expected_revenue or 0 }}</field>
+    </record>
+
+    <record id="rule_lead_assigned" model="midvex.notification.rule">
+        <field name="name">CRM lead assigned -&gt; Telegram</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_write</field>
+        <field name="trigger_domain">[('user_id', '!=', False)]</field>
+        <field name="template_id" ref="template_lead_assigned"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_lead_stage_changed" model="midvex.notification.template">
+        <field name="name">Lead stage changed</field>
+        <field name="code">crm_lead_stage_changed</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Stage: {{ object.name }}</field>
+        <field name="body">{{ object.name }} moved to stage {{ object.stage_id.name }}.
+Salesperson: {{ object.user_id.name or 'unassigned' }}</field>
+    </record>
+
+    <record id="rule_lead_stage_changed" model="midvex.notification.rule">
+        <field name="name">CRM lead stage changed -&gt; Telegram</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_write</field>
+        <field name="template_id" ref="template_lead_stage_changed"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+        <!-- Off by default. It fires on every write to a lead, not only on a
+             stage change, so on a busy pipeline it is the noisiest rule here.
+             Narrow trigger_domain or pair it with the automation's trigger
+             fields before switching it on. -->
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="template_lead_won" model="midvex.notification.template">
+        <field name="name">Lead won</field>
+        <field name="code">crm_lead_won</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Won: {{ object.name }}</field>
+        <field name="body">{{ object.name }} was won by {{ object.user_id.name or 'the team' }}.
+Value: {{ object.expected_revenue or 0 }} {{ object.company_currency.name or '' }}</field>
+    </record>
+
+    <record id="rule_lead_won" model="midvex.notification.rule">
+        <field name="name">CRM lead won -&gt; Telegram</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_write</field>
+        <field name="trigger_domain">[('stage_id.is_won', '=', True)]</field>
+        <field name="template_id" ref="template_lead_won"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_lead_lost" model="midvex.notification.template">
+        <field name="name">Lead lost</field>
+        <field name="code">crm_lead_lost</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="subject">Lost: {{ object.name }}</field>
+        <field name="body">{{ object.name }} was marked lost.
+Reason: {{ object.lost_reason_id.name or 'not given' }}
+Salesperson: {{ object.user_id.name or 'unassigned' }}</field>
+    </record>
+
+    <record id="rule_lead_lost" model="midvex.notification.rule">
+        <field name="name">CRM lead lost -&gt; Telegram</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="trigger">on_write</field>
+        <!-- A lost lead is archived, so it is only visible to a domain that
+             asks for inactive records explicitly. -->
+        <field name="trigger_domain">[('active', '=', False)]</field>
+        <field name="template_id" ref="template_lead_lost"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+</odoo>
