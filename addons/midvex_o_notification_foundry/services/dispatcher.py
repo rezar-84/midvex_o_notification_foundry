@@ -21,13 +21,23 @@ def _record_company_id(record, env):
     return env.company.id
 
 
-def enqueue_event(env, model_name, record, event_code):
-    trigger = 'on_create' if event_code == 'created' else 'on_write'
-    rules = env['midvex.notification.rule'].search([
+_TRIGGERS = {'created': 'on_create', 'updated': 'on_write', 'scheduled': 'on_schedule'}
+
+
+def enqueue_event(env, model_name, record, event_code, rule_id=None):
+    trigger = _TRIGGERS.get(event_code, 'on_write')
+    domain = [
         ('active', '=', True),
         ('model_id.model', '=', model_name),
         ('trigger', '=', trigger),
-    ])
+    ]
+    # A scheduled rule owns its automation and names itself in the call, so it
+    # must not drag its siblings in: "due soon" and "overdue" watch the same
+    # model with overlapping domains, and without this every run of either
+    # would enqueue both.
+    if rule_id:
+        domain.append(('id', '=', rule_id))
+    rules = env['midvex.notification.rule'].search(domain)
     Message = env['midvex.notification.message']
     Recipient = env['midvex.notification.recipient']
     Account = env['midvex.notification.account']
@@ -40,7 +50,17 @@ def enqueue_event(env, model_name, record, event_code):
     # into silence. write_date is that discriminator, and it is deliberately
     # absent for on_create so those keys stay byte-identical to the ones
     # already in the table.
-    occurrence = '' if trigger == 'on_create' else '-%s' % record.write_date
+    #
+    # A scheduled rule gets a constant instead, so it notifies a given record
+    # once and never again. That matches base.automation's own semantics - its
+    # cron fires each record once, as its date crosses the window - and means
+    # an automation recreated with a reset last_run cannot re-send anything.
+    if trigger == 'on_create':
+        occurrence = ''
+    elif trigger == 'on_schedule':
+        occurrence = '-sched'
+    else:
+        occurrence = '-%s' % record.write_date
     for rule in rules:
         if not _match_domain(record, rule.trigger_domain):
             continue
@@ -64,7 +84,14 @@ def enqueue_event(env, model_name, record, event_code):
                 ).hexdigest()
                 if Message.search([('idempotency_key', '=', idempotency_key)], limit=1):
                     continue
-                rendered = rule.template_id.render(record)
+                # Rendered per recipient, in the recipient's language. Template
+                # subjects and bodies are translatable, but the environment
+                # here belongs to whoever saved the record - so without this a
+                # Turkish colleague's alert arrived in English purely because
+                # an English-speaking user happened to trigger it. Group chats
+                # have no user to ask (see the kind constraint on recipients),
+                # so they keep the acting environment's language.
+                rendered = _render_for(rule.template_id, record, recipient)
                 created |= Message.create({
                     'rule_id': rule.id,
                     'recipient_id': recipient.id,
@@ -79,6 +106,21 @@ def enqueue_event(env, model_name, record, event_code):
                     'idempotency_key': idempotency_key,
                 })
     return created
+
+
+def _render_for(template, record, recipient):
+    """Render a template in the recipient's language.
+
+    Putting the language on the *template* is enough to translate the record's
+    own fields too: render() resolves placeholders through mail.render.mixin,
+    which re-browses the record in the template's environment. A line like
+    {{ object.stage_id.name }} therefore comes back Turkish as well, rather
+    than leaving a translated sentence wrapped around an English stage.
+    """
+    lang = recipient.user_id.lang
+    if not lang:
+        return template.render(record)
+    return template.with_context(lang=lang).render(record)
 
 
 def _targets(Recipient, rule, users, channel):
