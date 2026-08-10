@@ -16,3 +16,4 @@
 - Notifications are delivered within seconds via an `ir.cron` trigger instead of waiting for the five-minute queue tick (foundry 19.0.1.5.0).
 - Sends are paced inside the channel's declared rate limits; breaching messages are deferred, not dropped.
 - Rate-limited sends no longer count as delivery failures; permanent errors quarantine, and retries back off.
+- The app now shows its own icon on the home screen tile, not a placeholder (foundry 19.0.1.5.1).
