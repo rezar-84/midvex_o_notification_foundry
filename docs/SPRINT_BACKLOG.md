@@ -22,6 +22,9 @@
 - [ ] Digest (the other half of feature 8) — batch a recipient's queued alerts into one message instead of a burst. Not started. Needs a second cron and a way to keep each event's row honest while only one message is delivered.
   Still open after the `on_schedule` work: that trigger fires **per record**, so it gives
   "this invoice is overdue" but not "here are the twelve invoices overdue this week".
+- [x] Prompt delivery and rate limiting — enqueue triggers the queue cron (~2s end to end, measured),
+  sends are paced inside the channel's declared limits, and a 429 no longer counts as a delivery
+  failure. See ADR-012.
 - [ ] Delivery dashboard (feature 9) — the foundry manifest's summary still advertises a dashboard that does not exist. Either build it or stop claiming it.
 - [x] Rules wire their own `base.automation` — until 2026-08-09 a rule added in the UI matched nothing and reported no error.
 - [x] Send by hand — the compose wizard, reachable from the menu, a linked recipient, and a record's Actions menu, replacing the Message Queue's dead Create button.

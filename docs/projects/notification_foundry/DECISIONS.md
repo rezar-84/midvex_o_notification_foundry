@@ -153,3 +153,27 @@ Accepted — 2026-08-10
 ### Reason
 
 Template subjects and bodies are `translate=True`, but the environment doing the rendering belongs to whoever saved the record. Rendered there, a Turkish recipient received English purely because an English-speaking colleague happened to trigger the alert — which made the Turkish catalogue decorative for exactly the mixed-language teams that need it. The render call already sat inside the per-recipient loop, so this costs no extra renders.
+
+## ADR-012: Delivery is prompt via a cron trigger, and rate limits defer rather than block
+
+### Status
+
+Accepted — 2026-08-10
+
+### Decision
+
+`enqueue_event` calls `ir.cron._trigger()` on the queue cron whenever it creates messages. The periodic five-minute cron stays, as the safety net for retries and quiet-hours releases rather than as the delivery path. Sending is never done inside the transaction that created the message.
+
+Channels declare their own rate limits as adapter attributes. A message that would breach one is stamped with `hold_until`/`hold_reason = 'rate_limit'` and skipped, and the queue is re-triggered for the moment the window opens. The check runs per message immediately before its send, never once per batch.
+
+A 429 returns the attempt it was charged and waits for the channel's own `retry_after`; causes no retry can fix are quarantined; everything else backs off 1, 5, then 25 minutes.
+
+### Reason
+
+Nothing sent at enqueue time, so the cron's interval *was* the delivery latency — an invoice posted at 10:00:01 alerted at 10:05. Measured after the change: **~2 seconds** from commit to the cron processing the message.
+
+Sending synchronously would have been faster still and was rejected: the user's save would then wait on an HTTP call to a third party, and a Telegram outage would make posting an invoice slow or fail. `_trigger()` fires after commit, so the channel can never affect the transaction that produced the alert.
+
+The per-message throttle check is not an optimisation detail: sending is what consumes the allowance, so a batch of twenty-five to one group would all see an empty window and go out together if it were checked once per batch. Deferring rather than sleeping keeps one busy room from starving every other recipient, and avoids holding the only cron worker doing nothing.
+
+Not counting a 429 against `max_attempts` is the point of the failure rework. Being rate-limited says nothing about the message, and three of them used to mark a good alert permanently failed.

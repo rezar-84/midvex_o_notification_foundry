@@ -21,7 +21,14 @@
 
 ## Open gaps — unconfirmed by the official page, handled defensively
 
-1. **Rate limits.** The official Bot API reference page does not itself state numeric rate limits. Telegram's separate FAQ has long advised (not confirmed on this page, treat as unofficial guidance): roughly 1 message/second to the same individual chat, and roughly 30 messages/second overall across different chats, with HTTP 429 + `retry_after` returned when exceeded. The adapter must treat any 429 as retryable and honor `retry_after_seconds` from the Error contract rather than hard-coding a specific rate.
+1. **Rate limits — confirmed 2026-08-10** at `https://core.telegram.org/bots/faq` (the Bot API reference page still states none; the FAQ does). Quoted:
+
+   - *"In a single chat, avoid sending more than one message per second."*
+   - *"For bulk notifications, bots are not able to broadcast more than about 30 messages per second, unless they enable paid broadcasts to increase the limit."*
+   - *"In a group, bots are not be able to send more than 20 messages per minute."* — **the group limit is the one a notification rule breaches first**, and it was not recorded here before.
+   - *"We may allow short bursts that go over this limit, but eventually you'll begin receiving 429 errors."*
+
+   So these are sustained rates to stay under, not hard walls. They are declared on `TelegramAdapter` as `rate_limit_chat_seconds`, `rate_limit_group_per_minute` and `rate_limit_global_per_second`; the foundry reads them off the adapter and defers messages that would breach them. A 429 is retryable and honours `retry_after` from the Error contract rather than any hard-coded delay.
 2. **`max_connections` tuning** — left at Telegram's default (40) for MVP; not exposed as a configurable field yet.
 3. **Certificate handling for self-signed certs** (`certificate` parameter on `setWebhook`) — out of scope; the MVP assumes a webhook URL with a valid, publicly-trusted TLS certificate (e.g. via a reverse proxy/tunnel), not a self-signed cert uploaded to Telegram.
 
