@@ -284,3 +284,69 @@ class TestGroupLinkCodes(TransactionCase):
         room = self._pending(kind='group', name='Our name for it')
         self.Recipient.process_link_code(room.link_code, '-100999', 'jane', 'Telegram title')
         self.assertEqual(room.name, 'Our name for it')
+
+
+class TestTelegramErrorClassification(TransactionCase):
+    """parse_error used to return retryable=False for everything, and nothing
+    called it - so a 429, which says nothing about the message, was treated as
+    a delivery failure and consumed one of only three attempts."""
+
+    def setUp(self):
+        super().setUp()
+        self.adapter = TelegramAdapter()
+
+    def _http_error(self, code, body):
+        return error.HTTPError(
+            'https://api.telegram.org/botX/sendMessage', code, 'error', {},
+            io.BytesIO(json.dumps(body).encode()))
+
+    def _raise_through_request(self, code, body):
+        """Drive the real _request so the test covers how the exception is
+        actually built, not a hand-made stand-in."""
+        def fake_urlopen(*args, **kwargs):
+            raise self._http_error(code, body)
+        self.patch(telegram_adapter_module.request, 'urlopen', fake_urlopen)
+        try:
+            self.adapter._request(FakeAccount(), 'sendMessage', {'chat_id': '1', 'text': 'x'})
+        except Exception as failure:
+            return failure
+        self.fail('_request did not raise')
+
+    def test_a_429_is_retryable_and_carries_telegrams_own_delay(self):
+        failure = self._raise_through_request(
+            429, {'ok': False, 'description': 'Too Many Requests: retry after 17',
+                   'parameters': {'retry_after': 17}})
+        verdict = self.adapter.parse_error(failure)
+
+        self.assertTrue(verdict['retryable'])
+        self.assertEqual(verdict['retry_after_seconds'], 17)
+        self.assertEqual(verdict['error_code'], 'TELEGRAM_RATE_LIMIT')
+
+    def test_a_429_without_parameters_still_yields_a_delay(self):
+        failure = self._raise_through_request(429, {'ok': False, 'description': 'Too Many Requests'})
+        verdict = self.adapter.parse_error(failure)
+
+        self.assertTrue(verdict['retryable'])
+        self.assertEqual(verdict['retry_after_seconds'], 30)
+
+    def test_a_blocked_bot_is_permanent(self):
+        """No number of retries makes a blocked recipient reachable, so this
+        belongs in quarantine rather than burning attempts."""
+        failure = self._raise_through_request(
+            403, {'ok': False, 'description': 'Forbidden: bot was blocked by the user'})
+        verdict = self.adapter.parse_error(failure)
+
+        self.assertFalse(verdict['retryable'])
+        self.assertIsNone(verdict['retry_after_seconds'])
+
+    def test_an_unknown_chat_is_permanent(self):
+        failure = self._raise_through_request(
+            400, {'ok': False, 'description': 'Bad Request: chat not found'})
+        self.assertFalse(self.adapter.parse_error(failure)['retryable'])
+
+    def test_a_server_error_is_retryable(self):
+        failure = self._raise_through_request(502, {'ok': False, 'description': 'Bad Gateway'})
+        verdict = self.adapter.parse_error(failure)
+
+        self.assertTrue(verdict['retryable'])
+        self.assertIsNone(verdict['retry_after_seconds'])

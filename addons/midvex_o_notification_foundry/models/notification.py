@@ -720,16 +720,68 @@ class NotificationMessage(models.Model):
                 message.write({'state': 'quarantined', 'error_message': str(error)})
                 message._log('warning', str(error), 'QUARANTINED')
             except Exception as error:
-                if message.attempt_count < message.max_attempts:
-                    message.write({
-                        'state': 'pending', 'error_message': str(error),
-                        'next_retry_at': fields.Datetime.now() + timedelta(minutes=5),
-                    })
-                    message._log('warning', str(error), 'RETRY_SCHEDULED')
-                else:
-                    message.write({'state': 'failed', 'error_message': str(error)})
-                    message._log('failed', _('Delivery failed: %s') % str(error), 'DELIVERY_ERROR')
+                message._handle_failure(error)
         return True
+
+    # 1 minute, 5, then 25. The old behaviour was a flat five minutes, which
+    # retried a briefly-unreachable channel too slowly and a genuinely broken
+    # one too eagerly.
+    _RETRY_BACKOFF_MINUTES = (1, 5, 25)
+
+    def _handle_failure(self, error):
+        """Decide what a failed send means, using the adapter's own verdict.
+
+        parse_error and its retryable/retry_after_seconds keys have been in
+        ADAPTER_CONTRACT.md from the start, and nothing ever called them: every
+        failure got the same flat retry and consumed an attempt. That made
+        being rate-limited fatal - three 429s, which say nothing at all about
+        the message, marked a perfectly good alert permanently failed.
+        """
+        self.ensure_one()
+        from ..services.registry import get_adapter
+        try:
+            verdict = get_adapter(self.channel_code).parse_error(error) or {}
+        except Exception:
+            # An adapter that cannot classify its own failure must not turn a
+            # delivery problem into a traceback in the cron.
+            verdict = {}
+
+        text = verdict.get('message') or str(error)
+        error_code = verdict.get('error_code') or 'DELIVERY_ERROR'
+        retry_after = verdict.get('retry_after_seconds')
+
+        if retry_after is not None:
+            # Gives back the attempt action_process took on the way in. The
+            # channel asked us to wait, which is not a failed attempt, and
+            # counting it would let a busy hour destroy messages that were
+            # never really tried.
+            self.write({
+                'state': 'pending', 'error_message': text, 'error_code': error_code,
+                'attempt_count': max(0, self.attempt_count - 1),
+                'next_retry_at': fields.Datetime.now() + timedelta(seconds=int(retry_after)),
+            })
+            self._log('warning', text, error_code)
+            self._trigger_queue(at=self.next_retry_at)
+            return
+
+        if not verdict.get('retryable', True):
+            self.write({'state': 'quarantined', 'error_message': text, 'error_code': error_code})
+            self._log('warning', text, error_code)
+            return
+
+        if self.attempt_count < self.max_attempts:
+            index = min(self.attempt_count, len(self._RETRY_BACKOFF_MINUTES)) - 1
+            delay = self._RETRY_BACKOFF_MINUTES[max(0, index)]
+            self.write({
+                'state': 'pending', 'error_message': text, 'error_code': error_code,
+                'next_retry_at': fields.Datetime.now() + timedelta(minutes=delay),
+            })
+            self._log('warning', text, 'RETRY_SCHEDULED')
+            self._trigger_queue(at=self.next_retry_at)
+            return
+
+        self.write({'state': 'failed', 'error_message': text, 'error_code': error_code})
+        self._log('failed', _('Delivery failed: %s') % text, error_code)
 
     def action_retry(self):
         """Put a failed or quarantined message back in the queue and send it now.
@@ -855,11 +907,17 @@ class NotificationMessage(models.Model):
         admin acting by hand has decided the message is worth the interruption.
         """
         now = fields.Datetime.now()
+        # order='id' overrides the model's own 'id desc', which is right for
+        # the list view and wrong for a queue: it drained newest-first. That
+        # was invisible while everything in a batch went out regardless, but
+        # under a rate limit the newest message wins each run and the oldest
+        # alert - the one someone has been waiting on longest - is the one that
+        # gets deferred again and again.
         messages = self.search([
             ('state', '=', 'pending'),
             '|', ('next_retry_at', '=', False), ('next_retry_at', '<=', now),
             '|', ('hold_until', '=', False), ('hold_until', '<=', now),
-        ], limit=self._batch_size())
+        ], limit=self._batch_size(), order='id')
         holds = []
         for message in messages:
             release = message.recipient_id._quiet_release_at(now)
