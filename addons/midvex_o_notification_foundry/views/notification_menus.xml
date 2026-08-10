@@ -110,7 +110,18 @@
         </field>
     </record>
 
-    <menuitem id="menu_notification_root" name="Notifications" sequence="90" groups="midvex_o_notification_foundry.group_notification_user"/>
+    <!-- web_icon is what puts the icon on the home screen tile.
+         static/description/icon.png alone only covers the Apps list card, so
+         without this the app shipped with artwork nobody ever saw and a generic
+         placeholder tile instead.
+
+         It is also the only thing that keeps the tile up to date: web_icon_data
+         is an attachment written when web_icon is written (ir_ui_menu.py:155),
+         never re-read from disk - so replacing the PNG shows nothing until this
+         attribute is rewritten by an upgrade. -->
+    <menuitem id="menu_notification_root" name="Notifications" sequence="90"
+              web_icon="midvex_o_notification_foundry,static/description/icon.png"
+              groups="midvex_o_notification_foundry.group_notification_user"/>
     <menuitem id="menu_notification_messages" name="Message Queue" parent="menu_notification_root" action="action_notification_messages" sequence="10"/>
     <menuitem id="menu_notification_logs" name="Delivery Logs" parent="menu_notification_root" action="action_notification_logs" sequence="20"/>
     <!-- Second, never first. Odoo opens an app by running its first child
