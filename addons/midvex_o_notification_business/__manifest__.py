@@ -1,6 +1,6 @@
 {
     'name': 'Midvex Notification Business Events',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'summary': 'Ready-made CRM, Sales and Invoicing notification templates and rules',
     'category': 'Productivity',
     'author': 'Midvex',

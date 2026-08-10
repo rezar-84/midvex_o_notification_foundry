@@ -1,0 +1,1787 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_notification_foundry
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-10 10:55+0000\n"
+"PO-Revision-Date: 2026-08-10 10:55+0000\n"
+"Last-Translator: Midvex\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: tr\n"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/wizard/notification_compose.py:0
+msgid "%(channel)s message sent to %(names)s:"
+msgstr "%(channel)s mesajı %(names)s alıcılarına gönderildi:"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "%(field)s belongs to %(other)s, not to %(model)s."
+msgstr "%(field)s alanı %(model)s modeline değil, %(other)s modeline ait."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/wizard/notification_compose.py:0
+msgid "%(sent)s of %(total)s sent. See the Message Queue for the rest."
+msgstr "%(total)s mesajın %(sent)s tanesi gönderildi. Kalanlar için Mesaj Kuyruğuna bakın."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid ""
+".\n"
+"                    A copy is logged in its chatter."
+msgstr ""
+".\n"
+"                    Bir kopyası kaydın sohbetine işlenir."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_form
+msgid "<span class=\"mx-2\">day(s)</span>"
+msgstr "<span class=\"mx-2\">gün</span>"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_channel_form
+msgid ""
+"<strong>Code</strong> lists only the adapters installed in this\n"
+"                        database, because it must match the code an adapter registered\n"
+"                        itself under. Channels normally arrive with their adapter\n"
+"                        module — you rarely need to create one by hand."
+msgstr ""
+"<strong>Kod</strong> yalnızca bu veritabanında kurulu adaptörleri listeler,\n"
+"                        çünkü bir adaptörün kendini kaydettiği kodla eşleşmesi\n"
+"                        gerekir. Kanallar normalde adaptör modülleriyle birlikte\n"
+"                        gelir — elle kanal oluşturmanız nadiren gerekir."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "<strong>How to link a group chat</strong>"
+msgstr "<strong>Bir grup sohbeti nasıl bağlanır</strong>"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "<strong>How to link this recipient</strong>"
+msgstr "<strong>Bu alıcı nasıl bağlanır</strong>"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "<strong>Last error</strong>"
+msgstr "<strong>Son hata</strong>"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_template_form
+msgid ""
+"<strong>Templating</strong> — inline syntax, e.g.\n"
+"                        <code>{{ object.name }}</code>, with <code>object</code> being the\n"
+"                        record that triggered the rule. Guard optional values with\n"
+"                        <code>{{ object.phone or '—' }}</code>.\n"
+"                        <br/>\n"
+"                        Useful on <code>crm.lead</code>: <code>object.name</code> (already a\n"
+"                        readable subject such as \"Quote — Olive Flounder — Acme Ltd\"),\n"
+"                        <code>contact_name</code>, <code>partner_name</code>,\n"
+"                        <code>email_from</code>, <code>phone</code>,\n"
+"                        <code>source_id.name</code>, <code>country_id.name</code>,\n"
+"                        <code>campaign_id.name</code>, and <code>object.id</code> for a\n"
+"                        deep link."
+msgstr ""
+"<strong>Şablonlama</strong> — satır içi sözdizimi, ör.\n"
+"                        <code>{{ object.name }}</code>; buradaki <code>object</code>,\n"
+"                        kuralı tetikleyen kayıttır. İsteğe bağlı değerleri\n"
+"                        <code>{{ object.phone or '—' }}</code> ile koruyun.\n"
+"                        <br/>\n"
+"                        <code>crm.lead</code> üzerinde kullanışlı olanlar:\n"
+"                        <code>object.name</code> (zaten \"Teklif — Olive Flounder — Acme Ltd\"\n"
+"                        gibi okunabilir bir konudur), <code>contact_name</code>,\n"
+"                        <code>partner_name</code>, <code>email_from</code>,\n"
+"                        <code>phone</code>, <code>source_id.name</code>,\n"
+"                        <code>country_id.name</code>, <code>campaign_id.name</code> ve\n"
+"                        derin bağlantı için <code>object.id</code>."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_form
+msgid ""
+"<strong>This rule matches every record of the model.</strong>\n"
+"                        With no filter, manually created and imported records trigger it\n"
+"                        too, not just the ones you care about."
+msgstr ""
+"<strong>Bu kural, modeldeki her kaydı eşleştirir.</strong>\n"
+"                        Filtre olmadan, elle oluşturulan ve içe aktarılan kayıtlar da\n"
+"                        kuralı tetikler; yalnızca ilgilendikleriniz değil."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_form
+msgid ""
+"<strong>This rule will not notify anyone.</strong>\n"
+"                        No audience is set, so it matches records and then delivers to\n"
+"                        nobody — without reporting an error. Add a group, a user, or a\n"
+"                        shared chat below."
+msgstr ""
+"<strong>Bu kural kimseye bildirim göndermeyecek.</strong>\n"
+"                        Hedef kitle belirlenmediği için kayıtları eşleştirir ve\n"
+"                        kimseye teslim etmez — üstelik hata da bildirmez. Aşağıdan bir\n"
+"                        grup, kullanıcı veya paylaşılan sohbet ekleyin."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_channels
+msgid ""
+"A channel is registered by its adapter module — installing\n"
+"                <b>Midvex Telegram Notifications</b> creates the Telegram one. You\n"
+"                rarely need to add these by hand."
+msgstr ""
+"Bir kanal, adaptör modülü tarafından kaydedilir — <b>Midvex Telegram\n"
+"                Bildirimleri</b> kurulduğunda Telegram kanalı oluşur. Bunları elle\n"
+"                eklemeniz nadiren gerekir."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid ""
+"A group chat must not be attached to a user. The dispatcher looks recipients"
+" up by user, so a group chat carrying one would receive that person's "
+"private alerts."
+msgstr "Bir grup sohbeti bir kullanıcıya bağlanamaz. Dağıtıcı alıcıları kullanıcıya göre bulur; kullanıcı taşıyan bir grup sohbeti o kişinin özel bildirimlerini alırdı."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_recipients
+msgid ""
+"A recipient links an Odoo user to their account on a channel. Until a\n"
+"                recipient reaches <b>Linked</b> they are skipped silently when a rule\n"
+"                fires — no alert is delivered and no error is raised."
+msgstr ""
+"Bir alıcı, bir Odoo kullanıcısını bir kanaldaki hesabına bağlar. Alıcı\n"
+"                <b>Bağlandı</b> durumuna gelene kadar, bir kural çalıştığında sessizce\n"
+"                atlanır — bildirim teslim edilmez ve hata da oluşmaz."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_rules
+msgid ""
+"A rule ties a model and a trigger to a template, one or more channels,\n"
+"                and an audience. A rule with no audience delivers to nobody, so set one."
+msgstr ""
+"Bir kural; bir modeli ve tetikleyiciyi bir şablona, bir veya daha fazla kanala\n"
+"                ve bir hedef kitleye bağlar. Hedef kitlesi olmayan bir kural kimseye\n"
+"                teslim etmez, bu yüzden mutlaka belirleyin."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_form
+msgid ""
+"A scheduled rule fires once per record, as the date below\n"
+"                            crosses the offset. It does not repeat, so it will not chase\n"
+"                            the same record twice."
+msgstr ""
+"Planlanmış bir kural, aşağıdaki tarih belirtilen farkı geçtiğinde kayıt\n"
+"                            başına bir kez çalışır. Tekrarlamaz, bu yüzden aynı kaydı\n"
+"                            iki kez takip etmez."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "A scheduled rule needs a date field to watch."
+msgstr "Planlanmış bir kuralın izleyeceği bir tarih alanı gerekir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.constraint,message:midvex_o_notification_foundry.constraint_midvex_notification_recipient_account_recipient_uniq
+msgid "A user already has a recipient link for this account."
+msgstr "Bu hesap için kullanıcının zaten bir alıcı bağlantısı var."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "A user recipient needs a user."
+msgstr "Kullanıcı tipindeki bir alıcı için bir kullanıcı gerekir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__api_secret
+msgid "API Secret"
+msgstr "API Gizli Anahtarı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__account_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__account_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__account_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_inbound_event_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Account"
+msgstr "Hesap"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_accounts
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_accounts
+msgid "Accounts"
+msgstr "Hesaplar"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_needaction
+msgid "Action Needed"
+msgstr "Aksiyon Gerekiyor"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__active
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__active
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__active
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__active
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__active
+msgid "Active"
+msgstr "Etkin"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_ids
+msgid "Activities"
+msgstr "Aktiviteler"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Etkinlik İstisna Dekorasyonu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_state
+msgid "Activity State"
+msgstr "Aktivite Durumu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Aktivite Türü İmgesi"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Adapter Result"
+msgstr "Adaptör Sonucu"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "Add the bot to the Telegram group."
+msgstr "Botu Telegram grubuna ekleyin."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid ""
+"Add the credentials below, then press <strong>Test Connection</strong>.\n"
+"                        Recipients cannot be linked until this account reaches\n"
+"                        <strong>Connected</strong>."
+msgstr ""
+"Aşağıya kimlik bilgilerini girin, ardından <strong>Bağlantıyı Sına</strong>\n"
+"                        düğmesine basın. Bu hesap <strong>Bağlandı</strong> durumuna\n"
+"                        gelmeden alıcılar bağlanamaz."
+
+#. module: midvex_o_notification_foundry
+#: model:res.groups,name:midvex_o_notification_foundry.group_notification_admin
+msgid "Administrator"
+msgstr "Yönetici"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_rule__schedule_offset_mode__after
+msgid "After"
+msgstr "Sonra"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid ""
+"Alerts raised inside this window are <strong>held, not\n"
+"                                dropped</strong> — they are delivered when it ends, so\n"
+"                                nothing is lost overnight. The window may cross midnight.\n"
+"                                Sending or retrying a message by hand ignores it."
+msgstr ""
+"Bu aralıkta oluşan bildirimler <strong>düşürülmez, bekletilir</strong> —\n"
+"                                aralık bittiğinde teslim edilirler, dolayısıyla gece\n"
+"                                boyunca hiçbir şey kaybolmaz. Aralık gece yarısını\n"
+"                                geçebilir. Bir mesajı elle göndermek veya yeniden\n"
+"                                denemek bu aralığı yok sayar."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_accounts
+msgid ""
+"An account holds the credentials for one channel — for Telegram, the\n"
+"                bot token from @BotFather. Create it, press <b>Test Connection</b>, and\n"
+"                it must reach <b>Connected</b> before recipients can be linked to it."
+msgstr ""
+"Bir hesap, tek bir kanalın kimlik bilgilerini tutar — Telegram için\n"
+"                @BotFather üzerinden alınan bot jetonu. Hesabı oluşturun, <b>Bağlantıyı\n"
+"                Sına</b> düğmesine basın; alıcılar bağlanabilmeden önce hesabın\n"
+"                <b>Bağlandı</b> durumuna gelmesi gerekir."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_template_search
+msgid "Archived"
+msgstr "Arşivlendi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_attachment_count
+msgid "Attachment Count"
+msgstr "Ek Sayısı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__attempt_count
+msgid "Attempt Count"
+msgstr "Deneme Sayısı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__audience_recipient_ids
+msgid "Audience Chats"
+msgstr "Hedef Sohbetler"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__audience_group_ids
+msgid "Audience Groups"
+msgstr "Hedef Gruplar"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__audience_user_ids
+msgid "Audience Users"
+msgstr "Hedef Kullanıcılar"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__automation_id
+msgid "Automation"
+msgstr "Otomasyon"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_rule__schedule_offset_mode__before
+msgid "Before"
+msgstr "Önce"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__body
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__body
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__body
+msgid "Body"
+msgstr "Gövde"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__api_key
+msgid "Bot Token / API Key"
+msgstr "Bot Jetonu / API Anahtarı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid "Cancel"
+msgstr "İptal"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__channel_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__channel_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_inbound_event_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Channel"
+msgstr "Kanal"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__channel_code
+msgid "Channel Code"
+msgstr "Kanal Kodu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.constraint,message:midvex_o_notification_foundry.constraint_midvex_notification_channel_channel_code_uniq
+msgid "Channel code must be unique."
+msgstr "Kanal kodu benzersiz olmalıdır."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_channels
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__channel_ids
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_channels
+msgid "Channels"
+msgstr "Kanallar"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_list
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Chat"
+msgstr "Sohbet"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__name
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "Chat Name"
+msgstr "Sohbet Adı"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/wizard/notification_compose.py:0
+msgid "Choose at least one recipient."
+msgstr "En az bir alıcı seçin."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__channel_code
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__code
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__channel_code
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__channel_code
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__channel_code
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__code
+msgid "Code"
+msgstr "Kod"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__company_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__company_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__company_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__company_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__company_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__company_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_search
+msgid "Company"
+msgstr "Firma"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_config
+msgid "Configuration"
+msgstr "Ayarlar"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_accounts
+msgid "Connect a channel account"
+msgstr "Bir kanal hesabı bağlayın"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_account__state__connected
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_search
+msgid "Connected"
+msgstr "Bağlandı"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Connected as %s"
+msgstr "%s olarak bağlandı"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Connection successful"
+msgstr "Bağlantı başarılı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Content"
+msgstr "İçerik"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Created On"
+msgstr "Oluşturulma"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__create_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__create_uid
+msgid "Created by"
+msgstr "Tarafından oluşturuldu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__create_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__create_date
+msgid "Created on"
+msgstr "Oluşturuldu"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "Credentials"
+msgstr "Kimlik bilgileri"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__date_field_id
+msgid "Date Field"
+msgstr "Tarih Alanı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_rules
+msgid "Decide what gets notified"
+msgstr "Neyin bildirileceğine karar verin"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "Defaults to the user's timezone"
+msgstr "Varsayılan olarak kullanıcının saat dilimi"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Delivered."
+msgstr "Teslim edildi."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_logs
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_logs
+msgid "Delivery Logs"
+msgstr "Teslimat Kayıtları"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Delivery failed after"
+msgstr "Teslimat başarısız oldu:"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Delivery failed: %s"
+msgstr "Teslimat başarısız: %s"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_message__hold_until
+msgid ""
+"Delivery is held until this time, because the recipient is inside their "
+"quiet hours."
+msgstr "Alıcı sessiz saatleri içinde olduğu için teslimat bu saate kadar bekletilir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_recipient__muted
+msgid "Delivery is skipped while muted. The link itself is kept."
+msgstr "Sessize alındığında teslimat atlanır. Bağlantının kendisi korunur."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_form
+msgid "Detail"
+msgstr "Detay"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__display_name
+msgid "Display Name"
+msgstr "Görünen Ad"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__documentation_url
+msgid "Documentation Url"
+msgstr "Dokümantasyon Adresi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_account__state__draft
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_search
+msgid "Draft"
+msgstr "Taslak"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.constraint,message:midvex_o_notification_foundry.constraint_midvex_notification_message_message_key_uniq
+msgid "Duplicate notification message."
+msgstr "Yinelenen bildirim mesajı."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_account__state__error
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Error"
+msgstr "Hata"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__error_code
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__error_code
+msgid "Error Code"
+msgstr "Hata Kodu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__error_message
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__error_message
+msgid "Error Message"
+msgstr "Hata Mesajı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__event_type
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_inbound_event_search
+msgid "Event Type"
+msgstr "Etkinlik Türü"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid ""
+"Everyone in the group sees every alert delivered here, so send\n"
+"                        only what the whole room should read. The bot's default privacy\n"
+"                        mode in BotFather is enough: it lets the bot see commands\n"
+"                        addressed to it without reading the rest of the conversation."
+msgstr ""
+"Buraya teslim edilen her bildirimi gruptaki herkes görür; bu yüzden yalnızca\n"
+"                        tüm odanın okuması gerekenleri gönderin. Botun BotFather\n"
+"                        üzerindeki varsayılan gizlilik modu yeterlidir: bot,\n"
+"                        konuşmanın geri kalanını okumadan yalnızca kendisine yazılan\n"
+"                        komutları görür."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__external_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__external_id
+msgid "External"
+msgstr "Harici"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__external_username
+msgid "External Username"
+msgstr "Harici Kullanıcı Adı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_log__status__failed
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_message__state__failed
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+msgid "Failed"
+msgstr "Başarısız"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_messages
+msgid ""
+"Failed and quarantined messages appear here. Clear the filter to see\n"
+"                everything that has been queued, including delivered messages."
+msgstr ""
+"Başarısız ve karantinaya alınmış mesajlar burada görünür. Teslim edilenler\n"
+"                dahil kuyruğa girmiş her şeyi görmek için filtreyi temizleyin."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_form
+msgid "Filter"
+msgstr "Filtre"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_follower_ids
+msgid "Followers"
+msgstr "Takipçiler"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Takipçiler (İş ortakları)"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Font Awesome simgesi, ör. fa-tasks"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid ""
+"For Telegram this is the bot token from @BotFather. It is stored\n"
+"                                on the account and never belongs in a repository or a config file\n"
+"                                under version control."
+msgstr ""
+"Telegram için bu, @BotFather üzerinden alınan bot jetonudur. Hesap\n"
+"                                üzerinde saklanır; bir depoya veya sürüm kontrolündeki\n"
+"                                bir yapılandırma dosyasına asla konmamalıdır."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__parse_mode
+msgid ""
+"Formatting applied to outgoing messages; leave empty for plain text. Once "
+"set, every message must be valid markup - a lead named 'Smith & Co' is "
+"rejected by Telegram unless the template escapes it."
+msgstr "Giden mesajlara uygulanan biçimlendirme; düz metin için boş bırakın. Bir kez ayarlandığında her mesajın geçerli biçimlendirme olması gerekir - şablon kaçış uygulamadıkça 'Smith & Co' adlı bir aday Telegram tarafından reddedilir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__quiet_start
+msgid "From"
+msgstr "Başlangıç"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "Generate Link Code"
+msgstr "Bağlantı Kodu Oluştur"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_recipient__kind__group
+msgid "Group Chat"
+msgstr "Grup Sohbeti"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Group Chats"
+msgstr "Grup Sohbetleri"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_account__parse_mode__html
+msgid "HTML"
+msgstr "HTML"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__has_message
+msgid "Has Message"
+msgstr "Mesaj Var"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Held (Quiet Hours)"
+msgstr "Bekletiliyor (Sessiz Saatler)"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__hold_until
+msgid "Held Until"
+msgstr "Bekletme Bitişi"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Held until %s: the recipient is in quiet hours."
+msgstr "%s saatine kadar bekletiliyor: alıcı sessiz saatlerinde."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_rule__schedule_offset
+msgid ""
+"How many days away from the date field to fire. 0 fires on the date itself."
+msgstr "Tarih alanından kaç gün uzakta tetikleneceği. 0, tarihin kendisinde tetikler."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__id
+msgid "ID"
+msgstr "ID"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_exception_icon
+msgid "Icon"
+msgstr "Simge"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "İstisnai bir etkinliği belirtmek için kullanılan simge."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__idempotency_key
+msgid "Idempotency Key"
+msgstr "Tekrarsızlık Anahtarı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "İşaretliyse, yeni mesajlar dikkatinize sunulacak."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__message_has_error
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "İşaretliyse, bazı mesajlar gönderi hatası içermektedir."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_search
+msgid "In Error"
+msgstr "Hatalı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_inbound_events
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_inbound_events
+msgid "Inbound Events"
+msgstr "Gelen Olaylar"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid ""
+"Inbound replies — including the link codes recipients send to the\n"
+"                                bot — arrive here. Without a registered webhook a recipient can\n"
+"                                generate a code but can never reach <strong>Linked</strong>."
+msgstr ""
+"Gelen yanıtlar — alıcıların bota gönderdiği bağlantı kodları dahil —\n"
+"                                buraya ulaşır. Kayıtlı bir webhook olmadan bir alıcı kod\n"
+"                                oluşturabilir ama asla <strong>Bağlandı</strong>\n"
+"                                durumuna gelemez."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/services/dispatcher.py:0
+msgid "Invalid trigger domain: %s"
+msgstr "Geçersiz tetikleyici alanı (domain): %s"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_is_follower
+msgid "Is Follower"
+msgstr "Takipçi mi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__kind
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Kind"
+msgstr "Tür"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_recipient__name
+msgid ""
+"Label for a shared chat. Filled in from the chat title on linking if left "
+"empty."
+msgstr "Paylaşılan bir sohbetin etiketi. Boş bırakılırsa bağlanma sırasında sohbet başlığından doldurulur."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Last 7 Days"
+msgstr "Son 7 Gün"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__last_error
+msgid "Last Error"
+msgstr "Son Hata"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__last_test_at
+msgid "Last Test At"
+msgstr "Son Sınama Zamanı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__write_uid
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__write_uid
+msgid "Last Updated by"
+msgstr "Son Güncelleyen"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__write_date
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__write_date
+msgid "Last Updated on"
+msgstr "Son Güncelleme"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__link_code
+msgid "Link Code"
+msgstr "Bağlantı Kodu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__link_code_expires_at
+msgid "Link Code Expires At"
+msgstr "Bağlantı Kodu Geçerlilik Sonu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_recipient__state__linked
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Linked"
+msgstr "Bağlandı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__linked_at
+msgid "Linked At"
+msgstr "Bağlanma Zamanı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+msgid "Logged On"
+msgstr "Kaydedilme Zamanı"
+
+#. module: midvex_o_notification_foundry
+#: model:res.groups,name:midvex_o_notification_foundry.group_notification_manager
+msgid "Manager"
+msgstr "Yönetici"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/wizard/notification_compose.py:0
+msgid "Manual message"
+msgstr "Elle gönderilen mesaj"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_account__parse_mode__markdownv2
+msgid "MarkdownV2"
+msgstr "MarkdownV2"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__max_attempts
+msgid "Max Attempts"
+msgstr "Azami Deneme"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__message
+msgid "Message"
+msgstr "Mesaj"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_count
+msgid "Message Count"
+msgstr "Mesaj Sayısı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_has_error
+msgid "Message Delivery error"
+msgstr "Mesaj Teslim hatası"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__parse_mode
+msgid "Message Formatting"
+msgstr "Mesaj Biçimlendirme"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_messages
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_messages
+msgid "Message Queue"
+msgstr "Mesaj Kuyruğu"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_ids
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "Messages"
+msgstr "Mesajlar"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__metadata
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_form
+msgid "Metadata"
+msgstr "Metadata"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__model_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__model_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_template_search
+msgid "Model"
+msgstr "Model"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__module_name
+msgid "Module Name"
+msgstr "Modül Adı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__muted
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Muted"
+msgstr "Sessize Alındı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Aktivite Son Tarihim"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__name
+msgid "Name"
+msgstr "Adı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Needs Attention"
+msgstr "Dikkat Gerekiyor"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_template_form
+msgid "New lead: {{ object.name }}"
+msgstr "Yeni aday: {{ object.name }}"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "Sonraki Aktivite Takvimi Etkinliği"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Sonraki Aktivite Son Tarihi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_summary
+msgid "Next Activity Summary"
+msgstr "Sonraki Aktivite Özeti"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_type_id
+msgid "Next Activity Type"
+msgstr "Sonraki Aktivitie Türü"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__next_retry_at
+msgid "Next Retry At"
+msgstr "Sonraki Deneme Zamanı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_search
+msgid "No Audience Set"
+msgstr "Hedef Kitle Belirlenmemiş"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_channels
+msgid "No channels installed"
+msgstr "Kurulu kanal yok"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "No connected %s account is configured for your company."
+msgstr "Firmanız için bağlı bir %s hesabı yapılandırılmamış."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_logs
+msgid "No delivery attempts logged yet"
+msgstr "Henüz teslimat denemesi kaydedilmedi"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_inbound_events
+msgid "No inbound events received"
+msgstr "Gelen olay alınmadı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_recipients
+msgid "No recipients yet"
+msgstr "Henüz alıcı yok"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Not Linked Yet"
+msgstr "Henüz Bağlanmadı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_messages
+msgid "Nothing needs attention"
+msgstr "Dikkat gerektiren bir şey yok"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+#: code:addons/midvex_o_notification_foundry/wizard/notification_compose.py:0
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__message_id
+msgid "Notification"
+msgstr "Bildirim"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_account
+msgid "Notification Account"
+msgstr "Bildirim Hesabı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_channel
+msgid "Notification Channel"
+msgstr "Bildirim Kanalı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_log
+msgid "Notification Delivery Log"
+msgstr "Bildirim Teslimat Kaydı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_inbound_event
+msgid "Notification Inbound Event"
+msgstr "Bildirim Gelen Olayı"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Notification Manager permission is required."
+msgstr "Bildirim Yöneticisi yetkisi gerekir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_message
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__notification_message_ids
+msgid "Notification Message"
+msgstr "Bildirim Mesajı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_recipient
+msgid "Notification Recipient"
+msgstr "Bildirim Alıcısı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_rule
+msgid "Notification Rule"
+msgstr "Bildirim Kuralı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_template
+msgid "Notification Template"
+msgstr "Bildirim Şablonu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.module.category,name:midvex_o_notification_foundry.module_category_notification
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_root
+#: model:res.groups.privilege,name:midvex_o_notification_foundry.privilege_notification
+msgid "Notifications"
+msgstr "Bildirimler"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.server,name:midvex_o_notification_foundry.ir_cron_notification_process_pending_ir_actions_server
+msgid "Notifications: process pending messages"
+msgstr "Bildirimler: bekleyen mesajları işle"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Aksiyon Sayısı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_has_error_counter
+msgid "Number of errors"
+msgstr "Hata adedi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "İşlem gerektiren mesaj sayısı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Teslimat hatası olan mesaj adedi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__schedule_offset
+msgid "Offset (days)"
+msgstr "Fark (gün)"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__schedule_offset_mode
+msgid "Offset Direction"
+msgstr "Fark Yönü"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_rule__trigger__on_create
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_search
+msgid "On Creation"
+msgstr "Oluşturulduğunda"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_rule__trigger__on_schedule
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_search
+msgid "On Schedule"
+msgstr "Planlanmış"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_rule__trigger__on_write
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_search
+msgid "On Update"
+msgstr "Güncellendiğinde"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_logs
+msgid ""
+"One row per delivery attempt, including retries. This is the audit\n"
+"                trail behind each message in the queue."
+msgstr ""
+"Her teslimat denemesi için bir satır; yeniden denemeler dahil. Bu, kuyruktaki\n"
+"                her mesajın arkasındaki denetim izidir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_rule__trigger_domain
+msgid ""
+"Optional Odoo domain, evaluated against the triggering record. Leave empty "
+"to always match."
+msgstr "İsteğe bağlı Odoo alanı (domain); tetikleyen kayda karşı değerlendirilir. Her zaman eşleşmesi için boş bırakın."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__payload
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Payload"
+msgstr "Yük"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_message__state__pending
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_recipient__state__pending
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Pending"
+msgstr "Bekleyen"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "People"
+msgstr "Kişiler"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid "People and group chats linked to this account"
+msgstr "Bu hesaba bağlı kişiler ve grup sohbetleri"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "Press <strong>Generate Link Code</strong>."
+msgstr "<strong>Bağlantı Kodu Oluştur</strong> düğmesine basın."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__processed
+msgid "Processed"
+msgstr "İşlendi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__processed_at
+msgid "Processed At"
+msgstr "İşlenme Zamanı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_message__state__quarantined
+msgid "Quarantined"
+msgstr "Karantinada"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid ""
+"Quarantined — the adapter rejected this as invalid rather than\n"
+"                        failing to reach the service, so retrying without changing\n"
+"                        something will reject it again."
+msgstr ""
+"Karantinaya alındı — adaptör bunu servise ulaşamadığı için değil, geçersiz\n"
+"                        olduğu için reddetti; bir şeyi değiştirmeden yeniden denemek\n"
+"                        yine reddedilecektir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__quiet_enabled
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "Quiet Hours"
+msgstr "Sessiz Saatler"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__raw_payload
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_inbound_event_form
+msgid "Raw Payload"
+msgstr "Ham Yük"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__recipient_ids
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_inbound_event__recipient_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__recipient_id
+msgid "Recipient"
+msgstr "Alıcı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__recipient_count
+msgid "Recipient Count"
+msgstr "Alıcı Sayısı"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_recipients
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_recipients
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "Recipients"
+msgstr "Alıcılar"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__record_name
+msgid "Record Name"
+msgstr "Kayıt Adı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "Register Webhook"
+msgstr "Webhook Kaydet"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_template__body
+msgid "Rendered with Odoo inline templating, e.g. {{ object.name }}."
+msgstr "Odoo satır içi şablonlamasıyla işlenir, ör. {{ object.name }}."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_template_form
+msgid "Rendered with inline templating, e.g. {{ object.name }}"
+msgstr "Satır içi şablonlamayla işlenir, ör. {{ object.name }}"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_inbound_events
+msgid ""
+"Replies sent to the bot arrive here, including the link codes recipients\n"
+"                send to connect their account. An empty list while someone is waiting to\n"
+"                be linked usually means the webhook is not registered."
+msgstr ""
+"Bota gönderilen yanıtlar, alıcıların hesaplarını bağlamak için gönderdiği\n"
+"                bağlantı kodları dahil buraya ulaşır. Biri bağlanmayı beklerken\n"
+"                listenin boş olması genellikle webhook kaydının yapılmadığı anlamına\n"
+"                gelir."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__res_id
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__res_id
+msgid "Res"
+msgstr "Res"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__res_model
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__res_model
+msgid "Res Model"
+msgstr "Res Model"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__activity_user_id
+msgid "Responsible User"
+msgstr "Sorumlu Kullanıcı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__result
+msgid "Result"
+msgstr "Sonuç"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_list
+msgid "Retry"
+msgstr "Yeniden Dene"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Retry Now"
+msgstr "Şimdi Yeniden Dene"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_recipient__state__revoked
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Revoked"
+msgstr "Geri Alındı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__rule_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Rule"
+msgstr "Kural"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_rules
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_rules
+msgid "Rules"
+msgstr "Kurallar"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS İleti hatası"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_form
+msgid "Schedule"
+msgstr "Planlama"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid "Send"
+msgstr "Gönder"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__account_id
+msgid "Send From"
+msgstr "Gönderen"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_compose
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_compose
+msgid "Send Message"
+msgstr "Mesaj Gönder"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Send Now"
+msgstr "Şimdi Gönder"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "Send Test Message"
+msgstr "Sınama Mesajı Gönder"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_compose__recipient_ids
+msgid "Send To"
+msgstr "Kime Gönderilecek"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model,name:midvex_o_notification_foundry.model_midvex_notification_compose
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid "Send a Notification"
+msgstr "Bildirim Gönder"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.server,name:midvex_o_notification_foundry.action_send_notification_partner
+msgid "Send on Telegram"
+msgstr "Telegram'dan Gönder"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid ""
+"Send the code <strong>in the group itself</strong>, as\n"
+"                                <code>/link CODE</code>. Sending it in a direct message\n"
+"                                is refused — that would link one person instead."
+msgstr ""
+"Kodu <strong>grubun içinde</strong>, <code>/link KOD</code> şeklinde\n"
+"                                gönderin. Doğrudan mesajda gönderilmesi reddedilir —\n"
+"                                bu, bunun yerine tek bir kişiyi bağlardı."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid ""
+"Send the code below to the bot as a direct message,\n"
+"                                from the account that should receive alerts."
+msgstr ""
+"Aşağıdaki kodu, bildirimleri alması gereken hesaptan bota doğrudan mesaj\n"
+"                                olarak gönderin."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_message__state__sending
+msgid "Sending"
+msgstr "Gönderiliyor"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid "Sending about"
+msgstr "Şu kayıt hakkında gönderiliyor:"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_message__state__sent
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Sent"
+msgstr "Gönderildi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__sent_at
+msgid "Sent At"
+msgstr "Gönderim Zamanı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid ""
+"Sent immediately, ignoring quiet hours. The text is sent as written —\n"
+"                    templates and their placeholders do not apply here."
+msgstr ""
+"Sessiz saatler yok sayılarak hemen gönderilir. Metin yazıldığı gibi gönderilir —\n"
+"                    şablonlar ve yer tutucuları burada geçerli değildir."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/wizard/notification_compose.py:0
+msgid "Sent to %s recipient(s)."
+msgstr "%s alıcıya gönderildi."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Set a webhook URL before registering it."
+msgstr "Kaydetmeden önce bir webhook adresi belirleyin."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_rule__audience_recipient_ids
+msgid "Shared chats to notify, in addition to the users above."
+msgstr "Yukarıdaki kullanıcılara ek olarak bildirim gönderilecek paylaşılan sohbetler."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Source Record"
+msgstr "Kaynak Kayıt"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__state
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__state
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__state
+msgid "State"
+msgstr "Durum"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_log__status
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_search
+msgid "Status"
+msgstr "Durumu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Aktivitelere göre durum\n"
+"Gecikmiş: Son tarih çoktan geçti\n"
+"Bugün: Aktivite tarihi bugün\n"
+"Planlanmış: Gelecekteki aktiviteler."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_message__subject
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__subject
+msgid "Subject"
+msgstr "Konu"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_log__status__success
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+msgid "Success"
+msgstr "Başarılı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_channel__supports_inbound
+msgid "Supports Inbound"
+msgstr "Gelen Mesajı Destekler"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "Technical"
+msgstr "Teknik"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__model_name
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_template__model_name
+msgid "Technical Model Name"
+msgstr "Teknik Model Adı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__template_id
+msgid "Template"
+msgstr "Şablon"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.constraint,message:midvex_o_notification_foundry.constraint_midvex_notification_template_template_code_uniq
+msgid "Template code must be unique."
+msgstr "Şablon kodu benzersiz olmalıdır."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.actions.act_window,name:midvex_o_notification_foundry.action_notification_templates
+#: model:ir.ui.menu,name:midvex_o_notification_foundry.menu_notification_templates
+msgid "Templates"
+msgstr "Şablonlar"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_templates
+msgid ""
+"Templates render with inline templating against the record that\n"
+"                triggered the rule, for example <code>{{ object.name }}</code>."
+msgstr ""
+"Şablonlar, kuralı tetikleyen kayda karşı satır içi şablonlamayla işlenir;\n"
+"                örneğin <code>{{ object.name }}</code>."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "Test Connection"
+msgstr "Bağlantıyı Sına"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_rule__automation_id
+msgid ""
+"The automation that makes this rule fire. Maintained automatically; several "
+"rules on the same model share one, except scheduled rules, which each own "
+"theirs."
+msgstr "Bu kuralı çalıştıran otomasyon. Otomatik olarak sürdürülür; aynı modeldeki birkaç kural bir otomasyonu paylaşır, ancak planlanmış kuralların her biri kendi otomasyonuna sahiptir."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "The channel accepted these credentials."
+msgstr "Kanal bu kimlik bilgilerini kabul etti."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid ""
+"The code expires 15 minutes after it is generated — regenerate it\n"
+"                        if that passes. Until this recipient is Linked the dispatcher skips\n"
+"                        them without raising an error, so no alerts arrive and nothing\n"
+"                        reports a failure."
+msgstr ""
+"Kod, oluşturulmasından 15 dakika sonra geçersiz olur — bu süre geçerse\n"
+"                        yeniden oluşturun. Bu alıcı Bağlandı durumuna gelene kadar\n"
+"                        dağıtıcı onu hata vermeden atlar; dolayısıyla bildirim ulaşmaz\n"
+"                        ve hiçbir şey hata bildirmez."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_rule__date_field_id
+msgid ""
+"The date this rule watches. The rule fires once per record, as that date "
+"crosses the offset below."
+msgstr "Bu kuralın izlediği tarih. Kural, bu tarih aşağıdaki farkı geçtiğinde kayıt başına bir kez çalışır."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "The status becomes <strong>Linked</strong> automatically."
+msgstr "Durum otomatik olarak <strong>Bağlandı</strong> olur."
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__tz
+msgid "Timezone"
+msgstr "Saat Dilimi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_recipient__tz
+msgid ""
+"Timezone the quiet hours are read in. Defaults to the user's own timezone; a"
+" shared chat has no user, so set it here."
+msgstr "Sessiz saatlerin okunduğu saat dilimi. Varsayılan olarak kullanıcının kendi saat dilimidir; paylaşılan bir sohbetin kullanıcısı yoktur, bu yüzden burada belirleyin."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_search
+msgid "Today"
+msgstr "Bugün"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__trigger
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_search
+msgid "Trigger"
+msgstr "Tetikleyici"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_rule__trigger_domain
+msgid "Trigger Domain"
+msgstr "Tetikleyici Alanı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Kayıtlardaki istisna etkinliğinin türü."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_compose_form
+msgid "Type the message to send…"
+msgstr "Gönderilecek mesajı yazın…"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "Unnamed chat"
+msgstr "Adsız sohbet"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_inbound_event_search
+msgid "Unprocessed"
+msgstr "İşlenmemiş"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__quiet_end
+msgid "Until"
+msgstr "Bitiş"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_recipient__user_id
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_recipient__kind__user
+#: model:res.groups,name:midvex_o_notification_foundry.group_notification_user
+msgid "User"
+msgstr "Kullanıcı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields.selection,name:midvex_o_notification_foundry.selection__midvex_notification_log__status__warning
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_log_search
+msgid "Warning"
+msgstr "Uyarı"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "Webhook"
+msgstr "Webhook"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__webhook_secret
+msgid "Webhook Secret"
+msgstr "Webhook Gizli Anahtarı"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__webhook_url
+msgid "Webhook Url"
+msgstr "Webhook Adresi"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,field_description:midvex_o_notification_foundry.field_midvex_notification_account__website_message_ids
+msgid "Website Messages"
+msgstr "Websitesi Mesajları"
+
+#. module: midvex_o_notification_foundry
+#: model:ir.model.fields,help:midvex_o_notification_foundry.field_midvex_notification_account__website_message_ids
+msgid "Website communication history"
+msgstr "Websitesi iletişim geçmişi"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_inbound_event_search
+msgid "With Error"
+msgstr "Hata İçerenler"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_foundry.action_notification_templates
+msgid "Write a message template"
+msgstr "Bir mesaj şablonu yazın"
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "You can only manage your own notification link."
+msgstr "Yalnızca kendi bildirim bağlantınızı yönetebilirsiniz."
+
+#. module: midvex_o_notification_foundry
+#. odoo-python
+#: code:addons/midvex_o_notification_foundry/models/notification.py:0
+msgid "account_id"
+msgstr "account_id"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_message_form
+msgid "attempt(s). Fix the cause, then press <strong>Retry Now</strong>."
+msgstr "deneme yapıldı. Nedenini giderin, ardından <strong>Şimdi Yeniden Dene</strong> düğmesine basın."
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_template_form
+msgid "crm_lead_created"
+msgstr "crm_lead_created"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_rule_form
+msgid "e.g. CRM lead created -> Telegram"
+msgstr "ör. CRM adayı oluşturuldu -> Telegram"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_template_form
+msgid "e.g. Lead created"
+msgstr "ör. Aday oluşturuldu"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_recipient_form
+msgid "e.g. Sales team room"
+msgstr "ör. Satış ekibi odası"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_channel_form
+msgid "e.g. Telegram"
+msgstr "ör. Telegram"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "e.g. VARS Sales Telegram Bot"
+msgstr "ör. VARS Satış Telegram Botu"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_account_form
+msgid "https://erp.example.com/notification/telegram/webhook/1"
+msgstr "https://erp.example.com/notification/telegram/webhook/1"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_channel_form
+msgid "midvex_o_notification_telegram"
+msgstr "midvex_o_notification_telegram"
+
+#. module: midvex_o_notification_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_foundry.view_notification_channel_form
+msgid "telegram"
+msgstr "telegram"

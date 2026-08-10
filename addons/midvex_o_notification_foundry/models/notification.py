@@ -422,10 +422,26 @@ class NotificationRule(models.Model):
     # real domain builder for trigger_domain instead of a bare text box — the
     # domain widget needs the target model name in a field it can read.
     model_name = fields.Char(related='model_id.model', string='Technical Model Name', store=True)
-    trigger = fields.Selection([('on_create', 'On Creation'), ('on_write', 'On Update')],
+    trigger = fields.Selection([('on_create', 'On Creation'), ('on_write', 'On Update'),
+                                 ('on_schedule', 'On Schedule')],
                                 default='on_create', required=True)
     trigger_domain = fields.Char(help='Optional Odoo domain, evaluated against the triggering record. '
                                        'Leave empty to always match.')
+    # --- Schedule (trigger == 'on_schedule' only) ---------------------------
+    # A scheduled rule reacts to a date passing rather than to somebody saving
+    # a record, which is the only way to express "this invoice is now overdue".
+    # These three map straight onto base.automation's on_time fields; see
+    # _automation_values.
+    date_field_id = fields.Many2one(
+        'ir.model.fields', string='Date Field', ondelete='cascade',
+        domain="[('model_id', '=', model_id), ('ttype', 'in', ('date', 'datetime'))]",
+        help='The date this rule watches. The rule fires once per record, as that '
+              'date crosses the offset below.')
+    schedule_offset = fields.Integer(
+        string='Offset (days)', default=0,
+        help='How many days away from the date field to fire. 0 fires on the date itself.')
+    schedule_offset_mode = fields.Selection([('after', 'After'), ('before', 'Before')],
+                                             string='Offset Direction', default='after')
     template_id = fields.Many2one('midvex.notification.template', required=True, ondelete='restrict')
     channel_ids = fields.Many2many('midvex.notification.channel', required=True, string='Channels')
     audience_group_ids = fields.Many2many('res.groups', 'notification_rule_group_rel', 'rule_id', 'group_id',
@@ -443,7 +459,22 @@ class NotificationRule(models.Model):
     active = fields.Boolean(default=True)
     automation_id = fields.Many2one('base.automation', string='Automation', readonly=True, copy=False,
                                      help='The automation that makes this rule fire. Maintained '
-                                          'automatically; several rules on the same model share one.')
+                                          'automatically; several rules on the same model share one, '
+                                          'except scheduled rules, which each own theirs.')
+
+    @api.constrains('trigger', 'date_field_id')
+    def _check_schedule(self):
+        for rule in self:
+            if rule.trigger != 'on_schedule':
+                continue
+            if not rule.date_field_id:
+                raise ValidationError(_('A scheduled rule needs a date field to watch.'))
+            if rule.date_field_id.model != rule.model_name:
+                raise ValidationError(_('%(field)s belongs to %(other)s, not to %(model)s.') % {
+                    'field': rule.date_field_id.name,
+                    'other': rule.date_field_id.model,
+                    'model': rule.model_name,
+                })
 
     # --- Wiring -------------------------------------------------------------
     # Nothing calls enqueue_event() by itself. A rule only fires because a
@@ -455,15 +486,40 @@ class NotificationRule(models.Model):
 
     _AUTOMATION_CODE = (
         "env['midvex.notification.message'].sudo()._trigger_event(%r, record, %r)")
+    # Scheduled rules name themselves in the call. Their automations are not
+    # shared, so without the rule id the automation for "due soon" would also
+    # enqueue "overdue" for any record both domains happen to match.
+    _SCHEDULED_AUTOMATION_CODE = (
+        "env['midvex.notification.message'].sudo()._trigger_event(%r, record, %r, rule_id=%d)")
+
+    _EVENT_CODES = {'on_create': 'created', 'on_write': 'updated', 'on_schedule': 'scheduled'}
 
     def _automation_values(self):
         self.ensure_one()
-        return {
+        values = {
             'name': 'Notification: %s on %s' % (
                 dict(self._fields['trigger'].selection).get(self.trigger), self.model_name),
             'model_id': self.model_id.id,
             'trigger': self.trigger,
         }
+        if self.trigger != 'on_schedule':
+            return values
+        # base.automation calls the time-based trigger 'on_time', and drives it
+        # from its own cron. Its @api.constrains rejects a negative delay, so
+        # "before" is expressed through the mode and never through the sign.
+        values.update({
+            'name': 'Notification: %s (%s)' % (self.name, self.model_name),
+            'trigger': 'on_time',
+            'trg_date_id': self.date_field_id.id,
+            'trg_date_range': abs(self.schedule_offset),
+            'trg_date_range_mode': self.schedule_offset_mode,
+            'trg_date_range_type': 'day',
+            # Given to the automation as well as kept on the rule: this one is
+            # applied in the cron's search, so a rule watching invoices does
+            # not drag every journal entry through the dispatcher first.
+            'filter_domain': self.trigger_domain or False,
+        })
+        return values
 
     def _find_or_create_automation(self):
         """One automation per (model, trigger), shared by every rule on it.
@@ -473,23 +529,43 @@ class NotificationRule(models.Model):
         second time. Existing automations are adopted rather than duplicated,
         which matters because a hand-written one is already installed for
         crm.lead on production.
+
+        Scheduled rules are the exception and own theirs outright: the watched
+        date field, the offset and the domain all live on the automation, so
+        two scheduled rules on one model cannot describe themselves with one.
         """
         self.ensure_one()
         Automation = self.env['base.automation'].sudo()
-        automation = Automation.search([
-            ('model_id', '=', self.model_id.id),
-            ('trigger', '=', self.trigger),
-        ], limit=1)
-        if automation:
-            return automation
+        if self.trigger == 'on_schedule':
+            if self.automation_id:
+                # Keep it in step - editing the offset or the domain on the rule
+                # has to reach the automation, or the cron keeps the old window.
+                self.automation_id.write(self._automation_values())
+                return self.automation_id
+        else:
+            automation = Automation.search([
+                ('model_id', '=', self.model_id.id),
+                ('trigger', '=', self.trigger),
+            ], limit=1)
+            if automation:
+                return automation
         automation = Automation.create(self._automation_values())
-        event_code = 'created' if self.trigger == 'on_create' else 'updated'
+        event_code = self._EVENT_CODES[self.trigger]
+        if self.trigger == 'on_schedule':
+            # base.automation defaults last_run to the epoch, and its cron fires
+            # every record whose date crossed between last_run and now. Left
+            # alone, switching this rule on would treat every invoice overdue
+            # since 1970 as newly due and enqueue the lot in one go.
+            automation.last_run = fields.Datetime.now()
+            code = self._SCHEDULED_AUTOMATION_CODE % (self.model_name, event_code, self.id)
+        else:
+            code = self._AUTOMATION_CODE % (self.model_name, event_code)
         self.env['ir.actions.server'].sudo().create({
             'name': automation.name,
             'base_automation_id': automation.id,
             'model_id': self.model_id.id,
             'state': 'code',
-            'code': self._AUTOMATION_CODE % (self.model_name, event_code),
+            'code': code,
         })
         return automation
 
@@ -514,11 +590,20 @@ class NotificationRule(models.Model):
             lambda item: any('midvex.notification.message' in (action.code or '')
                               for action in item.action_server_ids))
         for automation in ours:
-            still_needed = self.sudo().search_count([
-                ('active', '=', True),
-                ('model_id', '=', automation.model_id.id),
-                ('trigger', '=', automation.trigger),
-            ])
+            if automation.trigger == 'on_time':
+                # A scheduled automation belongs to exactly one rule, so the
+                # headcount below cannot see it: two scheduled rules on one
+                # model would keep each other's automations alive forever.
+                still_needed = self.sudo().search_count([
+                    ('active', '=', True),
+                    ('automation_id', '=', automation.id),
+                ])
+            else:
+                still_needed = self.sudo().search_count([
+                    ('active', '=', True),
+                    ('model_id', '=', automation.model_id.id),
+                    ('trigger', '=', automation.trigger),
+                ])
             if not still_needed:
                 automation.unlink()
 
@@ -530,10 +615,13 @@ class NotificationRule(models.Model):
 
     def write(self, vals):
         result = super().write(vals)
-        # Only the fields that decide which automation is needed. Without this
-        # guard, writing automation_id from _sync_automations would recurse.
+        # Only the fields that decide which automation is needed, or - for a
+        # scheduled rule, whose whole window lives on the automation - what it
+        # should say. Without this guard, writing automation_id from
+        # _sync_automations would recurse.
         if not self.env.context.get('skip_automation_sync') and (
-                {'model_id', 'trigger', 'active'} & set(vals)):
+                {'model_id', 'trigger', 'active', 'name', 'date_field_id',
+                 'schedule_offset', 'schedule_offset_mode', 'trigger_domain'} & set(vals)):
             self._sync_automations()
         return result
 
@@ -689,9 +777,12 @@ class NotificationMessage(models.Model):
         return ready.action_process()
 
     @api.model
-    def _trigger_event(self, model_name, record, event_code):
+    def _trigger_event(self, model_name, record, event_code, rule_id=None):
+        # rule_id is optional so the server actions written before scheduled
+        # rules existed keep working untouched - which is why this change needs
+        # no migration.
         from ..services.dispatcher import enqueue_event
-        return enqueue_event(self.env, model_name, record, event_code)
+        return enqueue_event(self.env, model_name, record, event_code, rule_id=rule_id)
 
 
 class NotificationLog(models.Model):

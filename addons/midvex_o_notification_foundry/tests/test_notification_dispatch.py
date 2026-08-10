@@ -521,3 +521,86 @@ class TestOnWriteIsNotDedupedForever(TransactionCase):
         again = Message._trigger_event('res.partner', partner, 'updated')
         self.assertEqual(len(first), 1)
         self.assertEqual(len(again), 0)
+
+
+class TestRecipientLanguage(TransactionCase):
+    """Template subjects and bodies are translatable, but the environment doing
+    the rendering belongs to whoever saved the record. Rendered there, a
+    Turkish colleague's alert arrives in English purely because an
+    English-speaking user happened to trigger it."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.adapter = MockAdapter()
+        registry._ADAPTERS[cls.adapter.channel_code] = cls.adapter
+        cls.channel = ensure_channel(cls.env, cls.adapter.channel_code, 'Mock Channel')
+        cls.account = cls.env['midvex.notification.account'].create({
+            'name': 'Language account', 'channel_id': cls.channel.id, 'state': 'connected',
+        })
+        # Activated, not installed: activating is enough to store a translation
+        # against the language, and installing one would pull the whole
+        # catalogue into every run of this suite.
+        cls.env['res.lang']._activate_lang('tr_TR')
+
+        cls.english = cls.env['res.users'].create({
+            'name': 'English Member', 'login': 'notif_lang_en',
+            'email': 'en@example.com', 'lang': 'en_US',
+        })
+        cls.turkish = cls.env['res.users'].create({
+            'name': 'Turkish Member', 'login': 'notif_lang_tr',
+            'email': 'tr@example.com', 'lang': 'tr_TR',
+        })
+        for user in (cls.english, cls.turkish):
+            cls.env['midvex.notification.recipient'].create({
+                'user_id': user.id, 'account_id': cls.account.id,
+                'state': 'linked', 'external_id': 'chat-%s' % user.id,
+            })
+        cls.room = cls.env['midvex.notification.recipient'].create({
+            'kind': 'group', 'name': 'Shared room', 'account_id': cls.account.id,
+            'state': 'linked', 'external_id': '-100777',
+        })
+
+        partner_model = cls.env['ir.model']._get('res.partner')
+        cls.template = cls.env['midvex.notification.template'].create({
+            'name': 'Partner created', 'code': 'lang_partner_created',
+            'model_id': partner_model.id, 'subject': 'New partner',
+            'body': '{{ object.name }} was created',
+        })
+        cls.template.with_context(lang='tr_TR').write({
+            'subject': 'Yeni cari', 'body': '{{ object.name }} oluşturuldu',
+        })
+        cls.rule = cls.env['midvex.notification.rule'].create({
+            'name': 'Notify both languages', 'model_id': partner_model.id,
+            'trigger': 'on_create', 'template_id': cls.template.id,
+            'channel_ids': [(4, cls.channel.id)],
+            'audience_user_ids': [(4, cls.english.id), (4, cls.turkish.id)],
+            'audience_recipient_ids': [(4, cls.room.id)],
+        })
+
+    @classmethod
+    def tearDownClass(cls):
+        registry.unregister_adapter(cls.adapter.channel_code)
+        super().tearDownClass()
+
+    def test_one_event_renders_per_recipient_language(self):
+        partner = self.env['res.partner'].create({'name': 'Acme Corp'})
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+
+        by_user = {message.recipient_id.user_id: message for message in created}
+        self.assertEqual(by_user[self.english].body, 'Acme Corp was created')
+        self.assertEqual(by_user[self.english].subject, 'New partner')
+        self.assertEqual(by_user[self.turkish].body, 'Acme Corp oluşturuldu')
+        self.assertEqual(by_user[self.turkish].subject, 'Yeni cari')
+
+    def test_a_group_chat_keeps_the_acting_language(self):
+        """A shared chat has no user to ask - the kind constraint forbids one -
+        so it falls back rather than picking somebody's language at random."""
+        partner = self.env['res.partner'].create({'name': 'Beta Corp'})
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+
+        room_message = created.filtered(lambda message: message.recipient_id == self.room)
+        self.assertEqual(len(room_message), 1)
+        self.assertEqual(room_message.body, 'Beta Corp was created')

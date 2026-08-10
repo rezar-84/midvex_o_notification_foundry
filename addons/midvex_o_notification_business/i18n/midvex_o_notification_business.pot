@@ -1,0 +1,317 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_notification_business
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-10 10:55+0000\n"
+"PO-Revision-Date: 2026-08-10 10:55+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_vendor_bill_paid
+msgid "Bill paid: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_vendor_bill_posted
+msgid "Bill posted: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_cancelled
+msgid "Cancelled: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_credit_note_issued
+msgid ""
+"Credit note {{ object.name }} was posted for {{ object.partner_id.name }}.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Reversal of: {{ object.reversed_entry_id.name or 'not linked to an invoice' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_credit_note_issued
+msgid "Credit note: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_credit_note_issued
+msgid "Customer credit note issued"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_cancelled
+msgid "Customer invoice cancelled"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_due_soon
+msgid "Customer invoice due soon"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_overdue
+msgid "Customer invoice overdue"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_paid
+msgid "Customer invoice paid"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_partially_paid
+msgid "Customer invoice partially paid"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_posted
+msgid "Customer invoice posted"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_cancelled
+msgid ""
+"Customer invoice {{ object.name }} for {{ object.partner_id.name }} was cancelled.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_payment_received
+msgid "Customer payment received"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_due_soon
+msgid "Due soon: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_high_value_invoice
+msgid "High-value invoice posted"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_high_value_invoice
+msgid "High-value invoice: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_posted
+msgid "Invoice posted: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_paid
+msgid ""
+"Invoice {{ object.name }} from {{ object.partner_id.name }} is paid.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_assigned
+msgid "Lead assigned"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_assigned
+msgid "Lead assigned: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_lost
+msgid "Lead lost"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_stage_changed
+msgid "Lead stage changed"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_won
+msgid "Lead won"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_lost
+msgid "Lost: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_sale_confirmed
+msgid "Order confirmed: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_overdue
+msgid "Overdue: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_paid
+msgid "Paid: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_partially_paid
+msgid "Partially paid: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_payment_received
+msgid "Payment received: {{ object.amount }} {{ object.currency_id.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_sale_confirmed
+msgid "Sales order confirmed"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:ir.actions.server,name:midvex_o_notification_business.action_send_telegram_invoice
+#: model:ir.actions.server,name:midvex_o_notification_business.action_send_telegram_sale
+msgid "Send on Telegram"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_stage_changed
+msgid "Stage: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_vendor_bill_paid
+msgid "Vendor bill paid"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_vendor_bill_posted
+msgid "Vendor bill posted"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_vendor_bill_paid
+msgid ""
+"Vendor bill {{ object.name }} from {{ object.partner_id.name }} is paid.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_vendor_bill_posted
+msgid ""
+"Vendor bill {{ object.name }} from {{ object.partner_id.name }} was posted.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Due: {{ object.invoice_date_due or 'not set' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_vendor_credit_note
+msgid "Vendor credit note received"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_vendor_credit_note
+msgid ""
+"Vendor credit note {{ object.name }} from {{ object.partner_id.name }} was posted.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_vendor_credit_note
+msgid "Vendor credit note: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_won
+msgid "Won: {{ object.name }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_due_soon
+msgid ""
+"{{ object.name }} for {{ object.partner_id.name }} falls due on {{ object.invoice_date_due }}.\n"
+"Outstanding: {{ object.amount_residual }} {{ object.currency_id.name }}\n"
+"Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_overdue
+msgid ""
+"{{ object.name }} for {{ object.partner_id.name }} is overdue.\n"
+"Outstanding: {{ object.amount_residual }} {{ object.currency_id.name }}\n"
+"Was due: {{ object.invoice_date_due }}\n"
+"Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_partially_paid
+msgid ""
+"{{ object.name }} from {{ object.partner_id.name }} is partly paid.\n"
+"Still due: {{ object.amount_residual }} of {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Due date: {{ object.invoice_date_due or 'not set' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_assigned
+msgid ""
+"{{ object.name }} is now assigned to {{ object.user_id.name or 'nobody' }}.\n"
+"Contact: {{ object.partner_name or object.contact_name or 'unknown' }}\n"
+"Expected revenue: {{ object.expected_revenue or 0 }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_stage_changed
+msgid ""
+"{{ object.name }} moved to stage {{ object.stage_id.name }}.\n"
+"Salesperson: {{ object.user_id.name or 'unassigned' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_sale_confirmed
+msgid ""
+"{{ object.name }} was confirmed for {{ object.partner_id.name }}.\n"
+"Total: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Salesperson: {{ object.user_id.name or 'unassigned' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_lost
+msgid ""
+"{{ object.name }} was marked lost.\n"
+"Reason: {{ object.lost_reason_id.name or 'not given' }}\n"
+"Salesperson: {{ object.user_id.name or 'unassigned' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_high_value_invoice
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_posted
+msgid ""
+"{{ object.name }} was posted for {{ object.partner_id.name }}.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Due: {{ object.invoice_date_due or 'not set' }}\n"
+"Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_won
+msgid ""
+"{{ object.name }} was won by {{ object.user_id.name or 'the team' }}.\n"
+"Value: {{ object.expected_revenue or 0 }} {{ object.company_currency.name or '' }}"
+msgstr ""
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_payment_received
+msgid ""
+"{{ object.partner_id.name or 'An unnamed partner' }} paid {{ object.amount }} {{ object.currency_id.name }}.\n"
+"Reference: {{ object.name or object.memo or 'none' }}\n"
+"Date: {{ object.date }}"
+msgstr ""

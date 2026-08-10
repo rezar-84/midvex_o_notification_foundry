@@ -1,5 +1,47 @@
 <odoo noupdate="1">
 
+    <!-- Accounting and Invoicing events.
+
+         Like the CRM file, every rule here ships with no audience, which the
+         Rule form warns about in orange. That is deliberate: guessing one would
+         either notify the wrong people on install or notify a whole company.
+         Set an audience per rule after install.
+
+         One trait these inherit from the engine and worth knowing before you
+         enable the noisier ones: an on-update rule re-fires whenever a record
+         that still matches its domain is written again. Posted and paid
+         documents are largely locked in Odoo, so in practice this is quiet -
+         the exception is the payment rule below, where in_process -> paid is a
+         second write that still matches. -->
+
+    <!-- ================================================================
+         Cash in - receivables
+         ================================================================ -->
+
+    <record id="template_invoice_posted" model="midvex.notification.template">
+        <field name="name">Customer invoice posted</field>
+        <field name="code">account_invoice_posted</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Invoice posted: {{ object.name }}</field>
+        <field name="body">{{ object.name }} was posted for {{ object.partner_id.name }}.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}
+Due: {{ object.invoice_date_due or 'not set' }}
+Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}</field>
+    </record>
+
+    <record id="rule_invoice_posted" model="midvex.notification.rule">
+        <field name="name">Customer invoice posted -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- The receivable now exists and the payment clock starts. move_type
+             is as necessary here as on the paid rule: account.move also covers
+             bills, refunds and plain journal entries, and none of those are a
+             sale. -->
+        <field name="trigger_domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted')]</field>
+        <field name="template_id" ref="template_invoice_posted"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
     <record id="template_invoice_paid" model="midvex.notification.template">
         <field name="name">Customer invoice paid</field>
         <field name="code">account_invoice_paid</field>
@@ -18,6 +60,252 @@ Amount: {{ object.amount_total }} {{ object.currency_id.name }}</field>
              bill is money going out, not a sale to celebrate. -->
         <field name="trigger_domain">[('payment_state', '=', 'paid'), ('move_type', '=', 'out_invoice')]</field>
         <field name="template_id" ref="template_invoice_paid"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_invoice_partially_paid" model="midvex.notification.template">
+        <field name="name">Customer invoice partially paid</field>
+        <field name="code">account_invoice_partially_paid</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Partially paid: {{ object.name }}</field>
+        <field name="body">{{ object.name }} from {{ object.partner_id.name }} is partly paid.
+Still due: {{ object.amount_residual }} of {{ object.amount_total }} {{ object.currency_id.name }}
+Due date: {{ object.invoice_date_due or 'not set' }}</field>
+    </record>
+
+    <record id="rule_invoice_partially_paid" model="midvex.notification.rule">
+        <field name="name">Customer invoice partially paid -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- A partial payment needs a human to chase the rest, and it is
+             invisible to both the posted and the paid rule above. -->
+        <field name="trigger_domain">[('payment_state', '=', 'partial'), ('move_type', '=', 'out_invoice')]</field>
+        <field name="template_id" ref="template_invoice_partially_paid"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_payment_received" model="midvex.notification.template">
+        <field name="name">Customer payment received</field>
+        <field name="code">account_payment_received</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="subject">Payment received: {{ object.amount }} {{ object.currency_id.name }}</field>
+        <field name="body">{{ object.partner_id.name or 'An unnamed partner' }} paid {{ object.amount }} {{ object.currency_id.name }}.
+Reference: {{ object.name or object.memo or 'none' }}
+Date: {{ object.date }}</field>
+    </record>
+
+    <record id="rule_payment_received" model="midvex.notification.rule">
+        <field name="name">Customer payment received -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="trigger">on_write</field>
+        <!-- The only rule here that sees deposits, advances and unallocated
+             payments: money that arrives without an invoice behind it, which no
+             account.move rule can ever match.
+
+             Both live states are accepted because a payment reconciled on the
+             spot can reach 'paid' without ever being written as 'in_process'.
+             The cost is that the ordinary in_process -> paid transition is a
+             second write that still matches, so an allocated payment can alert
+             twice. Narrow this to one state if that matters more than catching
+             the immediately-reconciled case. -->
+        <field name="trigger_domain">[('payment_type', '=', 'inbound'), ('partner_type', '=', 'customer'), ('state', 'in', ('in_process', 'paid'))]</field>
+        <field name="template_id" ref="template_payment_received"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <!-- ================================================================
+         Cash in - the two date-driven ones
+
+         These are the reason midvex.notification.rule grew an on_schedule
+         trigger. Nobody writes to an invoice on the day it falls due, so an
+         on-update rule can never express either of them.
+
+         Each fires once per invoice, as invoice_date_due crosses the offset.
+         They do not repeat, so neither will chase the same invoice twice.
+         ================================================================ -->
+
+    <record id="template_invoice_due_soon" model="midvex.notification.template">
+        <field name="name">Customer invoice due soon</field>
+        <field name="code">account_invoice_due_soon</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Due soon: {{ object.name }}</field>
+        <field name="body">{{ object.name }} for {{ object.partner_id.name }} falls due on {{ object.invoice_date_due }}.
+Outstanding: {{ object.amount_residual }} {{ object.currency_id.name }}
+Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}</field>
+    </record>
+
+    <record id="rule_invoice_due_soon" model="midvex.notification.rule">
+        <field name="name">Customer invoice due in 3 days -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_schedule</field>
+        <field name="date_field_id" ref="account.field_account_move__invoice_date_due"/>
+        <field name="schedule_offset">3</field>
+        <field name="schedule_offset_mode">before</field>
+        <!-- Not fully paid, so an invoice settled early goes quiet on its own. -->
+        <field name="trigger_domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))]</field>
+        <field name="template_id" ref="template_invoice_due_soon"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_invoice_overdue" model="midvex.notification.template">
+        <field name="name">Customer invoice overdue</field>
+        <field name="code">account_invoice_overdue</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Overdue: {{ object.name }}</field>
+        <field name="body">{{ object.name }} for {{ object.partner_id.name }} is overdue.
+Outstanding: {{ object.amount_residual }} {{ object.currency_id.name }}
+Was due: {{ object.invoice_date_due }}
+Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}</field>
+    </record>
+
+    <record id="rule_invoice_overdue" model="midvex.notification.rule">
+        <field name="name">Customer invoice overdue -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_schedule</field>
+        <field name="date_field_id" ref="account.field_account_move__invoice_date_due"/>
+        <!-- One day after, not zero: on the due date itself the invoice is due,
+             not late, and calling it overdue a day early is the kind of message
+             that gets a whole channel muted. -->
+        <field name="schedule_offset">1</field>
+        <field name="schedule_offset_mode">after</field>
+        <field name="trigger_domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))]</field>
+        <field name="template_id" ref="template_invoice_overdue"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <!-- ================================================================
+         Risk and control
+         ================================================================ -->
+
+    <record id="template_credit_note_issued" model="midvex.notification.template">
+        <field name="name">Customer credit note issued</field>
+        <field name="code">account_credit_note_issued</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Credit note: {{ object.name }}</field>
+        <field name="body">Credit note {{ object.name }} was posted for {{ object.partner_id.name }}.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}
+Reversal of: {{ object.reversed_entry_id.name or 'not linked to an invoice' }}</field>
+    </record>
+
+    <record id="rule_credit_note_issued" model="midvex.notification.rule">
+        <field name="name">Customer credit note issued -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- Revenue moving backwards, and the document in the ledger most worth
+             a second pair of eyes. -->
+        <field name="trigger_domain">[('move_type', '=', 'out_refund'), ('state', '=', 'posted')]</field>
+        <field name="template_id" ref="template_credit_note_issued"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_invoice_cancelled" model="midvex.notification.template">
+        <field name="name">Customer invoice cancelled</field>
+        <field name="code">account_invoice_cancelled</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Cancelled: {{ object.name }}</field>
+        <field name="body">Customer invoice {{ object.name }} for {{ object.partner_id.name }} was cancelled.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}</field>
+    </record>
+
+    <record id="rule_invoice_cancelled" model="midvex.notification.rule">
+        <field name="name">Customer invoice cancelled -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- Cancelling an invoice that was already posted is audit-sensitive
+             and should never happen quietly. -->
+        <field name="trigger_domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'cancel')]</field>
+        <field name="template_id" ref="template_invoice_cancelled"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_high_value_invoice" model="midvex.notification.template">
+        <field name="name">High-value invoice posted</field>
+        <field name="code">account_high_value_invoice</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">High-value invoice: {{ object.name }}</field>
+        <field name="body">{{ object.name }} was posted for {{ object.partner_id.name }}.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}
+Due: {{ object.invoice_date_due or 'not set' }}
+Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}</field>
+    </record>
+
+    <record id="rule_high_value_invoice" model="midvex.notification.rule">
+        <field name="name">High-value invoice posted -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- The 100000 is a placeholder in the company currency, not a
+             recommendation. Set it to a number that means something here. -->
+        <field name="trigger_domain">[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('amount_total', '&gt;=', 100000)]</field>
+        <field name="template_id" ref="template_high_value_invoice"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+        <!-- Off by default. A shipped threshold is either far too low, and
+             alerts on every invoice, or far too high and never fires once -
+             and both look identical to someone who has not read this file. -->
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- ================================================================
+         Cash out - payables
+         ================================================================ -->
+
+    <record id="template_vendor_bill_posted" model="midvex.notification.template">
+        <field name="name">Vendor bill posted</field>
+        <field name="code">account_vendor_bill_posted</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Bill posted: {{ object.name }}</field>
+        <field name="body">Vendor bill {{ object.name }} from {{ object.partner_id.name }} was posted.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}
+Due: {{ object.invoice_date_due or 'not set' }}</field>
+    </record>
+
+    <record id="rule_vendor_bill_posted" model="midvex.notification.rule">
+        <field name="name">Vendor bill posted -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- Opens the approval queue and commits future cash. -->
+        <field name="trigger_domain">[('move_type', '=', 'in_invoice'), ('state', '=', 'posted')]</field>
+        <field name="template_id" ref="template_vendor_bill_posted"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_vendor_bill_paid" model="midvex.notification.template">
+        <field name="name">Vendor bill paid</field>
+        <field name="code">account_vendor_bill_paid</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Bill paid: {{ object.name }}</field>
+        <field name="body">Vendor bill {{ object.name }} from {{ object.partner_id.name }} is paid.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}</field>
+    </record>
+
+    <record id="rule_vendor_bill_paid" model="midvex.notification.rule">
+        <field name="name">Vendor bill paid -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- A separate template from the customer one on purpose. Both say
+             "paid", and they mean opposite directions of cash: the customer
+             rule above excludes in_invoice for exactly this reason. -->
+        <field name="trigger_domain">[('payment_state', '=', 'paid'), ('move_type', '=', 'in_invoice')]</field>
+        <field name="template_id" ref="template_vendor_bill_paid"/>
+        <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
+    </record>
+
+    <record id="template_vendor_credit_note" model="midvex.notification.template">
+        <field name="name">Vendor credit note received</field>
+        <field name="code">account_vendor_credit_note</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="subject">Vendor credit note: {{ object.name }}</field>
+        <field name="body">Vendor credit note {{ object.name }} from {{ object.partner_id.name }} was posted.
+Amount: {{ object.amount_total }} {{ object.currency_id.name }}</field>
+    </record>
+
+    <record id="rule_vendor_credit_note" model="midvex.notification.rule">
+        <field name="name">Vendor credit note received -&gt; Telegram</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="trigger">on_write</field>
+        <!-- Supplier credit that has to be applied before the next payment run,
+             or it is paid twice. -->
+        <field name="trigger_domain">[('move_type', '=', 'in_refund'), ('state', '=', 'posted')]</field>
+        <field name="template_id" ref="template_vendor_credit_note"/>
         <field name="channel_ids" eval="[(4, ref('midvex_o_notification_telegram.channel_telegram'))]"/>
     </record>
 

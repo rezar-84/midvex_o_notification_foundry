@@ -394,6 +394,7 @@
                 <field name="template_id"/>
                 <filter name="filter_on_create" string="On Creation" domain="[('trigger', '=', 'on_create')]"/>
                 <filter name="filter_on_write" string="On Update" domain="[('trigger', '=', 'on_write')]"/>
+                <filter name="filter_on_schedule" string="On Schedule" domain="[('trigger', '=', 'on_schedule')]"/>
                 <separator/>
                 <!-- A rule with no audience enqueues nothing at all, which is the
                      single easiest misconfiguration to miss. -->
@@ -448,6 +449,22 @@
                             <field name="audience_user_ids" widget="many2many_tags"/>
                             <field name="audience_recipient_ids" widget="many2many_tags"/>
                         </group>
+                    </group>
+                    <group string="Schedule" invisible="trigger != 'on_schedule'">
+                        <div class="text-muted" colspan="2">
+                            A scheduled rule fires once per record, as the date below
+                            crosses the offset. It does not repeat, so it will not chase
+                            the same record twice.
+                        </div>
+                        <field name="date_field_id"
+                               required="trigger == 'on_schedule'"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <label for="schedule_offset"/>
+                        <div>
+                            <field name="schedule_offset" class="oe_inline"/>
+                            <span class="mx-2">day(s)</span>
+                            <field name="schedule_offset_mode" class="oe_inline"/>
+                        </div>
                     </group>
                     <group string="Filter">
                         <!-- Was a raw Char box, so the domain had to be typed by hand

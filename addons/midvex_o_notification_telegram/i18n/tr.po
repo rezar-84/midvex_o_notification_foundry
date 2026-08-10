@@ -1,0 +1,181 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_notification_telegram
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-10 10:55+0000\n"
+"PO-Revision-Date: 2026-08-10 10:55+0000\n"
+"Last-Translator: Midvex\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: tr\n"
+
+#. module: midvex_o_notification_telegram
+#: model:midvex.notification.template,body:midvex_o_notification_telegram.template_lead_created
+msgid ""
+"A new lead was created: {{ object.name }} ({{ object.partner_name or "
+"object.contact_name or 'no contact name' }})."
+msgstr "Yeni bir aday oluşturuldu: {{ object.name }} ({{ object.partner_name or object.contact_name or 'kişi adı yok' }})."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "Alerts paused. Send /unmute to resume."
+msgstr "Bildirimler duraklatıldı. Devam etmek için /unmute gönderin."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "Alerts resumed."
+msgstr "Bildirimler yeniden başlatıldı."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "Alerts were already active."
+msgstr "Bildirimler zaten etkindi."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "Alerts were already paused."
+msgstr "Bildirimler zaten duraklatılmıştı."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "Connected as %(name)s. Alerts are %(state)s."
+msgstr "%(name)s olarak bağlandı. Bildirimler %(state)s."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "Connected. Alerts for %s will arrive here."
+msgstr "Bağlandı. %s için bildirimler buraya gelecek."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid ""
+"Disconnected. %s will no longer receive alerts here. Use /link with a new "
+"code to reconnect."
+msgstr "Bağlantı kesildi. %s artık burada bildirim almayacak. Yeniden bağlanmak için yeni bir kodla /link kullanın."
+
+#. module: midvex_o_notification_telegram
+#: model:midvex.notification.template,name:midvex_o_notification_telegram.template_lead_created
+msgid "Lead created"
+msgstr "Aday oluşturuldu"
+
+#. module: midvex_o_notification_telegram
+#: model:midvex.notification.template,subject:midvex_o_notification_telegram.template_lead_created
+msgid "New lead: {{ object.name }}"
+msgstr "Yeni aday: {{ object.name }}"
+
+#. module: midvex_o_notification_telegram
+#: model:base.automation,name:midvex_o_notification_telegram.automation_lead_created
+#: model:ir.actions.server,name:midvex_o_notification_telegram.automation_lead_created_action
+msgid "Notification: CRM lead created"
+msgstr "Bildirim: CRM adayı oluşturuldu"
+
+#. module: midvex_o_notification_telegram
+#: model:ir.actions.server,name:midvex_o_notification_telegram.action_send_telegram_lead
+msgid "Send on Telegram"
+msgstr "Telegram'dan Gönder"
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "Send the code with the command, like: /link ABC12345"
+msgstr "Kodu komutla birlikte gönderin, örneğin: /link ABC12345"
+
+#. module: midvex_o_notification_telegram
+#: model:midvex.notification.channel,name:midvex_o_notification_telegram.channel_telegram
+msgid "Telegram"
+msgstr "Telegram"
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid ""
+"That code belongs to a shared chat. Send it in the group chat itself, after "
+"adding this bot to the group."
+msgstr "Bu kod paylaşılan bir sohbete ait. Botu gruba ekledikten sonra kodu grup sohbetinin içinde gönderin."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid ""
+"That code belongs to one person's link. Send it to this bot in a direct "
+"message, not in a group."
+msgstr "Bu kod bir kişinin bağlantısına ait. Gruba değil, bu bota doğrudan mesaj olarak gönderin."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid ""
+"That code could not be redeemed. Generate a fresh one in Odoo and try again."
+msgstr "Bu kod kullanılamadı. Odoo üzerinde yeni bir kod oluşturup tekrar deneyin."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid ""
+"That code was not accepted. It may have expired (codes last 15 minutes), "
+"already been used, or been typed differently - they are case-sensitive. "
+"Generate a fresh one in Odoo and try again."
+msgstr "Bu kod kabul edilmedi. Süresi dolmuş (kodlar 15 dakika geçerlidir), daha önce kullanılmış veya farklı yazılmış olabilir - kodlar büyük/küçük harfe duyarlıdır. Odoo üzerinde yeni bir kod oluşturup tekrar deneyin."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid ""
+"This chat is not connected to an Odoo user. Use /link <code> to connect it."
+msgstr "Bu sohbet bir Odoo kullanıcısına bağlı değil. Bağlamak için /link <kod> kullanın."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid ""
+"VARS notifications bot\n"
+"\n"
+"/link <code> - connect this chat to your Odoo user\n"
+"/status - show whether this chat is connected\n"
+"/mute - pause alerts, keeping the connection\n"
+"/unmute - resume alerts\n"
+"/unlink - disconnect this chat\n"
+"/help - show this message\n"
+"\n"
+"Generate a link code from your Recipient record in Odoo. Codes expire after 15 minutes.\n"
+"\n"
+"In a group: add this bot to the group first, then send /link there. A personal code will be refused in a group, and a group's code will be refused in a direct message."
+msgstr ""
+"VARS bildirim botu\n"
+"\n"
+"/link <kod> - bu sohbeti Odoo kullanıcınıza bağlar\n"
+"/status - bu sohbetin bağlı olup olmadığını gösterir\n"
+"/mute - bağlantıyı koruyarak bildirimleri duraklatır\n"
+"/unmute - bildirimleri yeniden başlatır\n"
+"/unlink - bu sohbetin bağlantısını keser\n"
+"/help - bu mesajı gösterir\n"
+"\n"
+"Bağlantı kodunu Odoo'daki Alıcı kaydınızdan oluşturun. Kodlar 15 dakika sonra geçersiz olur.\n"
+"\n"
+"Grupta: önce botu gruba ekleyin, ardından /link komutunu orada gönderin. Kişisel bir kod grupta, grup kodu ise doğrudan mesajda reddedilir."
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "active"
+msgstr "etkin"
+
+#. module: midvex_o_notification_telegram
+#. odoo-python
+#: code:addons/midvex_o_notification_telegram/controllers/telegram_webhook.py:0
+msgid "muted"
+msgstr "sessiz"
