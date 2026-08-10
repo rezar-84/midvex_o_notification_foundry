@@ -117,3 +117,39 @@ The generic `base.automation`/`ir.actions.server` mechanism and the `_trigger_ev
 ### Reason
 
 The foundry must not depend on `crm` or hard-code any specific business model just to install; only the module demonstrating a concrete integration should carry that dependency and data.
+
+## ADR-010: Scheduled rules reuse `base.automation`'s `on_time`, and own their automation
+
+### Status
+
+Accepted — 2026-08-10
+
+### Decision
+
+`midvex.notification.rule.trigger` gains `on_schedule`, backed by a `base.automation` whose trigger is `on_time` — Odoo's existing time-based machinery — rather than a cron of our own. The rule carries `date_field_id`, `schedule_offset` and `schedule_offset_mode`, which map onto `trg_date_id`, `trg_date_range` and `trg_date_range_mode`; `trigger_domain` is copied to the automation's `filter_domain` so the scan is filtered in SQL.
+
+Unlike create/update rules, **each scheduled rule owns its automation** rather than sharing one per (model, trigger), and its server action passes `rule_id` so only that rule is dispatched.
+
+A scheduled notification fires **once per record, ever**: the idempotency occurrence is the constant `-sched` rather than `write_date`.
+
+### Reason
+
+`_cron_process_time_based_actions` already fires each record once as its date crosses the window between `last_run` and now, applies the domain in its search, and tunes its own cron interval. Writing a second scanner would duplicate exactly the queue/retry plumbing this project forbids duplicating.
+
+Sharing is impossible here because the watched date, the offset and the domain all live *on* the automation — "due in 3 days" and "overdue by 1" cannot be described by one record. And without `rule_id` in the call, either automation firing would enqueue both rules for any invoice both domains match, so every invoice would be called overdue three days early.
+
+Once-per-record matches `base.automation`'s own semantics and gives a second, independent guard against a reset `last_run`: the first is stamping `last_run = now` when the automation is created, without which enabling a rule would treat every invoice overdue since 1970 as newly due and enqueue the lot.
+
+## ADR-011: Notifications render in the recipient's language
+
+### Status
+
+Accepted — 2026-08-10
+
+### Decision
+
+`enqueue_event` renders each message through `template.with_context(lang=recipient.user_id.lang)`. Group chats have no user, so they keep the acting environment's language.
+
+### Reason
+
+Template subjects and bodies are `translate=True`, but the environment doing the rendering belongs to whoever saved the record. Rendered there, a Turkish recipient received English purely because an English-speaking colleague happened to trigger the alert — which made the Turkish catalogue decorative for exactly the mixed-language teams that need it. The render call already sat inside the per-recipient loop, so this costs no extra renders.

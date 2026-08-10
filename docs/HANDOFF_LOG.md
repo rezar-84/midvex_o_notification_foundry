@@ -116,3 +116,48 @@ Reported as caused by this module. **It is not.** Recorded in full so nobody inv
 - **Fix:** drop the dangling key so the property falls back to the company default — `UPDATE res_partner SET property_account_receivable_id = property_account_receivable_id - '<company_id>' WHERE id = <partner_id>;`, after a backup. Worth asking how the account was deleted: if a chart of accounts was removed or reimported, journals, tax accounts and invoice lines may hold the same dangling references.
 - **Separately noticed:** in `odoo19_dev`, user 2 could not create a `midvex.notification.template` — `AccessError`, no Notifications/Manager group — even though `security/notification_security.xml` grants `group_notification_admin` to `base.user_admin` and the file is not `noupdate`. Not chased down; worth a look, since it means an admin may have to grant themselves the group by hand after install.
 - **Housekeeping:** the reproduction pointed contact #1 at the missing account. Its original value was recovered from `backups/odoo19_dev_pre_notif_upgrade.dump` (empty), restored, both throwaway rules and templates removed, and the scratch database dropped. Deleting the throwaway rule also removed its automation on its own, which incidentally exercised `_drop_orphan_automations` against real data.
+
+## 2026-08-10 — Accounting events, a scheduled trigger, and Turkish for all three modules
+
+Asked for: sample Accounting/Invoicing templates, an analysis of which notifications matter most, those notifications built, and a Turkish translation. The user chose the largest option on all three questions (full AR + AP set, add a scheduled trigger, translate all three modules).
+
+### What shipped
+
+- **Eleven new Accounting/Invoicing events** in `midvex_o_notification_business`, taking `account_templates.xml` from one event to twelve. Ranked by what goes wrong when nobody is told:
+  - *Cash in*: invoice posted (the receivable exists and the clock starts), partially paid, **customer payment received** on `account.payment` — the only rule that can see deposits, advances and unallocated payments, because money arriving without an invoice is invisible to every `account.move` rule — plus due-in-3-days and overdue.
+  - *Risk*: customer credit note posted, posted invoice cancelled, high-value invoice (**ships disabled**; the 100000 in its domain is a placeholder, and a shipped guess either alerts on every invoice or never fires, which look identical from outside).
+  - *Cash out*: vendor bill posted, vendor bill paid, vendor credit note.
+- **`on_schedule` rules** in the foundry (`19.0.1.4.0`), so a rule can react to a date passing. See ADR-010.
+- **Turkish** — `i18n/tr.po` for all three modules, 353 strings, plus the `.pot` each was generated from.
+- **Per-recipient language rendering** in the dispatcher. See ADR-011.
+
+### Things worth not rediscovering
+
+- **`base.automation` already does the scheduled scan, correctly.** `_cron_process_time_based_actions` (`base_automation.py:1171`) fires each record **once**, as its date crosses the window between the automation's `last_run` and now, offset by `trg_date_range`, and applies `filter_domain` in the search. A bespoke scanner would have re-implemented all of it.
+- **Two independent guards against a 1970 backfill.** `base.automation` defaults `last_run` to the epoch, so a freshly created scheduled automation would treat *every invoice overdue since 1970* as newly due and enqueue the lot on its first run. The primary guard is stamping `last_run = now` at creation; the second is the idempotency occurrence, a constant `-sched`, so a recreated automation cannot re-send anything either.
+- **Scheduled automations cannot be shared, and the call must name its rule.** The watched date, the offset and the domain all live on the automation, so "due soon" and "overdue" need one each. And because `enqueue_event` walks every rule matching (model, trigger), without `rule_id` in the server action either automation firing would enqueue **both** rules for any invoice both domains match — every invoice called overdue three days early. `_drop_orphan_automations` needed the matching split: its (model, trigger) headcount cannot see a per-rule automation, so two scheduled rules on one model would keep each other's alive forever.
+- **Odoo 19 moved the translation exporter to a subcommand.** `--i18n-export`/`--modules` are gone; it is `odoo-bin i18n export -c <conf> -d <db> MODULE...`, which writes into each module's own `i18n/` folder. `-l pot` **must not** precede the module names — its `nargs='+'` swallows them and the command fails asking for MODULE.
+- **Generate the catalogue, never hand-write the msgids.** A msgid that differs from the export by one character is silently untranslated at runtime, and implicit field labels are exported too. 114 of the 353 strings are inherited Odoo strings that already had official Turkish (pulled from `account/i18n/tr.po`, `mail`, `base`, so our wording matches what a Turkish user already sees elsewhere: Fatura, Tedarikçi Faturası, Vade Tarihi, Alıcı, Şablon, Kural).
+- **Odoo's own Turkish is wrong in context for some strings.** `State` is an address field in `base` ("İl/Eyalet"), not a status; `Display Name` is "İsim Göster"; `Revoked` is the imperative "Geriye al"; and the activity-status help carries stray backslashes before each colon that would render literally. Those eleven are overridden deliberately, not imported.
+- **A probe that looked like a bug and was not.** Calling `_trigger_event` by hand right after `action_post()` returns zero messages. `action_post()` writes to the invoice, which fires the automation, which already enqueued them — the manual call recomputes the same idempotency key and dedupes, exactly as designed. A second write in the *same transaction* also will not re-fire, because `base_automation` guards with `__action_done` in the context. Verify the language path with two separate records, not two writes to one.
+- **Recipient searches need `sudo`.** `rule_notification_recipient_self` restricts recipients to `user_id = user.id`, so a shell probe running as OdooBot resolves no targets at all. The real path is always `env['midvex.notification.message'].sudo()._trigger_event(...)` from the server action.
+- **Observed, not chased:** the very first invoice of a fresh sequence rendered its alert with an empty `{{ object.name }}` — the automation fires during `action_post` before the number lands. The second invoice rendered `INV/2026/00003` correctly, so this looks like a first-of-sequence artifact rather than a systematic problem. Worth a look if anyone reports a blank invoice number in an alert.
+
+### Verification
+
+- **0 failed, 0 errors of 104 tests** on `odoo19_notif_grp` (`--test-tags=/midvex_o_notification_foundry,/midvex_o_notification_telegram,/midvex_o_notification_business`). Port 8069 was busy from a running dev server, so the runs used `--http-port=8099 --dev=`.
+- `msgfmt --check` on all three catalogues: 51 / 280 / 22 translated, no fuzzy and no empty entries. A test in the business module parses each `tr.po` and fails on any empty `msgstr`, because a half-finished catalogue is invisible at runtime.
+- **`odoo19_dev` upgraded** (backed up first to `backups/odoo19_dev_pre_scheduled_i18n.dump`) with `--load-language=tr_TR`. All three catalogues logged as loaded; Turkish subjects and bodies confirmed in `midvex_notification_template.subject->>'tr_TR'`.
+- **Both scheduled rules verified in the live database**: two distinct automations, `trigger = on_time`, ranges 3/before and 1/after, `invoice_date_due`, the full domain copied to `filter_domain`, and `last_run` stamped at upgrade time rather than 1970.
+- **The real cron, end to end** (rolled back): a back-dated invoice produced **one** message on the first `_cron_process_time_based_actions()` run and **still one** after a second run with `last_run` pushed back again — and the due-soon rule did **not** fire off the overdue rule's automation.
+- **Turkish end to end** (rolled back): two invoices posted by the same user with `lang` switched between them produced `Invoice posted: …` / `… was posted for …` and `Fatura onaylandı: INV/2026/00003` / `Dil Testi Ltd için INV/2026/00003 onaylandı. | Tutar: 250.0 TRY | Vade: … | Satış Temsilcisi: …`.
+
+### No migration, deliberately
+
+The new fields and the new selection value are pure schema additions, and `_trigger_event` takes `rule_id` as a keyword with a default — so the server actions written before scheduled rules existed keep working untouched. Nothing needed rewriting in place.
+
+### Open
+
+- Nothing is committed. `git status` shows ten modified files and five new paths (three `i18n/` folders and two test files).
+- The shipped rules still carry **no audience**, on purpose. They match records and deliver to nobody until one is set — including the two scheduled ones.
+- The on-update rules re-fire if a record that still matches is written again. Posted and paid documents are largely locked, so this is quiet in practice; the exception is `rule_payment_received`, where `in_process -> paid` is a second write that still matches. Noted in the data file itself.

@@ -20,10 +20,23 @@
 - [x] Group-chat recipients (feature 7) — a shared chat is its own recipient `kind`, forbidden from carrying a `user_id`, and link codes are refused when redeemed in the wrong kind of chat.
 - [x] Quiet hours (half of feature 8) — delivery is held and released, never dropped; windows cross midnight and are read on the recipient's own clock.
 - [ ] Digest (the other half of feature 8) — batch a recipient's queued alerts into one message instead of a burst. Not started. Needs a second cron and a way to keep each event's row honest while only one message is delivered.
+  Still open after the `on_schedule` work: that trigger fires **per record**, so it gives
+  "this invoice is overdue" but not "here are the twelve invoices overdue this week".
 - [ ] Delivery dashboard (feature 9) — the foundry manifest's summary still advertises a dashboard that does not exist. Either build it or stop claiming it.
 - [x] Rules wire their own `base.automation` — until 2026-08-09 a rule added in the UI matched nothing and reported no error.
 - [x] Send by hand — the compose wizard, reachable from the menu, a linked recipient, and a record's Actions menu, replacing the Message Queue's dead Create button.
 - [x] Ready-made business events — `midvex_o_notification_business` (CRM, Sales, Invoicing).
+  Extended 2026-08-10 with eleven Accounting/Invoicing events: invoice posted, partially paid,
+  due in 3 days, overdue, cancelled, customer credit note, customer payment received
+  (`account.payment`, the only rule that sees deposits and unallocated payments), high-value
+  invoice (ships disabled — the threshold is a placeholder), vendor bill posted, vendor bill
+  paid, and vendor credit note.
+- [x] Scheduled rules (`on_schedule`) — a rule can now react to a date passing rather than to
+  somebody saving a record, which is what "overdue" needs. Built on `base.automation`'s
+  `on_time`; see ADR-010.
+- [x] Turkish translation — full `i18n/tr.po` for all three modules (353 strings, no fuzzy or
+  empty entries, guarded by a test). Messages now render in the recipient's language rather
+  than the acting user's; see ADR-011.
 - [ ] Migrate `template_lead_created` / `rule_lead_created_telegram` out of the Telegram adapter into the business module. They are `noupdate="1"` records already installed on production, so moving the XML ids needs a migration rather than a cut and paste. Left alone deliberately.
 
 ## Sprint 3 — Email MVP
