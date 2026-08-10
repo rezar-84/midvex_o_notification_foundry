@@ -668,8 +668,15 @@ class NotificationMessage(models.Model):
     # later" and drives the attempt count and the failure decorations. A held
     # message has not been attempted and nothing is wrong with it.
     hold_until = fields.Datetime(string='Held Until', index=True, readonly=True,
-                                  help='Delivery is held until this time, because the '
-                                       'recipient is inside their quiet hours.')
+                                  help='Delivery is held until this time, either because the '
+                                       'recipient is inside their quiet hours or because the '
+                                       "channel's rate limit would be breached.")
+    # One field answering "why is this not sending", rather than a second
+    # datetime per reason: the two holds behave identically and only differ in
+    # what an admin should do about them - wait, or reconsider the audience.
+    hold_reason = fields.Selection([('quiet_hours', 'Quiet Hours'),
+                                     ('rate_limit', 'Rate Limit')],
+                                    readonly=True)
     payload = fields.Json()
     result = fields.Json(readonly=True)
     error_code = fields.Char()
@@ -713,16 +720,68 @@ class NotificationMessage(models.Model):
                 message.write({'state': 'quarantined', 'error_message': str(error)})
                 message._log('warning', str(error), 'QUARANTINED')
             except Exception as error:
-                if message.attempt_count < message.max_attempts:
-                    message.write({
-                        'state': 'pending', 'error_message': str(error),
-                        'next_retry_at': fields.Datetime.now() + timedelta(minutes=5),
-                    })
-                    message._log('warning', str(error), 'RETRY_SCHEDULED')
-                else:
-                    message.write({'state': 'failed', 'error_message': str(error)})
-                    message._log('failed', _('Delivery failed: %s') % str(error), 'DELIVERY_ERROR')
+                message._handle_failure(error)
         return True
+
+    # 1 minute, 5, then 25. The old behaviour was a flat five minutes, which
+    # retried a briefly-unreachable channel too slowly and a genuinely broken
+    # one too eagerly.
+    _RETRY_BACKOFF_MINUTES = (1, 5, 25)
+
+    def _handle_failure(self, error):
+        """Decide what a failed send means, using the adapter's own verdict.
+
+        parse_error and its retryable/retry_after_seconds keys have been in
+        ADAPTER_CONTRACT.md from the start, and nothing ever called them: every
+        failure got the same flat retry and consumed an attempt. That made
+        being rate-limited fatal - three 429s, which say nothing at all about
+        the message, marked a perfectly good alert permanently failed.
+        """
+        self.ensure_one()
+        from ..services.registry import get_adapter
+        try:
+            verdict = get_adapter(self.channel_code).parse_error(error) or {}
+        except Exception:
+            # An adapter that cannot classify its own failure must not turn a
+            # delivery problem into a traceback in the cron.
+            verdict = {}
+
+        text = verdict.get('message') or str(error)
+        error_code = verdict.get('error_code') or 'DELIVERY_ERROR'
+        retry_after = verdict.get('retry_after_seconds')
+
+        if retry_after is not None:
+            # Gives back the attempt action_process took on the way in. The
+            # channel asked us to wait, which is not a failed attempt, and
+            # counting it would let a busy hour destroy messages that were
+            # never really tried.
+            self.write({
+                'state': 'pending', 'error_message': text, 'error_code': error_code,
+                'attempt_count': max(0, self.attempt_count - 1),
+                'next_retry_at': fields.Datetime.now() + timedelta(seconds=int(retry_after)),
+            })
+            self._log('warning', text, error_code)
+            self._trigger_queue(at=self.next_retry_at)
+            return
+
+        if not verdict.get('retryable', True):
+            self.write({'state': 'quarantined', 'error_message': text, 'error_code': error_code})
+            self._log('warning', text, error_code)
+            return
+
+        if self.attempt_count < self.max_attempts:
+            index = min(self.attempt_count, len(self._RETRY_BACKOFF_MINUTES)) - 1
+            delay = self._RETRY_BACKOFF_MINUTES[max(0, index)]
+            self.write({
+                'state': 'pending', 'error_message': text, 'error_code': error_code,
+                'next_retry_at': fields.Datetime.now() + timedelta(minutes=delay),
+            })
+            self._log('warning', text, 'RETRY_SCHEDULED')
+            self._trigger_queue(at=self.next_retry_at)
+            return
+
+        self.write({'state': 'failed', 'error_message': text, 'error_code': error_code})
+        self._log('failed', _('Delivery failed: %s') % text, error_code)
 
     def action_retry(self):
         """Put a failed or quarantined message back in the queue and send it now.
@@ -743,6 +802,102 @@ class NotificationMessage(models.Model):
         retryable.write({'state': 'pending', 'next_retry_at': False, 'hold_until': False})
         return retryable.action_process()
 
+    def _throttle_release_at(self, now=None):
+        """When sending this now would breach the channel's rate limits, the
+        moment it stops doing so. False when it is free to go.
+
+        Shaped like the recipient's _quiet_release_at() on purpose: both answer
+        "not yet, and here is when", and cron_process_pending treats them the
+        same way.
+
+        The limits are read off the adapter, which is where the channel's API
+        research lives - the foundry knows only that a channel may declare
+        them. An adapter that declares none is never throttled, which keeps
+        this invisible to channels whose API does not need it.
+        """
+        self.ensure_one()
+        now = now or fields.Datetime.now()
+        from ..services.registry import get_adapter
+        try:
+            adapter = get_adapter(self.channel_code)
+        except UserError:
+            # No adapter means this message cannot send at all; let
+            # action_process report that rather than silently holding it here.
+            return False
+
+        releases = []
+        Sent = self.sudo()
+        chat_seconds = getattr(adapter, 'rate_limit_chat_seconds', 0)
+        if chat_seconds:
+            last = Sent.search([
+                ('recipient_id', '=', self.recipient_id.id),
+                ('state', '=', 'sent'), ('sent_at', '!=', False),
+            ], order='sent_at desc', limit=1)
+            if last and last.sent_at > now - timedelta(seconds=chat_seconds):
+                releases.append(last.sent_at + timedelta(seconds=chat_seconds))
+
+        group_per_minute = getattr(adapter, 'rate_limit_group_per_minute', 0)
+        if group_per_minute and self.recipient_id.kind == 'group':
+            recent = Sent.search([
+                ('recipient_id', '=', self.recipient_id.id),
+                ('state', '=', 'sent'),
+                ('sent_at', '>=', now - timedelta(minutes=1)),
+            ], order='sent_at asc')
+            if len(recent) >= group_per_minute:
+                # The oldest one still inside the window has to age out before
+                # there is room for another.
+                oldest_blocking = recent[len(recent) - group_per_minute]
+                releases.append(oldest_blocking.sent_at + timedelta(minutes=1))
+
+        global_per_second = getattr(adapter, 'rate_limit_global_per_second', 0)
+        if global_per_second:
+            in_flight = Sent.search_count([
+                ('account_id', '=', self.account_id.id),
+                ('state', '=', 'sent'),
+                ('sent_at', '>=', now - timedelta(seconds=1)),
+            ])
+            if in_flight >= global_per_second:
+                releases.append(now + timedelta(seconds=1))
+
+        # Several limits can apply at once, and the message is only free when
+        # the last of them has passed.
+        return max(releases) if releases else False
+
+    @api.model
+    def _trigger_queue(self, at=None):
+        """Wake the queue cron, now or at a given moment.
+
+        This is what makes delivery prompt: the cron's own interval is a
+        safety net for retries and releases, not the delivery path. Odoo
+        commits an ir.cron.trigger row and notifies the runner post-commit,
+        which is the same mechanism core uses for web push.
+
+        Silent when the cron is missing rather than raising: a database
+        part-way through an upgrade must not fail to enqueue, and a message
+        that is only queued late is a far smaller problem than a save that
+        blows up.
+        """
+        cron = self.env.ref(
+            'midvex_o_notification_foundry.ir_cron_notification_process_pending',
+            raise_if_not_found=False)
+        if cron:
+            cron.sudo()._trigger(at=at)
+
+    @api.model
+    def _batch_size(self):
+        """How many messages one queue run drains.
+
+        Configurable because the right number depends on the channel's rate
+        limits and the box: too small and a burst takes several runs to clear,
+        too large and one run holds the cron worker for a long time.
+        """
+        value = self.env['ir.config_parameter'].sudo().get_param(
+            'midvex_notification.batch_size', '200')
+        try:
+            return max(1, int(value))
+        except (TypeError, ValueError):
+            return 200
+
     @api.model
     def cron_process_pending(self):
         """Send what is due, and hold back what the recipient is asleep for.
@@ -752,29 +907,59 @@ class NotificationMessage(models.Model):
         admin acting by hand has decided the message is worth the interruption.
         """
         now = fields.Datetime.now()
+        # order='id' overrides the model's own 'id desc', which is right for
+        # the list view and wrong for a queue: it drained newest-first. That
+        # was invisible while everything in a batch went out regardless, but
+        # under a rate limit the newest message wins each run and the oldest
+        # alert - the one someone has been waiting on longest - is the one that
+        # gets deferred again and again.
         messages = self.search([
             ('state', '=', 'pending'),
             '|', ('next_retry_at', '=', False), ('next_retry_at', '<=', now),
             '|', ('hold_until', '=', False), ('hold_until', '<=', now),
-        ], limit=50)
-        ready = self.browse()
+        ], limit=self._batch_size(), order='id')
+        holds = []
         for message in messages:
             release = message.recipient_id._quiet_release_at(now)
-            if not release:
-                # Clears a stale hold whose window has since passed or been
-                # turned off, so the field always reads as the current plan.
-                if message.hold_until:
-                    message.hold_until = False
-                ready |= message
+            if release:
+                # Logged only when the hold is new. The cron runs every few
+                # minutes, and re-logging each pass would bury the real delivery
+                # history under one line per message per tick.
+                if not message.hold_until:
+                    message._log('warning', _('Held until %s: the recipient is in quiet hours.')
+                                  % release, 'QUIET_HOURS')
+                message.write({'hold_until': release, 'hold_reason': 'quiet_hours'})
+                holds.append(release)
                 continue
-            # Logged only when the hold is new. The cron runs every few
-            # minutes, and re-logging each pass would bury the real delivery
-            # history under one line per message per tick.
-            if not message.hold_until:
-                message._log('warning', _('Held until %s: the recipient is in quiet hours.')
-                              % release, 'QUIET_HOURS')
-            message.hold_until = release
-        return ready.action_process()
+
+            # Checked here, one message at a time, and never once for the whole
+            # batch: sending each message is what consumes the channel's
+            # allowance, so a batch of twenty-five to one group would otherwise
+            # all see an empty window and go out together.
+            throttle = message._throttle_release_at()
+            if throttle:
+                if message.hold_reason != 'rate_limit':
+                    message._log('warning', _('Held until %s: the channel rate limit '
+                                               'would be exceeded.') % throttle, 'RATE_LIMIT')
+                message.write({'hold_until': throttle, 'hold_reason': 'rate_limit'})
+                holds.append(throttle)
+                # Deliberately not a break, and deliberately not a sleep: the
+                # rest of the batch is for other chats, and one busy group room
+                # must not starve everyone else's alerts - nor hold the only
+                # cron worker doing nothing.
+                continue
+
+            # Clears a stale hold whose window has since passed or been turned
+            # off, so the field always reads as the current plan.
+            if message.hold_until or message.hold_reason:
+                message.write({'hold_until': False, 'hold_reason': False})
+            message.action_process()
+
+        if holds:
+            # Wake exactly when the earliest hold expires, rather than leaving
+            # held messages to wait out the cron's own interval.
+            self._trigger_queue(at=max(min(holds), fields.Datetime.now()))
+        return True
 
     @api.model
     def _trigger_event(self, model_name, record, event_code, rule_id=None):

@@ -498,6 +498,7 @@
                 <field name="channel_code"/>
                 <field name="state"/>
                 <field name="hold_until" optional="show"/>
+                <field name="hold_reason" optional="show"/>
                 <field name="attempt_count"/>
                 <field name="next_retry_at" optional="hide"/>
                 <field name="sent_at" optional="hide"/>
@@ -523,8 +524,16 @@
                 <filter name="filter_pending" string="Pending" domain="[('state', '=', 'pending')]"/>
                 <!-- Separated from Pending so "why has this not gone out" has an
                      answer that is not "it is stuck". -->
-                <filter name="filter_held" string="Held (Quiet Hours)"
+                <filter name="filter_held" string="Held"
                         domain="[('state', '=', 'pending'), ('hold_until', '!=', False)]"/>
+                <!-- Split out because the two holds call for different actions:
+                     quiet hours resolve themselves, a rate limit means the
+                     audience or the rule is sending more than the channel
+                     accepts. -->
+                <filter name="filter_held_quiet" string="Held (Quiet Hours)"
+                        domain="[('state', '=', 'pending'), ('hold_reason', '=', 'quiet_hours')]"/>
+                <filter name="filter_rate_limited" string="Rate Limited"
+                        domain="[('state', '=', 'pending'), ('hold_reason', '=', 'rate_limit')]"/>
                 <filter name="filter_sent" string="Sent" domain="[('state', '=', 'sent')]"/>
                 <separator/>
                 <filter name="filter_today" string="Today" domain="[('create_date', '&gt;=', 'today')]"/>
@@ -577,6 +586,7 @@
                         <group>
                             <field name="sent_at" readonly="1" invisible="state != 'sent'"/>
                             <field name="hold_until" readonly="1" invisible="not hold_until"/>
+                            <field name="hold_reason" readonly="1" invisible="not hold_reason"/>
                             <field name="next_retry_at" readonly="1" invisible="not next_retry_at"/>
                             <field name="attempt_count" readonly="1"/>
                             <field name="max_attempts"/>

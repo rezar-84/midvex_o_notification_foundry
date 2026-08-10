@@ -604,3 +604,68 @@ class TestRecipientLanguage(TransactionCase):
         room_message = created.filtered(lambda message: message.recipient_id == self.room)
         self.assertEqual(len(room_message), 1)
         self.assertEqual(room_message.body, 'Beta Corp was created')
+
+
+class TestQueueIsWokenOnEnqueue(TransactionCase):
+    """Nothing sends at enqueue time, so without a trigger the cron's own
+    interval is the entire delivery latency."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.adapter = MockAdapter()
+        registry._ADAPTERS[cls.adapter.channel_code] = cls.adapter
+        cls.channel = ensure_channel(cls.env, cls.adapter.channel_code, 'Mock Channel')
+        cls.account = cls.env['midvex.notification.account'].create({
+            'name': 'Trigger account', 'channel_id': cls.channel.id, 'state': 'connected',
+        })
+        cls.member = cls.env['res.users'].create({
+            'name': 'Trigger Member', 'login': 'notif_trigger_member',
+            'email': 'trigger@example.com',
+        })
+        cls.env['midvex.notification.recipient'].create({
+            'user_id': cls.member.id, 'account_id': cls.account.id,
+            'state': 'linked', 'external_id': 'chat-trigger',
+        })
+        partner_model = cls.env['ir.model']._get('res.partner')
+        cls.template = cls.env['midvex.notification.template'].create({
+            'name': 'Partner created', 'code': 'trigger_partner_created',
+            'model_id': partner_model.id, 'body': '{{ object.name }} was created',
+        })
+        cls.rule = cls.env['midvex.notification.rule'].create({
+            'name': 'Notify on creation', 'model_id': partner_model.id, 'trigger': 'on_create',
+            'template_id': cls.template.id, 'channel_ids': [(4, cls.channel.id)],
+            'audience_user_ids': [(4, cls.member.id)],
+        })
+        cls.cron = cls.env.ref(
+            'midvex_o_notification_foundry.ir_cron_notification_process_pending')
+
+    @classmethod
+    def tearDownClass(cls):
+        registry.unregister_adapter(cls.adapter.channel_code)
+        super().tearDownClass()
+
+    def _triggers(self):
+        return self.env['ir.cron.trigger'].search_count([('cron_id', '=', self.cron.id)])
+
+    def test_enqueueing_wakes_the_queue(self):
+        before = self._triggers()
+        partner = self.env['res.partner'].create({'name': 'Prompt Ltd'})
+        created = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+
+        self.assertEqual(len(created), 1)
+        self.assertGreater(self._triggers(), before, 'the queue cron was never woken')
+
+    def test_an_event_that_enqueues_nothing_does_not_wake_the_queue(self):
+        """The rule matches, but the message is already queued - waking the
+        cron for a dedupe would have it scan for nothing."""
+        partner = self.env['res.partner'].create({'name': 'Repeat Ltd'})
+        self.env['midvex.notification.message']._trigger_event('res.partner', partner, 'created')
+        before = self._triggers()
+
+        again = self.env['midvex.notification.message']._trigger_event(
+            'res.partner', partner, 'created')
+
+        self.assertEqual(len(again), 0)
+        self.assertEqual(self._triggers(), before)

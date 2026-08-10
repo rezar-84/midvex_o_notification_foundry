@@ -161,3 +161,47 @@ The new fields and the new selection value are pure schema additions, and `_trig
 - Nothing is committed. `git status` shows ten modified files and five new paths (three `i18n/` folders and two test files).
 - The shipped rules still carry **no audience**, on purpose. They match records and deliver to nobody until one is set — including the two scheduled ones.
 - The on-update rules re-fire if a record that still matches is written again. Posted and paid documents are largely locked, so this is quiet in practice; the exception is `rule_payment_received`, where `in_process -> paid` is a second write that still matches. Noted in the data file itself.
+
+## 2026-08-10 (later) — "Is there a Telegram rate limit, and how do we get instant delivery?"
+
+Both halves of the question turned out to be real defects rather than tuning.
+
+### Delivery was never instant
+
+`enqueue_event` only created `pending` rows; nothing sent. The queue cron's five-minute tick **was** the entire delivery latency, so an invoice posted at 10:00:01 alerted at 10:05, and the batch limit of 50 capped the drain rate at ~600/hour — a burst of 200 alerts took twenty minutes.
+
+Fixed with `ir.cron._trigger()` at the end of `enqueue_event`. **Measured on a running server: 0.3s to pick up, cron `lastcall` 2 seconds after the trigger.** A synchronous send would be marginally faster and was rejected — the user's save would then wait on a third party, and a Telegram outage would make posting an invoice slow or fail.
+
+### Telegram's limits, and the one nobody had written down
+
+Confirmed 2026-08-10 at `https://core.telegram.org/bots/faq`: ~1 message/second to a chat, ~30/second overall, and **20 per minute in a group**. The group figure was missing from `API_RESEARCH.md` and is the one a notification rule breaches first — a rule pointed at a shared sales room can exceed it from a single batch. Nothing paced sends at all before this.
+
+### The 429 defect
+
+`_request` parsed `retry_after` and threw it away into an error string. `action_process` caught it as a generic exception, scheduled a flat five-minute retry and **incremented `attempt_count`** — so three 429s, which say nothing whatsoever about the message, marked a perfectly good alert permanently `failed`. Meanwhile `parse_error`, `retryable` and `retry_after_seconds` had been in `ADAPTER_CONTRACT.md` from the start and **nothing had ever called `parse_error`**; Telegram's returned `retryable: False` hardcoded.
+
+### Things worth not rediscovering
+
+- **The queue drained newest-first.** `_order = 'id desc'` is right for the list view and wrong for a queue. Invisible while everything in a batch went out regardless; under a rate limit the newest message wins every run and the oldest alert is deferred repeatedly. `cron_process_pending` now passes `order='id'`. Found by a test, not by reading.
+- **Throttle per message, never per batch.** Sending is what consumes the allowance. Checked once for the batch, twenty-five messages to one group all see an empty window and go out together.
+- **Defer, don't sleep.** `max_cron_threads = 1` locally, so sleeping to pace a batch holds the only worker and lets one busy room starve every other recipient.
+- **Running a cron in `odoo-bin shell` commits, so a "rolled back" probe is not.** `_cron_process_time_based_actions` calls `ir.cron._commit_progress()` mid-run. The earlier overdue probe printed "rolled back" and still left a posted invoice, a partner, an audience on a shipped rule and **a queued Telegram message** in `odoo19_dev`. See the cleanup note below. Probe anything that runs a cron on a scratch database, not on the one people open.
+- **Adapter objects are not rolled back between tests.** `send_calls` on a class-level mock accumulates across test methods; reset it in `setUp` or assertions on call counts silently inherit the previous test's sends.
+- **Production prerequisite:** none of this runs without a cron worker. Local `config/odoo.conf` has `workers = 0`, `max_cron_threads = 1`. On a deployment with `max_cron_threads = 0` nothing has ever sent, triggered or not.
+
+### Verification
+
+- **0 failed, 0 errors of 120 tests** (up from 104) on `odoo19_notif_grp`, port 8099 because a dev server holds 8069.
+- Latency measured against a real running server with a cron worker, on a scratch database whose Telegram account has **no token** — so the send failed locally with no network call, which is enough to prove the cron ran. Result above.
+- The probe message came back `attempt_count = 1`, `state = pending`, `error_code = TELEGRAM_ERROR` — the new classification and backoff working on a real run rather than only under a mock.
+- `odoo19_dev` upgraded to foundry `19.0.1.5.0`.
+
+### Cleanup of my own mess in `odoo19_dev`
+
+Removed: the queued "INV/2026/00001 for Overdue Probe Ltd is overdue" message, which would have sent a false alert to a real Telegram chat the moment a cron ran, and the audience the probe added to `rule_invoice_overdue` (that rule ships with none, deliberately).
+
+**Still there and left alone deliberately** — deleting posted accounting entries is not something to do unasked: posted customer invoice **INV/2026/00001** (id 25, 575.00) and partner **Overdue Probe Ltd** (id 348), both created by the probe. It also consumed the first number in the 2026 invoice sequence.
+
+### No migration
+
+`hold_reason` is a new nullable column and the batch size has a default, so nothing needed rewriting in place.

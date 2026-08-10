@@ -10,6 +10,20 @@ class TelegramAdapter:
     channel_code = 'telegram'
     timeout = 20
 
+    # Telegram's published limits, verified 2026-08-10 at
+    # https://core.telegram.org/bots/faq — see docs/projects/notification_telegram/
+    # API_RESEARCH.md. They live here rather than in the foundry because the
+    # foundry must not know anything channel-specific, and because the numbers
+    # belong next to the research that justifies them.
+    #
+    # "We may allow short bursts that go over this limit, but eventually you'll
+    # begin receiving 429 errors", so these are the sustained rates to stay
+    # under, not hard walls. The group figure is the one that bites first: a
+    # rule pointed at a busy shared room can breach it from a single batch.
+    rate_limit_chat_seconds = 1        # one message per second to one chat
+    rate_limit_group_per_minute = 20   # twenty per minute in a group
+    rate_limit_global_per_second = 30  # about thirty per second overall
+
     def _url(self, account, api_method):
         if not account.api_key:
             raise UserError('Telegram bot token is not configured.')
@@ -30,10 +44,24 @@ class TelegramAdapter:
             description = body.get('description') or 'HTTP %s' % exc.code
             if exc.code == 429:
                 retry_after = (body.get('parameters') or {}).get('retry_after', 30)
-                raise UserError('Telegram rate limit reached (429): %s. Retry after %ss.' % (description, retry_after)) from exc
-            raise UserError('Telegram API request failed: %s' % description) from exc
+                failure = UserError('Telegram rate limit reached (429): %s. Retry after %ss.'
+                                     % (description, retry_after))
+                # Carried on the exception rather than only formatted into the
+                # message, so parse_error can hand the foundry a real number.
+                # An attribute keeps the foundry free of anything
+                # Telegram-specific and needs no shared exception class.
+                failure.retry_after = retry_after
+                failure.http_status = exc.code
+                raise failure from exc
+            failure = UserError('Telegram API request failed: %s' % description)
+            failure.http_status = exc.code
+            raise failure from exc
         except error.URLError as exc:
-            raise UserError('Telegram API connection failed.') from exc
+            # A connection that never reached Telegram says nothing about the
+            # message, so it stays retryable.
+            failure = UserError('Telegram API connection failed.')
+            failure.http_status = 0
+            raise failure from exc
 
     def test_connection(self, account):
         result = self._request(account, 'getMe')
@@ -137,5 +165,47 @@ class TelegramAdapter:
             'raw': raw_payload,
         }
 
+    # Failures no retry can fix, matched against Telegram's own wording. Left
+    # to the generic path they would burn all three attempts and then sit in
+    # the queue as "failed", indistinguishable from a network problem, when
+    # what they actually need is a human to fix the recipient.
+    _PERMANENT_FRAGMENTS = (
+        'chat not found',
+        'bot was blocked by the user',
+        'user is deactivated',
+        'bot was kicked',
+        'have no rights to send a message',
+        'not enough rights',
+        'chat_id is empty',
+        'message text is empty',
+        'message is too long',
+        "can't parse entities",
+    )
+
     def parse_error(self, response_or_exception):
-        return {'error_code': 'TELEGRAM_ERROR', 'message': str(response_or_exception), 'retryable': False}
+        """Normalize a failure into the adapter contract's error shape.
+
+        Previously this returned retryable=False for everything and nothing
+        called it, so a 429 - which says nothing about the message - was
+        treated as a delivery failure and consumed one of only three attempts.
+        """
+        message = str(response_or_exception)
+        lowered = message.lower()
+        retry_after = getattr(response_or_exception, 'retry_after', None)
+        status = getattr(response_or_exception, 'http_status', None)
+
+        if retry_after is not None:
+            return {'error_code': 'TELEGRAM_RATE_LIMIT', 'message': message,
+                    'retryable': True, 'retry_after_seconds': retry_after}
+        if any(fragment in lowered for fragment in self._PERMANENT_FRAGMENTS):
+            return {'error_code': 'TELEGRAM_PERMANENT', 'message': message,
+                    'retryable': False, 'retry_after_seconds': None}
+        # Everything else retries. 5xx and connection failures (status 0) are
+        # Telegram's problem rather than this message's, and an unrecognised
+        # 4xx is treated the same way on purpose: guessing "retryable" wrongly
+        # costs two extra attempts, while guessing "permanent" wrongly drops a
+        # real alert on the floor. New permanent causes belong in
+        # _PERMANENT_FRAGMENTS as they are found.
+        return {'error_code': 'TELEGRAM_ERROR', 'message': message,
+                'retryable': True, 'retry_after_seconds': None,
+                'http_status': status}
