@@ -10,6 +10,20 @@ class TelegramAdapter:
     channel_code = 'telegram'
     timeout = 20
 
+    # Telegram's published limits, verified 2026-08-10 at
+    # https://core.telegram.org/bots/faq — see docs/projects/notification_telegram/
+    # API_RESEARCH.md. They live here rather than in the foundry because the
+    # foundry must not know anything channel-specific, and because the numbers
+    # belong next to the research that justifies them.
+    #
+    # "We may allow short bursts that go over this limit, but eventually you'll
+    # begin receiving 429 errors", so these are the sustained rates to stay
+    # under, not hard walls. The group figure is the one that bites first: a
+    # rule pointed at a busy shared room can breach it from a single batch.
+    rate_limit_chat_seconds = 1        # one message per second to one chat
+    rate_limit_group_per_minute = 20   # twenty per minute in a group
+    rate_limit_global_per_second = 30  # about thirty per second overall
+
     def _url(self, account, api_method):
         if not account.api_key:
             raise UserError('Telegram bot token is not configured.')

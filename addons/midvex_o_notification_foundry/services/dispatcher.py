@@ -105,6 +105,15 @@ def enqueue_event(env, model_name, record, event_code, rule_id=None):
                     'body': rendered.get('body'),
                     'idempotency_key': idempotency_key,
                 })
+    if created:
+        # Nothing sends at enqueue time, so without this the queue cron's own
+        # five-minute tick is the whole delivery latency: an invoice posted at
+        # 10:00:01 alerted at 10:05. _trigger() writes an ir.cron.trigger row
+        # and notifies the runner on commit, so the send happens seconds later
+        # and, crucially, *after* this transaction - the user's save never
+        # waits on an HTTP call to a channel, and a Telegram outage can never
+        # slow down or roll back posting an invoice.
+        Message._trigger_queue()
     return created
 
 
