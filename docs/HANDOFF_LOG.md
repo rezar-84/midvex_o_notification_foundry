@@ -205,3 +205,53 @@ Removed: the queued "INV/2026/00001 for Overdue Probe Ltd is overdue" message, w
 ### No migration
 
 `hold_reason` is a new nullable column and the batch size has a default, so nothing needed rewriting in place.
+
+## 2026-08-10 (end of session) — The app icon, and where everything was left
+
+### The icon
+
+Reported as "Odoo still shows the old icon of the app". It was not a cache problem and not an old file: the icon had **never** been shown on the home screen.
+
+Odoo has two app icons and they are easy to conflate:
+
+| Where | Driven by | Was |
+|---|---|---|
+| Apps list card (Settings → Apps) | `static/description/icon.png` | ✅ present since August |
+| Home screen tile | `web_icon` on the root `ir.ui.menu` | ❌ never set |
+
+`menu_notification_root` declared no `web_icon`, so the tile fell back to a generic placeholder, and **replacing the PNG could never have changed it**. Confirmed in `odoo19_dev` before the fix: `web_icon` empty, zero `web_icon_data` attachments. After: one `image/png` attachment of 7827 bytes, which is `icon.png` byte for byte.
+
+Worth keeping in mind: `web_icon_data` is an attachment written only when `web_icon` is written (`ir_ui_menu.py:155-156, 161-162`) and is **never re-read from disk**. Swapping the PNG therefore shows nothing until an upgrade rewrites the attribute. That is now recorded in a comment beside the menuitem.
+
+`icon.svg` sits next to the PNG as the editable master and is read by nothing — Odoo wants the PNG. Do not edit only the SVG and expect a change.
+
+### Where things stand
+
+- **`main` is 11 commits ahead of `origin/main` and nothing is pushed.** Three merge commits this session: `822e07a` (accounting events, scheduled rules, Turkish), `6844f11` (prompt delivery and rate limits), `78892c4` (the icon).
+- Branches `feat/accounting-notifications-scheduled-rules-tr`, `feat/instant-delivery-rate-limits` and `fix/app-home-screen-icon` are merged and can be deleted.
+- **0 failed, 0 errors of 120 tests**, re-run on merged `main`, not only on the branches.
+- `odoo19_dev` is on foundry `19.0.1.5.1` with all three modules and Turkish loaded. Backed up before the day's upgrades to `backups/odoo19_dev_pre_scheduled_i18n.dump`.
+
+### Open, in the order I would take them
+
+1. **Push.** Everything above is local only. The 2026-08-09 entry's lesson applies: check `git rev-list --count origin/main...HEAD` rather than trusting a number written down.
+2. **Set an audience on the shipped rules.** Every rule in the business module ships with none, deliberately — they match records and deliver to nobody until somebody chooses. The two scheduled ones included. Until this is done, none of the new accounting alerts do anything.
+3. **Confirm a real end-to-end Telegram delivery**, which has still never been observed from a rule. The sprint backlog item from 2026-08-08 is still open. `odoo19_dev`'s Telegram account has a token; the scratch database's does not.
+4. **Clean up my probe leftovers in `odoo19_dev`** — posted invoice `INV/2026/00001` (id 25, 575.00) and partner *Overdue Probe Ltd* (id 348). Left alone because reversing posted accounting entries is not something to do unasked. It also consumed the first number of the 2026 invoice sequence.
+5. **Unrelated, but it will keep appearing in the logs:** `midvex_l10n_tr_marketplace_foundry` and `midvex_l10n_tr_marketplace_trendyol` fail to load in `odoo19_dev` (missing dependency or manifest). Different repository.
+
+### Two production prerequisites, neither verified on erp
+
+- **A cron worker must be running.** Prompt delivery is an `ir.cron` trigger, and the queue itself is a cron. With `max_cron_threads = 0` nothing sends at all, triggered or not. Local config has 1.
+- **The live account's channel code.** The 2026-08-08 entry recorded it as `1`, so no adapter resolves and every send fails. Unless that was fixed on erp directly, it still is.
+
+### Exact next validation step
+
+```bash
+cd ~/Development/odoo19-dev && source .venv/bin/activate
+python odoo/odoo-bin -c config/odoo.conf -d odoo19_dev --http-port=8099 --dev= \
+  -u midvex_o_notification_foundry,midvex_o_notification_telegram,midvex_o_notification_business \
+  --stop-after-init
+```
+
+Then, in the UI: set an audience on `rule_invoice_posted`, post a customer invoice, and confirm the message reaches `sent` within seconds — `SELECT state, create_date, sent_at FROM midvex_notification_message ORDER BY id DESC LIMIT 5;`. `sent_at - create_date` is the number that proves the delivery path end to end against the real Telegram API, which is the one thing this session measured only against a tokenless account.
