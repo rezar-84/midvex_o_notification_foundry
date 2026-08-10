@@ -1,0 +1,362 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_notification_business
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-10 10:55+0000\n"
+"PO-Revision-Date: 2026-08-10 10:55+0000\n"
+"Last-Translator: Midvex\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: tr\n"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_vendor_bill_paid
+msgid "Bill paid: {{ object.name }}"
+msgstr "Tedarikçi faturası ödendi: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_vendor_bill_posted
+msgid "Bill posted: {{ object.name }}"
+msgstr "Tedarikçi faturası onaylandı: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_cancelled
+msgid "Cancelled: {{ object.name }}"
+msgstr "İptal edildi: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_credit_note_issued
+msgid ""
+"Credit note {{ object.name }} was posted for {{ object.partner_id.name }}.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Reversal of: {{ object.reversed_entry_id.name or 'not linked to an invoice' }}"
+msgstr ""
+"{{ object.partner_id.name }} için {{ object.name }} numaralı iade faturası onaylandı.\n"
+"Tutar: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"İade edilen: {{ object.reversed_entry_id.name or 'bir faturaya bağlı değil' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_credit_note_issued
+msgid "Credit note: {{ object.name }}"
+msgstr "İade faturası: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_credit_note_issued
+msgid "Customer credit note issued"
+msgstr "Müşteri iade faturası düzenlendi"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_cancelled
+msgid "Customer invoice cancelled"
+msgstr "Müşteri faturası iptal edildi"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_due_soon
+msgid "Customer invoice due soon"
+msgstr "Müşteri faturasının vadesi yaklaşıyor"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_overdue
+msgid "Customer invoice overdue"
+msgstr "Müşteri faturası gecikti"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_paid
+msgid "Customer invoice paid"
+msgstr "Müşteri faturası ödendi"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_partially_paid
+msgid "Customer invoice partially paid"
+msgstr "Müşteri faturası kısmen ödendi"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_invoice_posted
+msgid "Customer invoice posted"
+msgstr "Müşteri faturası onaylandı"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_cancelled
+msgid ""
+"Customer invoice {{ object.name }} for {{ object.partner_id.name }} was cancelled.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+"{{ object.partner_id.name }} için {{ object.name }} numaralı müşteri faturası iptal edildi.\n"
+"Tutar: {{ object.amount_total }} {{ object.currency_id.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_payment_received
+msgid "Customer payment received"
+msgstr "Müşteri ödemesi alındı"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_due_soon
+msgid "Due soon: {{ object.name }}"
+msgstr "Vadesi yaklaşıyor: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_high_value_invoice
+msgid "High-value invoice posted"
+msgstr "Yüksek tutarlı fatura onaylandı"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_high_value_invoice
+msgid "High-value invoice: {{ object.name }}"
+msgstr "Yüksek tutarlı fatura: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_posted
+msgid "Invoice posted: {{ object.name }}"
+msgstr "Fatura onaylandı: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_paid
+msgid ""
+"Invoice {{ object.name }} from {{ object.partner_id.name }} is paid.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+"{{ object.partner_id.name }} adına düzenlenen {{ object.name }} numaralı fatura ödendi.\n"
+"Tutar: {{ object.amount_total }} {{ object.currency_id.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_assigned
+msgid "Lead assigned"
+msgstr "Aday atandı"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_assigned
+msgid "Lead assigned: {{ object.name }}"
+msgstr "Aday atandı: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_lost
+msgid "Lead lost"
+msgstr "Aday kaybedildi"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_stage_changed
+msgid "Lead stage changed"
+msgstr "Aday aşaması değişti"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_lead_won
+msgid "Lead won"
+msgstr "Aday kazanıldı"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_lost
+msgid "Lost: {{ object.name }}"
+msgstr "Kaybedildi: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_sale_confirmed
+msgid "Order confirmed: {{ object.name }}"
+msgstr "Sipariş onaylandı: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_overdue
+msgid "Overdue: {{ object.name }}"
+msgstr "Gecikti: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_paid
+msgid "Paid: {{ object.name }}"
+msgstr "Ödendi: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_invoice_partially_paid
+msgid "Partially paid: {{ object.name }}"
+msgstr "Kısmen ödendi: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_payment_received
+msgid "Payment received: {{ object.amount }} {{ object.currency_id.name }}"
+msgstr "Ödeme alındı: {{ object.amount }} {{ object.currency_id.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_sale_confirmed
+msgid "Sales order confirmed"
+msgstr "Satış siparişi onaylandı"
+
+#. module: midvex_o_notification_business
+#: model:ir.actions.server,name:midvex_o_notification_business.action_send_telegram_invoice
+#: model:ir.actions.server,name:midvex_o_notification_business.action_send_telegram_sale
+msgid "Send on Telegram"
+msgstr "Telegram'dan Gönder"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_stage_changed
+msgid "Stage: {{ object.name }}"
+msgstr "Aşama: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_vendor_bill_paid
+msgid "Vendor bill paid"
+msgstr "Tedarikçi faturası ödendi"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_vendor_bill_posted
+msgid "Vendor bill posted"
+msgstr "Tedarikçi faturası onaylandı"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_vendor_bill_paid
+msgid ""
+"Vendor bill {{ object.name }} from {{ object.partner_id.name }} is paid.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+"{{ object.partner_id.name }} firmasından gelen {{ object.name }} numaralı tedarikçi faturası ödendi.\n"
+"Tutar: {{ object.amount_total }} {{ object.currency_id.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_vendor_bill_posted
+msgid ""
+"Vendor bill {{ object.name }} from {{ object.partner_id.name }} was posted.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Due: {{ object.invoice_date_due or 'not set' }}"
+msgstr ""
+"{{ object.partner_id.name }} firmasından gelen {{ object.name }} numaralı tedarikçi faturası onaylandı.\n"
+"Tutar: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Vade: {{ object.invoice_date_due or 'belirtilmemiş' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,name:midvex_o_notification_business.template_vendor_credit_note
+msgid "Vendor credit note received"
+msgstr "Tedarikçi iade faturası alındı"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_vendor_credit_note
+msgid ""
+"Vendor credit note {{ object.name }} from {{ object.partner_id.name }} was posted.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}"
+msgstr ""
+"{{ object.partner_id.name }} firmasından gelen {{ object.name }} numaralı tedarikçi iade faturası onaylandı.\n"
+"Tutar: {{ object.amount_total }} {{ object.currency_id.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_vendor_credit_note
+msgid "Vendor credit note: {{ object.name }}"
+msgstr "Tedarikçi iade faturası: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,subject:midvex_o_notification_business.template_lead_won
+msgid "Won: {{ object.name }}"
+msgstr "Kazanıldı: {{ object.name }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_due_soon
+msgid ""
+"{{ object.name }} for {{ object.partner_id.name }} falls due on {{ object.invoice_date_due }}.\n"
+"Outstanding: {{ object.amount_residual }} {{ object.currency_id.name }}\n"
+"Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}"
+msgstr ""
+"{{ object.partner_id.name }} için {{ object.name }} numaralı faturanın vadesi {{ object.invoice_date_due }} tarihinde doluyor.\n"
+"Ödenecek tutar: {{ object.amount_residual }} {{ object.currency_id.name }}\n"
+"Satış Temsilcisi: {{ object.invoice_user_id.name or 'atanmamış' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_overdue
+msgid ""
+"{{ object.name }} for {{ object.partner_id.name }} is overdue.\n"
+"Outstanding: {{ object.amount_residual }} {{ object.currency_id.name }}\n"
+"Was due: {{ object.invoice_date_due }}\n"
+"Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}"
+msgstr ""
+"{{ object.partner_id.name }} için {{ object.name }} numaralı fatura gecikti.\n"
+"Ödenecek tutar: {{ object.amount_residual }} {{ object.currency_id.name }}\n"
+"Vadesi: {{ object.invoice_date_due }}\n"
+"Satış Temsilcisi: {{ object.invoice_user_id.name or 'atanmamış' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_partially_paid
+msgid ""
+"{{ object.name }} from {{ object.partner_id.name }} is partly paid.\n"
+"Still due: {{ object.amount_residual }} of {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Due date: {{ object.invoice_date_due or 'not set' }}"
+msgstr ""
+"{{ object.partner_id.name }} adına düzenlenen {{ object.name }} kısmen ödendi.\n"
+"Kalan: {{ object.amount_residual }} / {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Vade tarihi: {{ object.invoice_date_due or 'belirtilmemiş' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_assigned
+msgid ""
+"{{ object.name }} is now assigned to {{ object.user_id.name or 'nobody' }}.\n"
+"Contact: {{ object.partner_name or object.contact_name or 'unknown' }}\n"
+"Expected revenue: {{ object.expected_revenue or 0 }}"
+msgstr ""
+"{{ object.name }} adayının sorumlusu artık {{ object.user_id.name or 'yok' }}.\n"
+"Kişi: {{ object.partner_name or object.contact_name or 'bilinmiyor' }}\n"
+"Beklenen gelir: {{ object.expected_revenue or 0 }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_stage_changed
+msgid ""
+"{{ object.name }} moved to stage {{ object.stage_id.name }}.\n"
+"Salesperson: {{ object.user_id.name or 'unassigned' }}"
+msgstr ""
+"{{ object.name }} adayı {{ object.stage_id.name }} aşamasına taşındı.\n"
+"Satış Temsilcisi: {{ object.user_id.name or 'atanmamış' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_sale_confirmed
+msgid ""
+"{{ object.name }} was confirmed for {{ object.partner_id.name }}.\n"
+"Total: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Salesperson: {{ object.user_id.name or 'unassigned' }}"
+msgstr ""
+"{{ object.name }}, {{ object.partner_id.name }} için onaylandı.\n"
+"Toplam: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Satış Temsilcisi: {{ object.user_id.name or 'atanmamış' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_lost
+msgid ""
+"{{ object.name }} was marked lost.\n"
+"Reason: {{ object.lost_reason_id.name or 'not given' }}\n"
+"Salesperson: {{ object.user_id.name or 'unassigned' }}"
+msgstr ""
+"{{ object.name }} kaybedildi olarak işaretlendi.\n"
+"Sebep: {{ object.lost_reason_id.name or 'belirtilmemiş' }}\n"
+"Satış Temsilcisi: {{ object.user_id.name or 'atanmamış' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_high_value_invoice
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_invoice_posted
+msgid ""
+"{{ object.name }} was posted for {{ object.partner_id.name }}.\n"
+"Amount: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Due: {{ object.invoice_date_due or 'not set' }}\n"
+"Salesperson: {{ object.invoice_user_id.name or 'unassigned' }}"
+msgstr ""
+"{{ object.partner_id.name }} için {{ object.name }} onaylandı.\n"
+"Tutar: {{ object.amount_total }} {{ object.currency_id.name }}\n"
+"Vade: {{ object.invoice_date_due or 'belirtilmemiş' }}\n"
+"Satış Temsilcisi: {{ object.invoice_user_id.name or 'atanmamış' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_lead_won
+msgid ""
+"{{ object.name }} was won by {{ object.user_id.name or 'the team' }}.\n"
+"Value: {{ object.expected_revenue or 0 }} {{ object.company_currency.name or '' }}"
+msgstr ""
+"{{ object.name }}, {{ object.user_id.name or 'ekip' }} tarafından kazanıldı.\n"
+"Değer: {{ object.expected_revenue or 0 }} {{ object.company_currency.name or '' }}"
+
+#. module: midvex_o_notification_business
+#: model:midvex.notification.template,body:midvex_o_notification_business.template_payment_received
+msgid ""
+"{{ object.partner_id.name or 'An unnamed partner' }} paid {{ object.amount }} {{ object.currency_id.name }}.\n"
+"Reference: {{ object.name or object.memo or 'none' }}\n"
+"Date: {{ object.date }}"
+msgstr ""
+"{{ object.partner_id.name or 'Adı belirtilmemiş bir cari' }} {{ object.amount }} {{ object.currency_id.name }} ödedi.\n"
+"Referans: {{ object.name or object.memo or 'yok' }}\n"
+"Tarih: {{ object.date }}"
