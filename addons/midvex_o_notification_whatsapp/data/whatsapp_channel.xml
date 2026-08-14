@@ -1,0 +1,9 @@
+<odoo noupdate="1">
+  <record id="channel_whatsapp" model="midvex.notification.channel">
+    <field name="name">WhatsApp</field>
+    <field name="code">whatsapp</field>
+    <field name="module_name">midvex_o_notification_whatsapp</field>
+    <field name="supports_inbound">True</field>
+    <field name="documentation_url">https://developers.facebook.com/docs/whatsapp/cloud-api/</field>
+  </record>
+</odoo>

@@ -1,0 +1,169 @@
+<odoo>
+
+  <!-- A WhatsApp page on the shared account form. Every field is hidden unless
+       the account's channel is WhatsApp, so a Telegram account looks exactly as
+       it did before this module was installed. -->
+  <record id="view_notification_account_form_whatsapp" model="ir.ui.view">
+    <field name="name">midvex.notification.account.form.whatsapp</field>
+    <field name="model">midvex.notification.account</field>
+    <field name="inherit_id" ref="midvex_o_notification_foundry.view_notification_account_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//notebook" position="inside">
+        <page string="WhatsApp" invisible="channel_code != 'whatsapp'">
+          <group>
+            <group string="Business Account">
+              <field name="wa_business_account_id"
+                     placeholder="e.g. 102290129340398"
+                     required="channel_code == 'whatsapp'"/>
+              <field name="wa_phone_number_id"
+                     placeholder="e.g. 106540352242922"
+                     required="channel_code == 'whatsapp'"/>
+              <field name="wa_display_number" placeholder="e.g. +90 541 834 09 08"/>
+            </group>
+            <group string="Provider">
+              <field name="wa_api_version"/>
+              <field name="wa_test_mode" widget="boolean_toggle"/>
+            </group>
+          </group>
+          <div class="alert alert-info" role="alert">
+            <p>
+              <strong>Credentials go on the Credentials page.</strong>
+              The access token is the <em>Bot Token / API Key</em> field, the app secret
+              is <em>API Secret</em>, and the webhook verify token is
+              <em>Webhook Secret</em>.
+            </p>
+            <p>
+              Production must use a <strong>System User</strong> token with the
+              <code>business_management</code>, <code>whatsapp_business_messaging</code>
+              and <code>whatsapp_business_management</code> permissions. The temporary
+              token shown in the App Dashboard expires quickly and is not suitable.
+            </p>
+            <p>
+              Meta has no API for registering a callback URL — <strong>Register
+              Webhook</strong> in the header does not apply to this channel. Use the
+              button below to see the URL, then paste it into the App Dashboard
+              yourself.
+            </p>
+            <button name="action_whatsapp_webhook_url" type="object"
+                    string="Show Callback URL" class="btn-secondary"
+                    groups="midvex_o_notification_foundry.group_notification_manager"/>
+          </div>
+          <separator string="Template Mappings"/>
+          <p class="text-muted">
+            Outside the 24-hour customer service window WhatsApp delivers only
+            templates Meta approved in advance. A notification whose template code is
+            mapped here is sent as that provider template; one that is not is sent as
+            plain text, which the provider will reject unless the customer messaged
+            recently.
+          </p>
+          <field name="wa_template_ids" nolabel="1">
+            <list editable="bottom">
+              <field name="template_code"/>
+              <field name="language_code"/>
+              <field name="provider_template_name"/>
+              <field name="body_variable_fields" optional="show"/>
+              <field name="provider_category" optional="hide"/>
+              <field name="provider_status" widget="badge"
+                     decoration-success="provider_status == 'approved'"
+                     decoration-warning="provider_status in ('pending', 'draft')"
+                     decoration-danger="provider_status in ('rejected', 'paused')"/>
+              <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+          </field>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- The queue stops at 'sent'; WhatsApp keeps reporting after that. Shown as
+       an optional column so the Message Queue looks unchanged for anyone not
+       using WhatsApp. -->
+  <record id="view_notification_message_list_whatsapp" model="ir.ui.view">
+    <field name="name">midvex.notification.message.list.whatsapp</field>
+    <field name="model">midvex.notification.message</field>
+    <field name="inherit_id" ref="midvex_o_notification_foundry.view_notification_message_list"/>
+    <field name="arch" type="xml">
+      <field name="state" position="after">
+        <field name="wa_delivery_status" optional="hide" widget="badge"
+               decoration-success="wa_delivery_status == 'read'"
+               decoration-info="wa_delivery_status == 'delivered'"/>
+      </field>
+    </field>
+  </record>
+
+  <record id="view_whatsapp_template_list" model="ir.ui.view">
+    <field name="name">midvex.notification.whatsapp.template.list</field>
+    <field name="model">midvex.notification.whatsapp.template</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="account_id"/>
+        <field name="company_id" groups="base.group_multi_company"/>
+        <field name="template_code"/>
+        <field name="language_code"/>
+        <field name="provider_template_name"/>
+        <field name="provider_category"/>
+        <field name="provider_status" widget="badge"
+               decoration-success="provider_status == 'approved'"
+               decoration-warning="provider_status in ('pending', 'draft')"
+               decoration-danger="provider_status in ('rejected', 'paused')"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_whatsapp_template_form" model="ir.ui.view">
+    <field name="name">midvex.notification.whatsapp.template.form</field>
+    <field name="model">midvex.notification.whatsapp.template</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <group string="Odoo Side">
+              <field name="account_id"/>
+              <field name="company_id" groups="base.group_multi_company"/>
+              <field name="template_code" placeholder="e.g. lead_created"/>
+              <field name="template_id"/>
+              <field name="active" widget="boolean_toggle"/>
+            </group>
+            <group string="Provider Side">
+              <field name="provider_template_name" placeholder="e.g. vars_lead_created"/>
+              <field name="language_code" placeholder="e.g. en_US"/>
+              <field name="provider_category"/>
+              <field name="provider_status"/>
+            </group>
+          </group>
+          <group string="Variables">
+            <field name="body_variable_fields" nolabel="1"
+                   placeholder="e.g. subject,body"/>
+          </group>
+          <p class="text-muted">
+            Approved templates address their variables positionally — <code>{{1}}</code>,
+            <code>{{2}}</code> — so the order above is the order Meta will substitute
+            them in. A name that is not in the message produces an empty variable
+            rather than a failed send.
+          </p>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_whatsapp_template" model="ir.actions.act_window">
+    <field name="name">WhatsApp Templates</field>
+    <field name="res_model">midvex.notification.whatsapp.template</field>
+    <field name="view_mode">list,form</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">Map a notification template to an approved WhatsApp template</p>
+      <p>
+        WhatsApp delivers business-initiated messages only as templates Meta approved
+        in advance. Each mapping ties one of this system's templates to one approved
+        provider template, in one language.
+      </p>
+    </field>
+  </record>
+
+  <menuitem id="menu_whatsapp_template"
+            name="WhatsApp Templates"
+            parent="midvex_o_notification_foundry.menu_notification_config"
+            action="action_whatsapp_template"
+            sequence="45"/>
+
+</odoo>
