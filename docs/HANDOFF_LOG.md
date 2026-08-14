@@ -336,3 +336,47 @@ python odoo/odoo-bin -c config/odoo.conf -d odoo19_dev --http-port=8099 --dev= \
 Then in the UI: create a WhatsApp account, enter the three credentials yourself, press **Test Connection** — it reads the phone number node and messages nobody, so it is safe to run first. The one number that proves the path is what `SELECT state, wa_delivery_status, sent_at FROM midvex_notification_message ORDER BY id DESC LIMIT 5;` shows after a real send: `wa_delivery_status` reaching `delivered` means the outbound call, the webhook, the signature check and the status ladder all worked, which is the whole chain this session could only prove one fixture at a time.
 
 Until then, the honest status is: built, tested against fixtures, and never once run against WhatsApp.
+
+## 2026-08-14 (later) — Reading the WhatsApp module back, and what it turned up
+
+### Objective
+
+A review pass over the ~1,000 lines committed above, before anything depends on them. Three defects, all real, none found by the tests that already existed — which is the useful part.
+
+### What the tests could not have caught
+
+**Views load and render are different things.** A modifier referencing a field absent from the arch loads cleanly and fails when somebody opens the form. Checked by calling `get_views` for the account form, both template views and the message list; all render, and Odoo auto-added `channel_code` because the modifier referenced it. Worth doing again after any view change — the install log will not tell you.
+
+### The three defects
+
+**1. A stranger could turn a 403 into a 500.** `hmac.compare_digest` raises `TypeError` on a `str` containing any non-ASCII character. Both comparisons in the webhook take input somebody else controls — the `X-Hub-Signature-256` header, and the `hub.verify_token` query parameter — so one high byte produced an unhandled exception instead of a refusal.
+
+The reason it matters is specific to this endpoint: **Meta retries a 500 and does not retry a 403.** An unauthenticated caller could therefore make the endpoint retry-storm itself by sending one malformed header. Fixed with `constant_time_equals`, which encodes to bytes first; `compare_digest` has no ASCII restriction on bytes and stays constant-time.
+
+**2. A misconfigured record burned three retries and then lied about why.** Missing token, missing phone number ID and a recipient with no number were plain `UserError`, so the foundry's sensible default — retry an unclassified failure — applied to three things no retry can fix. Each spent 1, 5 and 25 minutes and then reported `failed`, indistinguishable from a provider outage.
+
+`WhatsAppError` now carries `permanent=True` for pre-flight failures and they quarantine on the first attempt. This is the same principle as the Telegram adapter's `_PERMANENT_FRAGMENTS`, reached by a flag rather than by matching prose — these strings are ours, so there is no reason to pattern-match them.
+
+**3. The template mapping model had no record rule.** It shipped with access rights, which say who may read the *model*, not which *rows*. A user in one company could read, and a manager could edit, another company's mappings — which name the provider templates that company had approved under its own WABA. The acceptance criteria say plainly that a view domain is not isolation; access rights are not either, and it is easy to conflate them when the ACL file is the only security file in the module.
+
+### Verification
+
+- **213 tests, 0 failed** on fresh `odoo19_wa_final2`, up from 196. WhatsApp's own count went 76 → 93.
+- Same 3 pre-existing chart-of-accounts errors, unchanged.
+- `odoo19_dev` updated to `19.0.1.0.1`; `rule_whatsapp_template_company` confirmed present in `ir_rule` by hand.
+- Secret scan clean.
+
+### Worth not rediscovering
+
+- **Assert classification through the queue, not at the seam.** `parse_error` returning `retryable: False` is worth nothing unless `_handle_failure` acts on it. Four tests now drive real messages through `action_process` and assert the resulting `state`, which is how defect 2 was confirmed fixed rather than assumed.
+- **The registry holds one adapter instance for the process lifetime.** Those queue tests stub `adapter.client.send_message` on the *registered* instance, so each restores it in a `finally`. A stub left behind follows the suite into every later test. The 2026-08-09 entry warned about this for `send_calls`; it applies to anything hung off a registered adapter.
+
+### Still true, unchanged
+
+Nothing here has spoken to Meta. No credentials. Inbound free text is stored, deduped, acknowledged and read by nothing. The previous entry's items 2–4 and both `erp` prerequisites are still open.
+
+### Exact next step
+
+Unchanged from the entry above: the eight-step onboarding in `docs/projects/notification_whatsapp/API_RESEARCH.md`, against a dedicated test number, then confirm `wa_delivery_status` reaches `delivered` on a real send.
+
+One repository-level thing first, though: **`main` is 8 commits ahead of `origin/main` and nothing has been pushed.** The 2026-08-10 entry's lesson applies — check `git rev-list --count origin/main..HEAD` rather than trusting a number written down.
