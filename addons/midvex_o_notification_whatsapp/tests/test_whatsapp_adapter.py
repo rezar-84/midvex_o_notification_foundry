@@ -52,8 +52,16 @@ class TestWhatsAppClient(TransactionCase):
         self.assertEqual(self.client._url(account, 'x'), 'https://graph.facebook.com/v26.0/x')
 
     def test_missing_token_is_refused_before_any_request(self):
-        with self.assertRaises(UserError):
+        with self.assertRaises(WhatsAppError) as caught:
             self.client.request(FakeAccount(api_key=False), 'x')
+        # The flag is the point: it is what stops the queue retrying a record
+        # that no retry can fix.
+        self.assertTrue(caught.exception.permanent)
+
+    def test_missing_phone_number_id_is_refused_before_any_request(self):
+        with self.assertRaises(WhatsAppError) as caught:
+            self.client.send_message(FakeAccount(phone_number_id=False), {})
+        self.assertTrue(caught.exception.permanent)
 
     def test_http_error_carries_the_provider_code_and_trace(self):
         raised = self.client._error_from_http(http_error(400, fixtures.error_body(131047)))
@@ -117,8 +125,9 @@ class TestWhatsAppSend(TransactionCase):
         self.assertNotIn('text', self.sent[0])
 
     def test_send_without_a_recipient_is_refused(self):
-        with self.assertRaises(UserError):
+        with self.assertRaises(WhatsAppError) as caught:
             self.adapter.send(self.account, {'body': 'Hello'})
+        self.assertTrue(caught.exception.permanent)
 
     def test_accepted_response_without_a_wamid_is_a_failure(self):
         """A 200 carrying no message id has not sent anything.
@@ -212,6 +221,30 @@ class TestWhatsAppErrorClassification(TransactionCase):
         self.assertFalse(self.verdict(132001)['retryable'])
         self.assertFalse(self.verdict(131026)['retryable'])
 
+    def test_a_misconfigured_record_is_permanent_not_retried(self):
+        """No token, no phone number ID, no recipient — the record is wrong.
+
+        Left to the generic path these retry three times over half an hour and
+        then report "failed", indistinguishable from a provider outage, when
+        what they need is a human. Quarantining says that plainly and says it
+        immediately.
+        """
+        for message in ('WhatsApp access token is not configured on this account.',
+                        'WhatsApp phone number ID is not configured on this account.',
+                        'Recipient has no linked WhatsApp phone number.'):
+            with self.subTest(message=message):
+                verdict = self.adapter.parse_error(WhatsAppError(message, permanent=True))
+                self.assertEqual(verdict['error_code'], 'WHATSAPP_NOT_CONFIGURED')
+                self.assertFalse(verdict['retryable'])
+                self.assertIsNone(verdict['retry_after_seconds'])
+
+    def test_permanence_wins_over_an_http_status(self):
+        """A pre-flight failure never reached the provider, so any status on it
+        is noise rather than a verdict."""
+        verdict = self.adapter.parse_error(
+            WhatsAppError('no token', http_status=429, permanent=True))
+        self.assertFalse(verdict['retryable'])
+
     def test_unknown_codes_retry(self):
         verdict = self.verdict(999999)
         self.assertEqual(verdict['error_code'], 'WHATSAPP_ERROR')
@@ -299,6 +332,113 @@ class TestWhatsAppIdentity(TransactionCase):
         # Media is phase 11. Claiming it here would have the future inbox offer
         # an attachment button that cannot work.
         self.assertFalse(capabilities['supports_media'])
+
+
+class TestWhatsAppThroughTheQueue(TransactionCase):
+    """The classification claims, proven through the foundry rather than at the seam.
+
+    parse_error returning `retryable: False` is only interesting if
+    action_process and _handle_failure actually act on it. These go through the
+    real queue so the wiring is asserted, not assumed.
+    """
+
+    def setUp(self):
+        super().setUp()
+        from odoo.addons.midvex_o_notification_foundry.tests.common import ensure_channel
+
+        channel = ensure_channel(self.env, 'whatsapp', 'WhatsApp')
+        self.account = self.env['midvex.notification.account'].create({
+            'name': 'Test WhatsApp', 'channel_id': channel.id,
+            'wa_phone_number_id': fixtures.PHONE_NUMBER_ID,
+            'api_key': 'TOKEN-PLACEHOLDER',
+        })
+        self.recipient = self.env['midvex.notification.recipient'].create({
+            'kind': 'user', 'user_id': self.env.user.id, 'account_id': self.account.id,
+            'state': 'linked',
+        })
+
+    def queue(self, key='wa-queue-1'):
+        return self.env['midvex.notification.message'].create({
+            'name': 'Test', 'recipient_id': self.recipient.id, 'account_id': self.account.id,
+            'body': 'Hello', 'idempotency_key': key,
+        })
+
+    def test_a_recipient_with_no_number_is_quarantined_on_the_first_attempt(self):
+        """Not retried three times over half an hour and then called failed.
+
+        Quarantined means "a human must fix this", which is exactly what an
+        unlinked recipient needs. The distinction is invisible in the adapter
+        and very visible in the queue.
+        """
+        message = self.queue()
+        self.assertFalse(self.recipient.external_id)
+        message.action_process()
+        self.assertEqual(message.state, 'quarantined')
+        self.assertEqual(message.error_code, 'WHATSAPP_NOT_CONFIGURED')
+        self.assertEqual(message.attempt_count, 1)
+        self.assertFalse(message.next_retry_at)
+
+    def test_a_rate_limit_hands_back_the_attempt(self):
+        """ADR-012, in a second channel.
+
+        Being rate-limited says nothing about the message. If the attempt were
+        counted, a busy hour would destroy alerts that were never really tried.
+        """
+        from odoo.addons.midvex_o_notification_foundry.services.registry import get_adapter
+
+        self.recipient.external_id = '+%s' % fixtures.CUSTOMER_WA_ID
+        adapter = get_adapter('whatsapp')
+        original = adapter.client.send_message
+        adapter.client.send_message = lambda account, payload: (_ for _ in ()).throw(
+            WhatsAppError('too fast', code=130429, http_status=429))
+        try:
+            message = self.queue('wa-queue-2')
+            message.action_process()
+        finally:
+            # The registry holds one adapter for the process lifetime, so a
+            # stub left in place would follow this test into every later one.
+            adapter.client.send_message = original
+
+        self.assertEqual(message.state, 'pending')
+        self.assertEqual(message.error_code, 'WHATSAPP_RATE_LIMIT')
+        self.assertEqual(message.attempt_count, 0)
+        self.assertTrue(message.next_retry_at)
+
+    def test_a_closed_messaging_window_is_quarantined(self):
+        """131047 cannot be retried into success — only a template can."""
+        from odoo.addons.midvex_o_notification_foundry.services.registry import get_adapter
+
+        self.recipient.external_id = '+%s' % fixtures.CUSTOMER_WA_ID
+        adapter = get_adapter('whatsapp')
+        original = adapter.client.send_message
+        adapter.client.send_message = lambda account, payload: (_ for _ in ()).throw(
+            WhatsAppError('window closed', code=131047, http_status=400))
+        try:
+            message = self.queue('wa-queue-3')
+            message.action_process()
+        finally:
+            adapter.client.send_message = original
+
+        self.assertEqual(message.state, 'quarantined')
+        self.assertEqual(message.error_code, 'WHATSAPP_POLICY_RESTRICTED')
+
+    def test_a_successful_send_stores_the_wamid_and_reaches_sent(self):
+        from odoo.addons.midvex_o_notification_foundry.services.registry import get_adapter
+
+        self.recipient.external_id = '+%s' % fixtures.CUSTOMER_WA_ID
+        adapter = get_adapter('whatsapp')
+        original = adapter.client.send_message
+        adapter.client.send_message = lambda account, payload: fixtures.send_success()
+        try:
+            message = self.queue('wa-queue-4')
+            message.action_process()
+        finally:
+            adapter.client.send_message = original
+
+        self.assertEqual(message.state, 'sent')
+        # The stored compute is what the webhook searches on. Without it a
+        # delivery status can never find the row it belongs to.
+        self.assertEqual(message.wa_message_id, fixtures.OUTBOUND_WAMID)
 
 
 class TestWhatsAppRegistration(TransactionCase):

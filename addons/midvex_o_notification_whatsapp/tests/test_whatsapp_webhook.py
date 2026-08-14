@@ -5,7 +5,7 @@ import json
 from odoo.tests.common import TransactionCase
 
 from . import fixtures
-from ..controllers.whatsapp_webhook import signature_is_valid
+from ..controllers.whatsapp_webhook import constant_time_equals, signature_is_valid
 from ..models.whatsapp_inbound_event import NotificationInboundEvent
 
 APP_SECRET = 'app-secret-placeholder'
@@ -63,6 +63,25 @@ class TestWhatsAppSignature(TransactionCase):
         bare = hmac.new(APP_SECRET.encode(), self.body, hashlib.sha256).hexdigest()
         self.assertFalse(signature_is_valid(bare, self.body, APP_SECRET))
 
+    def test_a_non_ascii_signature_header_is_rejected_not_crashed(self):
+        """This endpoint is reachable by anyone who finds the URL.
+
+        hmac.compare_digest raises TypeError on a str carrying any non-ASCII
+        character, so passing an attacker-controlled header straight to it
+        turns a 403 into a 500 — and Meta retries a 500 while it does not retry
+        a 403. One high byte would have made the endpoint noisily retryable by
+        a stranger.
+        """
+        for header in ('sha256=ürk', 'sha256=' + 'ÿ' * 64, 'sha256=🙂'):
+            with self.subTest(header=header):
+                self.assertFalse(signature_is_valid(header, self.body, APP_SECRET))
+
+    def test_a_non_ascii_secret_does_not_crash_verification(self):
+        """The secret is typed into a form by a person, so it can be anything."""
+        secret = 'gizli-anahtar-şifre'
+        self.assertTrue(signature_is_valid(sign(self.body, secret), self.body, secret))
+        self.assertFalse(signature_is_valid(sign(self.body, 'other'), self.body, secret))
+
     def test_verification_fails_closed_when_no_secret_is_configured(self):
         """Unlike the Telegram webhook, which fails open for a staff linking bot.
 
@@ -73,6 +92,27 @@ class TestWhatsAppSignature(TransactionCase):
         """
         self.assertFalse(signature_is_valid(sign(self.body), self.body, None))
         self.assertFalse(signature_is_valid(sign(self.body), self.body, ''))
+
+
+class TestConstantTimeEquals(TransactionCase):
+    """Used by both the signature check and the GET verify-token check."""
+
+    def test_equal_values_match(self):
+        self.assertTrue(constant_time_equals('abc', 'abc'))
+        self.assertTrue(constant_time_equals('şifre', 'şifre'))
+
+    def test_different_values_do_not(self):
+        self.assertFalse(constant_time_equals('abc', 'abd'))
+        self.assertFalse(constant_time_equals('şifre', 'sifre'))
+
+    def test_none_never_matches(self):
+        """A missing hub.verify_token must be a refusal, not a comparison."""
+        self.assertFalse(constant_time_equals(None, 'abc'))
+        self.assertFalse(constant_time_equals('abc', None))
+        self.assertFalse(constant_time_equals(None, None))
+
+    def test_mixed_str_and_bytes_are_comparable(self):
+        self.assertTrue(constant_time_equals('abc', b'abc'))
 
 
 class TestWhatsAppEventKey(TransactionCase):

@@ -19,6 +19,25 @@ _logger = logging.getLogger(__name__)
 _STATUS_RANK = {'sent': 1, 'delivered': 2, 'read': 3}
 
 
+def constant_time_equals(left, right):
+    """hmac.compare_digest over values that may not be ASCII.
+
+    Both callers below compare something a stranger sent against something a
+    human typed, and compare_digest raises TypeError on a str containing any
+    non-ASCII character. Passed straight through, one high byte in a header
+    turns a 403 into a 500 — which is worse than it sounds on this endpoint,
+    because Meta retries a 500 and does not retry a 403.
+
+    Encoding both sides sidesteps it: compare_digest on bytes has no such
+    restriction, and stays constant-time.
+    """
+    if left is None or right is None:
+        return False
+    return hmac.compare_digest(
+        left.encode('utf-8', 'surrogatepass') if isinstance(left, str) else left,
+        right.encode('utf-8', 'surrogatepass') if isinstance(right, str) else right)
+
+
 def signature_is_valid(signature_header, raw_body, app_secret):
     """Verify Meta's X-Hub-Signature-256 over the raw request body.
 
@@ -39,7 +58,7 @@ def signature_is_valid(signature_header, raw_body, app_secret):
     if not signature_header.startswith('sha256='):
         return False
     expected = hmac.new(app_secret.encode(), raw_body, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, signature_header[len('sha256='):])
+    return constant_time_equals(expected, signature_header[len('sha256='):])
 
 
 class WhatsAppWebhookController(Controller):
@@ -62,7 +81,7 @@ class WhatsAppWebhookController(Controller):
         challenge = kwargs.get('hub.challenge')
 
         expected = account.sudo().webhook_secret
-        if mode != 'subscribe' or not expected or not hmac.compare_digest(token or '', expected):
+        if mode != 'subscribe' or not expected or not constant_time_equals(token, expected):
             _logger.warning('WhatsApp webhook verification refused for account %s', account_id)
             return request.make_response('', status=403)
 
