@@ -379,4 +379,10 @@ Nothing here has spoken to Meta. No credentials. Inbound free text is stored, de
 
 Unchanged from the entry above: the eight-step onboarding in `docs/projects/notification_whatsapp/API_RESEARCH.md`, against a dedicated test number, then confirm `wa_delivery_status` reaches `delivered` on a real send.
 
-One repository-level thing first, though: **`main` is 8 commits ahead of `origin/main` and nothing has been pushed.** The 2026-08-10 entry's lesson applies — check `git rev-list --count origin/main..HEAD` rather than trusting a number written down.
+One repository-level thing first, though: **everything above is local — nothing has been pushed.** Deliberately: pushing was offered and not taken up, so `main` is waiting.
+
+No count is written here on purpose. The 2026-08-10 entry recorded "11 commits ahead" and that number was stale by the time anyone read it; writing one here would go stale the moment this entry was itself committed. Run it instead:
+
+```bash
+git rev-list --count origin/main..HEAD
+```
