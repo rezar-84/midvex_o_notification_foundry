@@ -1,6 +1,6 @@
 {
     'name': 'Midvex WhatsApp Notifications',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'summary': 'WhatsApp Cloud API adapter for Midvex Notification Foundry',
     'category': 'Productivity',
     'author': 'Midvex',
@@ -8,6 +8,7 @@
     'depends': ['midvex_o_notification_foundry'],
     'data': [
         'security/ir.model.access.csv',
+        'security/whatsapp_security.xml',
         'data/whatsapp_channel.xml',
         'views/whatsapp_views.xml',
     ],

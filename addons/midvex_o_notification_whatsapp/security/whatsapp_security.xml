@@ -1,0 +1,23 @@
+<odoo>
+  <data noupdate="0">
+
+    <!--
+      Access rights alone are not company isolation. Without this rule a user
+      in one company can read, and a manager can edit, another company's
+      template mappings — which name the approved provider templates that
+      company had approved under its own WhatsApp Business Account.
+
+      Scoped to the user group so it applies to managers too: group_notification_manager
+      implies group_notification_user, and a rule attached to the implied group
+      applies to everyone who has it. That mirrors rule_notification_account_company
+      in the foundry, which guards the accounts these mappings hang off.
+    -->
+    <record id="rule_whatsapp_template_company" model="ir.rule">
+      <field name="name">WhatsApp template mappings by company</field>
+      <field name="model_id" ref="model_midvex_notification_whatsapp_template"/>
+      <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+      <field name="groups" eval="[(4, ref('midvex_o_notification_foundry.group_notification_user'))]"/>
+    </record>
+
+  </data>
+</odoo>

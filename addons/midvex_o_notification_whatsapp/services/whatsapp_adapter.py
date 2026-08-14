@@ -62,7 +62,8 @@ class WhatsAppAdapter:
     def send(self, account, message_dto):
         recipient = message_dto.get('recipient_external_id')
         if not recipient:
-            raise UserError('Recipient has no linked WhatsApp phone number.')
+            raise WhatsAppError('Recipient has no linked WhatsApp phone number.',
+                                permanent=True)
 
         payload = self._build_payload(account, recipient, message_dto)
         result = self.client.send_message(account, payload)
@@ -234,6 +235,14 @@ class WhatsAppAdapter:
         message = str(response_or_exception)
         code = getattr(response_or_exception, 'code', None)
         status = getattr(response_or_exception, 'http_status', None)
+
+        if getattr(response_or_exception, 'permanent', False):
+            # Raised before the request went out — no token, no phone number ID,
+            # no recipient. The record is wrong, not the network, and three
+            # attempts spread over half an hour would only delay somebody
+            # noticing.
+            return {'error_code': 'WHATSAPP_NOT_CONFIGURED', 'message': message,
+                    'retryable': False, 'retry_after_seconds': None}
 
         if code in RATE_LIMIT_CODES or status == 429:
             retry_after = getattr(response_or_exception, 'retry_after', None)

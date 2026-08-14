@@ -85,13 +85,20 @@ class WhatsAppError(UserError):
     """
 
     def __init__(self, message, code=None, subcode=None, http_status=None,
-                 fbtrace_id=None, retry_after=None):
+                 fbtrace_id=None, retry_after=None, permanent=False):
         super().__init__(message)
         self.code = code
         self.subcode = subcode
         self.http_status = http_status
         self.fbtrace_id = fbtrace_id
         self.retry_after = retry_after
+        # Set for failures raised before the request goes out: a recipient with
+        # no phone number, an account with no token. No retry can fix those, and
+        # the foundry's default for an unclassified failure is to retry — which
+        # would burn all three attempts over half an hour and then report
+        # "failed", indistinguishable from a provider outage, when what it
+        # actually needs is somebody to fix the record.
+        self.permanent = permanent
 
 
 class WhatsAppClient:
@@ -108,7 +115,8 @@ class WhatsAppClient:
         # rest of the foundry uses to read account credentials.
         token = account.sudo().api_key
         if not token:
-            raise UserError('WhatsApp access token is not configured on this account.')
+            raise WhatsAppError(
+                'WhatsApp access token is not configured on this account.', permanent=True)
         return token
 
     def _url(self, account, path):
@@ -187,11 +195,13 @@ class WhatsAppClient:
         when the recipient is a customer.
         """
         if not account.wa_phone_number_id:
-            raise UserError('WhatsApp phone number ID is not configured on this account.')
+            raise WhatsAppError(
+                'WhatsApp phone number ID is not configured on this account.', permanent=True)
         query = parse.urlencode({'fields': 'id,display_phone_number,verified_name,quality_rating'})
         return self.request(account, '%s?%s' % (account.wa_phone_number_id, query))
 
     def send_message(self, account, payload):
         if not account.wa_phone_number_id:
-            raise UserError('WhatsApp phone number ID is not configured on this account.')
+            raise WhatsAppError(
+                'WhatsApp phone number ID is not configured on this account.', permanent=True)
         return self.request(account, '%s/messages' % account.wa_phone_number_id, payload)

@@ -130,6 +130,61 @@ class TestWhatsAppTemplateMapping(TransactionCase):
         self.assertEqual(self.Mapping.search_count([('account_id', '=', self.account.id)]), 2)
 
 
+class TestWhatsAppTemplateIsolation(TransactionCase):
+    """Company isolation, asserted through record rules rather than a view domain.
+
+    The acceptance criteria are explicit that a domain on a view is not
+    isolation. Access rights alone are not either: they say who may read the
+    model, not which rows.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.channel = ensure_channel(self.env, 'whatsapp', 'WhatsApp')
+        self.company_a = self.env['res.company'].create({'name': 'WA Company A'})
+        self.company_b = self.env['res.company'].create({'name': 'WA Company B'})
+        self.mapping_a = self._mapping(self.company_a, fixtures.PHONE_NUMBER_ID, 'a_template')
+        self.mapping_b = self._mapping(self.company_b, '400000000000004', 'b_template')
+
+        group = self.env.ref('midvex_o_notification_foundry.group_notification_manager')
+        self.agent_a = self.env['res.users'].create({
+            'name': 'Agent A', 'login': 'wa_agent_a',
+            'company_id': self.company_a.id, 'company_ids': [(6, 0, [self.company_a.id])],
+            'group_ids': [(4, group.id)],
+        })
+
+    def _mapping(self, company, phone_number_id, provider_name):
+        account = self.env['midvex.notification.account'].create({
+            'name': 'WA %s' % company.name, 'channel_id': self.channel.id,
+            'company_id': company.id, 'wa_phone_number_id': phone_number_id,
+        })
+        return self.env['midvex.notification.whatsapp.template'].create({
+            'account_id': account.id, 'template_code': 'lead_created',
+            'language_code': 'en_US', 'provider_template_name': provider_name,
+        })
+
+    def test_a_user_sees_only_their_own_companys_mappings(self):
+        visible = self.env['midvex.notification.whatsapp.template'].with_user(
+            self.agent_a).search([])
+        self.assertIn(self.mapping_a, visible)
+        self.assertNotIn(self.mapping_b, visible)
+
+    def test_another_companys_mapping_cannot_be_read(self):
+        from odoo.exceptions import AccessError
+        with self.assertRaises(AccessError):
+            self.mapping_b.with_user(self.agent_a).read(['provider_template_name'])
+
+    def test_another_companys_mapping_cannot_be_edited(self):
+        from odoo.exceptions import AccessError
+        with self.assertRaises(AccessError):
+            self.mapping_b.with_user(self.agent_a).write({'provider_template_name': 'stolen'})
+
+    def test_the_company_comes_from_the_account_not_the_row(self):
+        """So a mapping cannot be quietly reassigned by editing a field on it."""
+        self.assertEqual(self.mapping_a.company_id, self.company_a)
+        self.assertEqual(self.mapping_b.company_id, self.company_b)
+
+
 class TestWhatsAppTemplateSelection(TransactionCase):
     """The whole path from a queued message to the payload on the wire.
 

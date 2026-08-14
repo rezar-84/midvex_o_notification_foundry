@@ -2,7 +2,7 @@
 
 ## Automated (`addons/midvex_o_notification_whatsapp/tests/`)
 
-76 tests, no live API call anywhere. Payloads come from `tests/fixtures.py`,
+93 tests, no live API call anywhere. Payloads come from `tests/fixtures.py`,
 whose shapes are Meta's published examples with every identifier, phone number,
 name and body replaced.
 
@@ -28,6 +28,13 @@ name and body replaced.
 - **Registration** — the adapter resolves under `whatsapp`, the channel record
   ships, and the rate limits are declared where `_throttle_release_at` reads them.
 
+- **Through the real queue** — the classification claims proven end to end
+  rather than at the adapter seam: an unlinked recipient quarantines on the
+  first attempt, a rate limit hands the attempt back, a closed window
+  quarantines, and a successful send stores the `wamid` the webhook later
+  searches on. `retryable: False` is only interesting if `_handle_failure`
+  acts on it.
+
 ### `test_whatsapp_templates.py`
 
 Mapping lookup (exact language, base-language fallback, never a *different*
@@ -37,14 +44,22 @@ unique constraint. Then the whole path from a queued message to the payload on
 the wire, including that the mapping is looked up in the recipient's language
 and not the acting user's.
 
+**Company isolation** is asserted with `with_user`, not by reading the rule:
+another company's mapping cannot be listed, read or written. The acceptance
+criteria are explicit that a view domain is not isolation, and access rights
+say who may read the model rather than which rows.
+
 ### `test_whatsapp_webhook.py`
 
 Signature verification against forgery, another secret, a body altered after
 signing, a missing header, a header without the algorithm prefix, and
 re-serialized JSON — that last one being the mistake this code is shaped to
-avoid. Failing closed with no secret configured. The dedupe key, its unique
-constraint, and that Telegram's NULL keys coexist freely. The delivery ladder,
-including `read` before `delivered`.
+avoid. Failing closed with no secret configured. **Non-ASCII input on both
+comparisons**, because `hmac.compare_digest` raises `TypeError` on a non-ASCII
+`str` and both sides take input a stranger controls — which turned a 403 into a
+500, and Meta retries a 500. The dedupe key, its unique constraint, and that
+Telegram's NULL keys coexist freely. The delivery ladder, including `read`
+before `delivered`.
 
 ## Foundry integration
 
