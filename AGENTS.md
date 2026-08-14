@@ -31,6 +31,20 @@ Before implementation:
 11. Read the local environment guide at `~/Development/odoo19-dev/AGENTS.md` before running local commands.
 12. Read `docs/HANDOFF_LOG.md`, `docs/SPRINT_BACKLOG.md`, and `docs/DEVELOPMENT_RUNBOOK.md` before resuming work.
 
+### Additionally, for conversation and omnichannel work
+
+The conversation suite is a sibling of the notification suite, not a layer on it. If the task touches two-way messaging, an inbox, live chat, or WhatsApp, also read:
+
+13. `docs/projects/omnichannel_messaging/README.md` and `ARCHITECTURE.md`.
+14. `docs/projects/conversation_foundry/DATA_MODEL.md` and `ADAPTER_CONTRACT.md` — the latter reconciles the pack's proposed adapter interface onto the registry that already exists.
+15. `docs/projects/omnichannel_messaging/SECURITY_MULTI_COMPANY.md`.
+16. The target conversation channel docs:
+    - `docs/projects/conversation_whatsapp/`
+    - `docs/projects/conversation_webchat/`
+    - `docs/projects/conversation_telegram/`
+    - `docs/projects/messaging_api/`
+17. ADR-013 through ADR-018 in `docs/projects/notification_foundry/DECISIONS.md` — they record what the merged specification pack changed and, in two cases, where the pack is wrong.
+
 ## Repository and handoff rule
 
 This repository is a monorepo. Addons are stored below `addons/`; Odoo discovers them through direct symlinks in the local `custom-addons/` directory. Do not copy addon files into Odoo core or Enterprise directories.
@@ -113,11 +127,17 @@ The MVP must support:
 Delay:
 
 - rich attachments/media;
-- inbound conversational commands beyond `/link`;
+- inbound conversational commands beyond `/link` — **for the notification modules only**; see below;
 - delivery analytics/reporting;
 - per-user channel preference center beyond linking;
 - SLA/escalation rules;
 - bulk campaign sending.
+
+### Scope note on inbound conversation
+
+Handling inbound *customer* messages is no longer out of scope for the repository — it is the entire purpose of the conversation suite. See ADR-018.
+
+What remains delayed is inbound conversation **inside the notification modules**. `midvex_o_notification_telegram` keeps its six-command staff linking vocabulary and gains nothing; a customer conversation belongs in `midvex_o_conversation_*`, behind the shared adapter registry.
 
 ## Security rules
 

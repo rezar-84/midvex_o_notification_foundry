@@ -177,3 +177,107 @@ Sending synchronously would have been faster still and was rejected: the user's 
 The per-message throttle check is not an optimisation detail: sending is what consumes the allowance, so a batch of twenty-five to one group would all see an empty window and go out together if it were checked once per batch. Deferring rather than sleeping keeps one busy room from starving every other recipient, and avoids holding the only cron worker doing nothing.
 
 Not counting a 429 against `max_attempts` is the point of the failure rework. Being rate-limited says nothing about the message, and three of them used to mark a good alert permanently failed.
+
+## ADR-013: Conversations get a sibling foundry, not a bigger notification foundry
+
+### Status
+
+Accepted — 2026-08-14
+
+### Decision
+
+Adopt the omnichannel messaging specification pack into this repository under `docs/projects/{omnichannel_messaging,conversation_foundry,conversation_whatsapp,conversation_webchat,conversation_telegram,messaging_api}/`. The repository copy is canonical; the standalone pack at `~/Projects/varsco_omnichannel_messaging_project/` is a historical drop.
+
+Two-way customer conversation gets its own module, `midvex_o_conversation_foundry`, depending on this one. `midvex_o_notification_foundry` keeps the queue, retry, throttle, delivery logs, templates, rules, channel/account registry and recipient linking, and does not gain a thread, a session or a conversation message model.
+
+### Reason
+
+The two look similar and are not. A notification is an event the business chose to emit: it has a rule, a template, a recipient, a delivery attempt and a terminal state. A conversation message is something a stranger sent us: it has a thread, a counterparty identity, an assignment, a read state and no rule at all. `midvex.notification.message` is a queue row that stops mattering once it is `sent`; `midvex.conversation.message` is a durable record that starts mattering then.
+
+Merging them would mean either a queue full of rows that never leave, or a conversation history that gets pruned with the queue. Both are worse than one dependency edge.
+
+The pack arrived unversioned, in one directory, with no history and no backup. Merging it here was the first thing worth doing regardless of what gets built next.
+
+## ADR-014: Conversation models keep the `midvex.` prefix
+
+### Status
+
+Accepted — 2026-08-14
+
+### Decision
+
+The models are `midvex.conversation.thread`, `.session`, `.message`, `.identity`, `.inbound.event`, `.assignment.event` and `.channel.capability` — not the bare `conversation.*` names the source pack proposes.
+
+### Reason
+
+Every model in this repository is `midvex.notification.*`. An unprefixed `conversation.thread` claims a generic name in a shared Odoo registry where `im_livechat`, `mail` and any future third-party addon are neighbours. The prefix costs nine characters and removes a whole class of collision.
+
+## ADR-015: One adapter registry, extended — not a second one
+
+### Status
+
+Accepted — 2026-08-14
+
+### Decision
+
+Conversation channels register through the existing `addons/midvex_o_notification_foundry/services/registry.py`, keyed on the same `channel_code`. The contract stays the five methods `TelegramAdapter` already implements — `test_connection`, `send`, `register_webhook`, `parse_inbound`, `parse_error` — plus three optional additions with conservative defaults: `verify_webhook`, `normalize_identity`, `capabilities`.
+
+The pack's proposed `validate_account`, `send_message` and `normalize_status_event` are dropped as synonyms of methods that exist. The reconciliation table is in `docs/projects/conversation_foundry/ADAPTER_CONTRACT.md`.
+
+### Reason
+
+The pack says it itself: *"do not invent an incompatible registry when reuse is possible."* Two registries keyed on the same `channel_code` would mean two objects claiming to be the WhatsApp adapter, and `available_adapter_codes()` — which drives the channel Code selection field — would show one of them. That field exists because a free-text channel code once produced a channel nothing could send through, and the mismatch only surfaced at delivery time.
+
+Optional-with-defaults rather than required keeps every existing adapter valid without edits.
+
+## ADR-016: The public website is TanStack Start, not Next.js
+
+### Status
+
+Accepted — 2026-08-14
+
+### Decision
+
+The merged docs describe the frontend generically, and where a stack matters they name the real one. `~/Projects/Websites/varsco_com` is TanStack Start + Vite + React on Bun, Radix/shadcn, Vitest and Playwright, deployed via Docker and Cloudflare Wrangler, and Lovable-connected — its own `AGENTS.md` warns that commits sync back to the Lovable editor and history must not be rewritten.
+
+This supersedes the source pack's ADR-006 and its repeated "headless Next.js" framing.
+
+### Reason
+
+There is no Next.js VARS site. The pack's frontend assumption is simply wrong, and it appears in the brief, the live chat spec, the API spec and an ADR — four places where a reader would take it as settled.
+
+The practical consequence is small today and large at phase 5: `src/components/layout/WhatsAppWidget.tsx` already exists as a nine-language `wa.me` deep-link popover that Odoo never sees. It is the shell to absorb, and the Lovable constraint shapes how anyone may work in that repository.
+
+## ADR-017: WhatsApp is two modules sharing one transport client
+
+### Status
+
+Accepted — 2026-08-14
+
+### Decision
+
+`midvex_o_notification_whatsapp` owns event-driven transactional sending through the foundry queue. `midvex_o_conversation_whatsapp` owns two-way conversation, the customer-service window and identity normalization. Both import one `services/whatsapp_client.py` for auth, base URL, request execution, error parsing and status mapping.
+
+One webhook endpoint per account serves both: `statuses[]` feeds the notification queue, `messages[]` feeds the conversation foundry.
+
+### Reason
+
+Duplicating the HTTP and auth code across two modules is the failure mode the foundry exists to prevent, and error classification in particular is not something to get right twice — the code-to-taxonomy table in `API_RESEARCH.md` has thirty entries and one of them, the rate-limit class, must not consume a retry attempt.
+
+One endpoint rather than two is not a preference: Meta delivers a phone number's callbacks to one URL. Registering a second would silently starve the first.
+
+## ADR-018: Inbound conversational messages are now in scope
+
+### Status
+
+Accepted — 2026-08-14. Supersedes the MVP non-goal in `AGENTS.md`, `docs/projects/notification_foundry/PRD.md` and `docs/projects/notification_telegram/PRD.md`.
+
+### Decision
+
+"Inbound conversational commands beyond `/link`" is no longer a non-goal. Handling inbound customer messages is the point of the conversation foundry.
+
+The non-goal stands for the *notification* modules: `midvex_o_notification_telegram` keeps its six-command staff vocabulary and gains nothing. What changes is that a free-text inbound message stops being stored-and-dropped once `midvex_o_conversation_foundry` exists to receive it.
+
+### Reason
+
+Three documents currently declare this out of scope. Building it while those stand would leave the next reader with a repository whose rules contradict its code, and the rules would lose — quietly, and only for whoever noticed. A scope expansion that is written down is a decision; one that is not is a defect.
