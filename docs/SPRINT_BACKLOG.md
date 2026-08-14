@@ -67,37 +67,43 @@ omnichannel roadmap's phases 1–2 are **the same work**, and are being done onc
 - [x] Merge the specification pack into `docs/projects/`, correcting the frontend stack error.
 - [x] Record ADR-013 through ADR-018.
 
-## Sprint 5 — WhatsApp notification MVP (roadmap phase 1)
+## Sprint 5 — WhatsApp notification MVP (roadmap phase 1) — built 2026-08-14
 
-- [ ] `midvex_o_notification_whatsapp` addon: manifest, channel data, security, views.
-- [ ] Account model extension — WABA ID, phone number ID, display number, API version, app secret, verify token, test mode — on the existing `midvex.notification.account`.
-- [ ] `services/whatsapp_client.py` — one transport client, shared with the future conversation module (ADR-017).
-- [ ] `services/whatsapp_adapter.py` registered on `channel_code = 'whatsapp'`.
-- [ ] Test connection that proves token, asset assignment and phone number ID without messaging anyone.
-- [ ] Outbound approved-template send, and free-form text inside the window.
-- [ ] Semantic template → provider template mapping by company and language.
-- [ ] Error classification against the thirty-entry code table, with rate limits deferring rather than failing.
-- [ ] Fixture-based tests, no live API call.
+- [x] `midvex_o_notification_whatsapp` addon: manifest, channel data, security, views, Turkish.
+- [x] Account model extension — WABA ID, phone number ID, display number, API version, test mode — on the existing `midvex.notification.account`. Credentials reuse the three admin-gated fields that already exist rather than adding three more ways to leak a secret.
+- [x] `services/whatsapp_client.py` — one transport client, shared with the future conversation module (ADR-017).
+- [x] `services/whatsapp_adapter.py` registered on `channel_code = 'whatsapp'`.
+- [x] Test connection that proves token, asset assignment and phone number ID without messaging anyone — a read of the phone number node, since there is no `getMe` equivalent.
+- [x] Outbound approved-template send, and free-form text inside the window.
+- [x] Semantic template → provider template mapping by account and language, looked up in the *recipient's* language (ADR-011 applies here too).
+- [x] Error classification against the thirty-entry code table, with rate limits deferring rather than failing and `131047` classified permanent.
+- [x] Fixture-based tests, no live API call. 76 of them.
 
-Exit: an Odoo event can send a WhatsApp transactional notification reliably.
+Exit: an Odoo event can send a WhatsApp transactional notification reliably — **proven against
+fixtures, never against Meta.**
 
-**Blocked on the user for live validation only.** No Meta credentials yet; everything above is
-buildable and testable against fixtures without them.
+- [ ] **Live validation.** Blocked on credentials, which do not exist yet. Work the eight-step
+      onboarding in `docs/projects/notification_whatsapp/API_RESEARCH.md` against a dedicated
+      test number, then confirm `wa_delivery_status` reaches `delivered` on a real send. That
+      single value proves the outbound call, the webhook, the signature check and the status
+      ladder at once.
 
-## Sprint 6 — Inbound WhatsApp (roadmap phase 2)
+## Sprint 6 — Inbound WhatsApp (roadmap phase 2) — built 2026-08-14
 
-- [ ] `GET` webhook verification challenge (`hub.mode` / `hub.verify_token` / `hub.challenge`).
-- [ ] `POST` signature validation — HMAC-SHA256 over the **raw** body, constant-time compare, 403 on mismatch or missing header.
-- [ ] Store the inbound envelope before any processing; dedupe on the provider message id, which needs a unique constraint the model does not currently have.
-- [ ] Map `statuses[]` onto queued messages as a monotonic ladder that tolerates `read` arriving before `delivered`.
-- [ ] Unsupported message types stored safely rather than crashing the handler.
-- [ ] Fast 200 acknowledgement; no business work inside the request.
+- [x] `GET` webhook verification challenge (`hub.mode` / `hub.verify_token` / `hub.challenge`).
+- [x] `POST` signature validation — HMAC-SHA256 over the **raw** body, constant-time compare, 403 on mismatch or missing header, failing closed when no app secret is configured.
+- [x] Store the inbound envelope before any processing; dedupe on `wa_event_key` with a unique constraint. It could not reuse `external_id` — for Telegram that column holds the chat id, and every message from one chat reuses it.
+- [x] Map `statuses[]` onto queued messages as a monotonic ladder that tolerates `read` arriving before `delivered`.
+- [x] Unsupported message types stored safely rather than crashing the handler.
+- [x] Fast 200 acknowledgement; no business work inside the request.
 
 Exit: an inbound message safely reaches a generic handler.
 
 Note the bounded scope: inbound free text is **stored and acknowledged only**. Nothing threads
 it, because there is no conversation model until Sprint 7. That is exactly the roadmap's phase-2
-exit criterion, and the acceptance criteria doc records the same bound.
+exit criterion, and the acceptance criteria doc records the same bound. It also means inbound
+message events stay `processed = False` — accurately, since nothing has processed them. If a
+number goes live before Sprint 7, somebody has to watch Inbound Events by hand.
 
 ## Sprint 7 onward — Conversation Foundry and beyond
 
