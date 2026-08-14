@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_whatsapp_template_user,notification.whatsapp.template.user,model_midvex_notification_whatsapp_template,midvex_o_notification_foundry.group_notification_user,1,0,0,0
+access_whatsapp_template_manager,notification.whatsapp.template.manager,model_midvex_notification_whatsapp_template,midvex_o_notification_foundry.group_notification_manager,1,1,1,1

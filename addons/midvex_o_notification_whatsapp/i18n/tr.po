@@ -1,0 +1,545 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_notification_whatsapp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-14 14:32+0000\n"
+"PO-Revision-Date: 2026-08-14 14:32+0000\n"
+"Last-Translator: Midvex\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: tr\n"
+
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid ""
+"<strong>Credentials go on the Credentials page.</strong>\n"
+"              The access token is the <em>Bot Token / API Key</em> field, the app secret\n"
+"              is <em>API Secret</em>, and the webhook verify token is\n"
+"              <em>Webhook Secret</em>."
+msgstr ""
+"<strong>Kimlik bilgileri Kimlik Bilgileri sayfasındadır.</strong>\n"
+"              Erişim belirteci <em>Bot Token / API Key</em> alanı, uygulama gizli anahtarı\n"
+"              <em>API Secret</em>, webhook doğrulama belirteci ise\n"
+"              <em>Webhook Secret</em> alanıdır."
+
+#. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/whatsapp_account.py:0
+msgid ""
+"A WhatsApp account needs its Phone Number ID. Without it no message can be "
+"sent and no webhook can be matched to this account."
+msgstr "Bir WhatsApp hesabı için Telefon Numarası ID zorunludur. Bu olmadan hiçbir mesaj gönderilemez ve hiçbir webhook bu hesapla eşleştirilemez."
+
+#. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/whatsapp_template_map.py:0
+msgid "A template mapping needs a language code."
+msgstr "Şablon eşleştirmesi için dil kodu zorunludur."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__account_id
+msgid "Account"
+msgstr "Hesap"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__active
+msgid "Active"
+msgstr "Aktif"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_status__approved
+msgid "Approved"
+msgstr "Onaylandı"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid ""
+"Approved templates address their variables positionally — <code>{{1}}</code>,\n"
+"            <code>{{2}}</code> — so the order above is the order Meta will substitute\n"
+"            them in. A name that is not in the message produces an empty variable\n"
+"            rather than a failed send."
+msgstr ""
+"Onaylı şablonlar değişkenlerine konuma göre başvurur — <code>{{1}}</code>,\n"
+"            <code>{{2}}</code> — dolayısıyla yukarıdaki sıra, Meta’nın değerleri yerleştireceği\n"
+"            sıradır. Mesajda bulunmayan bir ad, başarısız bir gönderim yerine boş bir\n"
+"            değişken üretir."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_category__authentication
+msgid "Authentication"
+msgstr "Kimlik Doğrulama"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__body_variable_fields
+msgid "Body Variables"
+msgstr "Gövde Değişkenleri"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "Business Account"
+msgstr "İşletme Hesabı"
+
+#. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/whatsapp_account.py:0
+msgid ""
+"Callback URL: %s\n"
+"\n"
+"Meta requires HTTPS and will refuse this URL. Set web.base.url to the instance's public HTTPS address first."
+msgstr ""
+"Geri çağırma URL’si: %s\n"
+"\n"
+"Meta HTTPS zorunlu kılar ve bu URL’yi reddeder. Önce web.base.url değerini sunucunun herkese açık HTTPS adresine ayarlayın."
+
+#. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/whatsapp_account.py:0
+msgid ""
+"Callback URL: %s\n"
+"\n"
+"Paste this into the Meta App Dashboard under WhatsApp > Configuration, with the account's Verify Token, then subscribe the WhatsApp Business Account to the \"messages\" field."
+msgstr ""
+"Geri çağırma URL’si: %s\n"
+"\n"
+"Bunu Meta App Dashboard üzerinde WhatsApp > Configuration bölümüne, hesabın Doğrulama Belirteci ile birlikte yapıştırın; ardından WhatsApp İşletme Hesabını \"messages\" alanına abone edin."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__body_variable_fields
+msgid ""
+"Comma-separated names of message DTO keys, in the order the approved "
+"template expects them, e.g. \"subject,body\". Leave empty for a template "
+"with no variables."
+msgstr "Onaylı şablonun beklediği sırayla, virgülle ayrılmış mesaj DTO anahtar adları; örn. \"subject,body\". Değişkeni olmayan şablonlar için boş bırakın."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__company_id
+msgid "Company"
+msgstr "Şirket"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__create_uid
+msgid "Created by"
+msgstr "Tarafından oluşturuldu"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__create_date
+msgid "Created on"
+msgstr "Oluşturulma tarihi"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_message__wa_delivery_status__delivered
+msgid "Delivered"
+msgstr "İletildi"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_inbound_event__wa_event_key
+msgid ""
+"Deterministic identity of one WhatsApp webhook event, used to reject "
+"redeliveries. \"msg:<wamid>\" for an inbound message, "
+"\"status:<wamid>:<state>\" for a delivery status."
+msgstr "Bir WhatsApp webhook olayının belirlenimci kimliği; yeniden teslimleri reddetmek için kullanılır. Gelen mesaj için \"msg:<wamid>\", teslimat durumu için \"status:<wamid>:<state>\"."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_inbound_event__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_message__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__display_name
+msgid "Display Name"
+msgstr "Görünen Ad"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_display_number
+msgid "Display Number"
+msgstr "Görünen Numara"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_status__draft
+msgid "Draft"
+msgstr "Taslak"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_api_version
+msgid "Graph API Version"
+msgstr "Graph API Sürümü"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__id
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_inbound_event__id
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_message__id
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__id
+msgid "ID"
+msgstr "ID"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__language_code
+msgid "Language Code"
+msgstr "Dil Kodu"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__write_uid
+msgid "Last Updated by"
+msgstr "Son güncelleyen"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__write_date
+msgid "Last Updated on"
+msgstr "Son güncellenme tarihi"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_whatsapp.action_whatsapp_template
+msgid "Map a notification template to an approved WhatsApp template"
+msgstr "Bir bildirim şablonunu onaylı bir WhatsApp şablonuyla eşleştirin"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_category__marketing
+msgid "Marketing"
+msgstr "Pazarlama"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_test_mode
+msgid ""
+"Marks this account as pointing at a test number. Does not change how "
+"messages are sent — it exists so a production number is never mistaken for a"
+" sandbox one in the account list."
+msgstr "Bu hesabın bir test numarasını gösterdiğini işaretler. Mesajların nasıl gönderildiğini değiştirmez; yalnızca hesap listesinde bir üretim numarasının test numarasıyla karıştırılmaması için vardır."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__provider_category
+msgid ""
+"Meta categorises templates and prices them differently. Ordinary "
+"transactional notifications are Utility."
+msgstr "Meta şablonları kategorilere ayırır ve farklı fiyatlandırır. Olağan işlemsel bildirimler Hizmet kategorisindedir."
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid ""
+"Meta has no API for registering a callback URL — <strong>Register\n"
+"              Webhook</strong> in the header does not apply to this channel. Use the\n"
+"              button below to see the URL, then paste it into the App Dashboard\n"
+"              yourself."
+msgstr ""
+"Meta’nın geri çağırma URL’si kaydetmek için bir API’si yoktur — başlıktaki <strong>Webhook\n"
+"              Kaydet</strong> bu kanal için geçerli değildir. URL’yi görmek için aşağıdaki\n"
+"              düğmeyi kullanın, ardından App Dashboard’a kendiniz\n"
+"              yapıştırın."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__language_code
+msgid ""
+"Meta language and locale code, e.g. en_US or tr_TR. A template approved in "
+"one language cannot be sent as another — they are separate approvals."
+msgstr "Meta dil ve yerel ayar kodu; örn. en_US veya tr_TR. Bir dilde onaylanmış şablon başka bir dil olarak gönderilemez; bunlar ayrı onaylardır."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_message__wa_message_id
+msgid ""
+"Meta's wamid for this message, extracted from the delivery result. Every "
+"status notification names it and nothing else, so it is what links an "
+"inbound status back to the row that produced it."
+msgstr "Bu mesaj için Meta’nın wamid değeri; teslimat sonucundan çıkarılır. Her durum bildirimi yalnızca bunu belirtir, dolayısıyla gelen bir durumu onu üreten kayda bağlayan şey budur."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model,name:midvex_o_notification_whatsapp.model_midvex_notification_account
+msgid "Notification Account"
+msgstr "Bildirim Hesabı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model,name:midvex_o_notification_whatsapp.model_midvex_notification_inbound_event
+msgid "Notification Inbound Event"
+msgstr "Gelen Bildirim Olayı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model,name:midvex_o_notification_whatsapp.model_midvex_notification_message
+msgid "Notification Message"
+msgstr "Bildirim Mesajı"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid "Odoo Side"
+msgstr "Odoo Tarafı"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid ""
+"Outside the 24-hour customer service window WhatsApp delivers only\n"
+"            templates Meta approved in advance. A notification whose template code is\n"
+"            mapped here is sent as that provider template; one that is not is sent as\n"
+"            plain text, which the provider will reject unless the customer messaged\n"
+"            recently."
+msgstr ""
+"24 saatlik müşteri hizmetleri penceresi dışında WhatsApp yalnızca Meta’nın önceden\n"
+"            onayladığı şablonları iletir. Şablon kodu burada eşleştirilmiş bir bildirim, o\n"
+"            sağlayıcı şablonu olarak gönderilir; eşleştirilmemiş olan düz metin olarak\n"
+"            gönderilir ve müşteri yakın zamanda yazmadıysa sağlayıcı bunu\n"
+"            reddeder."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_status__paused
+msgid "Paused"
+msgstr "Duraklatıldı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_status__pending
+msgid "Pending Approval"
+msgstr "Onay Bekliyor"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_phone_number_id
+msgid "Phone Number ID"
+msgstr "Telefon Numarası ID"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_api_version
+msgid ""
+"Pinned rather than tracking latest, so a provider release cannot change "
+"behaviour without a decision. Moving version is a change here, not a code "
+"release."
+msgstr "En son sürümü takip etmek yerine sabitlenmiştir; böylece sağlayıcının bir sürümü, karar alınmadan davranışı değiştiremez. Sürüm değiştirmek burada bir veri değişikliğidir, kod yayını değil."
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid ""
+"Production must use a <strong>System User</strong> token with the\n"
+"              <code>business_management</code>, <code>whatsapp_business_messaging</code>\n"
+"              and <code>whatsapp_business_management</code> permissions. The temporary\n"
+"              token shown in the App Dashboard expires quickly and is not suitable."
+msgstr ""
+"Üretimde <code>business_management</code>, <code>whatsapp_business_messaging</code>\n"
+"              ve <code>whatsapp_business_management</code> izinlerine sahip bir\n"
+"              <strong>Sistem Kullanıcısı</strong> belirteci kullanılmalıdır. App Dashboard’da\n"
+"              gösterilen geçici belirtecin süresi hızla dolar ve uygun değildir."
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "Provider"
+msgstr "Sağlayıcı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__provider_category
+msgid "Provider Category"
+msgstr "Sağlayıcı Kategorisi"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid "Provider Side"
+msgstr "Sağlayıcı Tarafı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__provider_status
+msgid "Provider Status"
+msgstr "Sağlayıcı Durumu"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__provider_template_name
+msgid "Provider Template Name"
+msgstr "Sağlayıcı Şablon Adı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_message__wa_delivery_status__read
+msgid "Read"
+msgstr "Okundu"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__provider_status
+msgid ""
+"Recorded by hand. Not synced from Meta — a stale approval flag would be "
+"worse than none."
+msgstr "Elle kaydedilir. Meta ile senkronize edilmez; eskimiş bir onay bilgisi, hiç olmamasından daha kötüdür."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_status__rejected
+msgid "Rejected"
+msgstr "Reddedildi"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_message__wa_delivery_status__sent
+msgid "Sent"
+msgstr "Gönderildi"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "Show Callback URL"
+msgstr "Geri Çağırma URL’sini Göster"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__template_id
+msgid "Template"
+msgstr "Şablon"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__template_code
+msgid "Template Code"
+msgstr "Şablon Kodu"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_template_ids
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "Template Mappings"
+msgstr "Şablon Eşleştirmeleri"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_test_mode
+msgid "Test Mode"
+msgstr "Test Modu"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_business_account_id
+msgid ""
+"The WABA ID from the Meta App Dashboard. Inbound webhook payloads carry it "
+"as entry[].id."
+msgstr "Meta App Dashboard’daki WABA ID. Gelen webhook yükleri bunu entry[].id olarak taşır."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_phone_number_id
+msgid ""
+"The business phone number ID from the Meta App Dashboard. This is the ID "
+"used in API calls, not the phone number itself."
+msgstr "Meta App Dashboard’daki işletme telefon numarası ID’si. API çağrılarında kullanılan kimlik budur, telefon numarasının kendisi değil."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__template_id
+msgid ""
+"The foundry template this stands in for. Optional: a provider template can "
+"be mapped by code alone, for rules whose template was created elsewhere."
+msgstr "Bunun karşılık geldiği foundry şablonu. İsteğe bağlıdır: şablonu başka bir yerde oluşturulmuş kurallar için sağlayıcı şablonu yalnızca kodla eşleştirilebilir."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__template_code
+msgid "The foundry template's code, e.g. lead_created."
+msgstr "Foundry şablonunun kodu; örn. lead_created."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_message__wa_delivery_status
+msgid ""
+"The furthest state WhatsApp has reported. Never moves backwards: statuses "
+"arrive out of order, and `read` routinely lands before `delivered`."
+msgstr "WhatsApp’ın bildirdiği en ileri durum. Asla geriye gitmez: durumlar sırasız gelir ve `read`, çoğu zaman `delivered` bildiriminden önce ulaşır."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_display_number
+msgid ""
+"The number customers see. Informational only; API calls use the phone number"
+" ID."
+msgstr "Müşterilerin gördüğü numara. Yalnızca bilgi amaçlıdır; API çağrıları telefon numarası ID’sini kullanır."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__provider_template_name
+msgid "The template name exactly as approved in the Meta App Dashboard."
+msgstr "Şablon adı, Meta App Dashboard’da onaylandığı şekliyle birebir."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.constraint,message:midvex_o_notification_whatsapp.constraint_midvex_notification_inbound_event_wa_event_key_uniq
+msgid "This WhatsApp event has already been recorded."
+msgstr "Bu WhatsApp olayı zaten kaydedilmiş."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.constraint,message:midvex_o_notification_whatsapp.constraint_midvex_notification_whatsapp_template_template_language_uniq
+msgid "This account already maps that template for that language."
+msgstr "Bu hesap, o şablonu o dil için zaten eşleştirmiş."
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_category__utility
+msgid "Utility"
+msgstr "Hizmet"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid "Variables"
+msgstr "Değişkenler"
+
+#. module: midvex_o_notification_whatsapp
+#: model:midvex.notification.channel,name:midvex_o_notification_whatsapp.channel_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_business_account_id
+msgid "WhatsApp Business Account ID"
+msgstr "WhatsApp İşletme Hesabı ID"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_message__wa_delivery_status
+msgid "WhatsApp Delivery"
+msgstr "WhatsApp Teslimatı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_inbound_event__wa_event_key
+msgid "WhatsApp Event Key"
+msgstr "WhatsApp Olay Anahtarı"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_message__wa_message_id
+msgid "WhatsApp Message ID"
+msgstr "WhatsApp Mesaj ID"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model,name:midvex_o_notification_whatsapp.model_midvex_notification_whatsapp_template
+msgid "WhatsApp Template Mapping"
+msgstr "WhatsApp Şablon Eşleştirmesi"
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.actions.act_window,name:midvex_o_notification_whatsapp.action_whatsapp_template
+#: model:ir.ui.menu,name:midvex_o_notification_whatsapp.menu_whatsapp_template
+msgid "WhatsApp Templates"
+msgstr "WhatsApp Şablonları"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.actions.act_window,help:midvex_o_notification_whatsapp.action_whatsapp_template
+msgid ""
+"WhatsApp delivers business-initiated messages only as templates Meta approved\n"
+"        in advance. Each mapping ties one of this system's templates to one approved\n"
+"        provider template, in one language."
+msgstr ""
+"WhatsApp, işletme tarafından başlatılan mesajları yalnızca Meta’nın önceden onayladığı\n"
+"        şablonlar olarak iletir. Her eşleştirme, bu sistemin bir şablonunu tek bir dilde tek bir\n"
+"        onaylı sağlayıcı şablonuna bağlar."
+
+#. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/whatsapp_account.py:0
+msgid "WhatsApp webhook"
+msgstr "WhatsApp webhook"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "e.g. +90 541 834 09 08"
+msgstr "örn. +90 541 834 09 08"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "e.g. 102290129340398"
+msgstr "örn. 102290129340398"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+msgid "e.g. 106540352242922"
+msgstr "örn. 106540352242922"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid "e.g. en_US"
+msgstr "örn. en_US"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid "e.g. lead_created"
+msgstr "örn. lead_created"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid "e.g. subject,body"
+msgstr "örn. subject,body"
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_whatsapp_template_form
+msgid "e.g. vars_lead_created"
+msgstr "örn. vars_lead_created"
