@@ -281,3 +281,55 @@ The non-goal stands for the *notification* modules: `midvex_o_notification_teleg
 ### Reason
 
 Three documents currently declare this out of scope. Building it while those stand would leave the next reader with a repository whose rules contradict its code, and the rules would lose — quietly, and only for whoever noticed. A scope expansion that is written down is a decision; one that is not is a defect.
+
+## ADR-019: One inbound envelope store, shared by both foundries
+
+### Status
+
+Accepted — 2026-08-15. Settles the open question left in `conversation_foundry/DATA_MODEL.md` §5.
+
+### Decision
+
+`midvex.notification.inbound.event` stays the single record of "something arrived from a provider". The conversation foundry extends it with what it needs — a processing state, a retry count, a correlation id, and links to the thread and message an event produced — rather than introducing `midvex.conversation.inbound.event` alongside it.
+
+### Reason
+
+The webhook is already shared. Meta delivers one phone number's callbacks to exactly one URL, so `/notification/whatsapp/webhook/<account_id>` receives customer messages and delivery statuses through the same door and writes both to this model today. A second envelope store would mean that controller choosing which table each event belongs in — at the very moment it knows least, before parsing, when the whole point is to record the payload *before* interpreting it.
+
+It would also split the dedupe key space in two. `wa_event_key` is unique per account; two tables would need two constraints and a rule about which wins, and a redelivery that landed in the other one would be accepted twice.
+
+The envelope is transport-level, not business-level, so this does not make the notification foundry the canonical conversation store — the thing ADR-013 forbids. `midvex.conversation.message` is that store. This model records what a provider sent us; it is the audit trail behind both foundries, not a queue and not a conversation.
+
+### Consequences
+
+The notification module owns a table the conversation module writes to. That is already true of the channel/account registry and is the same shape: shared infrastructure below the split, not above it.
+
+## ADR-020: Conversation replies go out through the one delivery queue
+
+### Status
+
+Accepted — 2026-08-15. Settles the open question left in `conversation_foundry/ARCHITECTURE.md`.
+
+### Decision
+
+`midvex.conversation.message` is the durable record. When one needs sending, the service creates a `midvex.notification.message` as its **delivery job** and links the two. There is one queue in this platform, one cron draining it, one retry classifier, one throttle.
+
+Three small changes to the foundry make a customer addressable:
+
+1. `recipient_id` becomes optional. It identifies a *staff member* linked to an account, and a customer is not one.
+2. `destination_external_id` is added, with a computed `destination_key` that resolves to the recipient's external id or, absent a recipient, the raw destination.
+3. `_throttle_release_at` keys its per-destination limit on `destination_key` instead of `recipient_id`, and `cron_process_pending` skips the quiet-hours check when there is no recipient.
+
+### Reason
+
+`AGENTS.md` is unambiguous: channel modules must not write their own queue, retry or log logic, and the foundry exists so that workflow is written once. A conversation foundry with its own drain would be the largest violation of that rule in the repository, and it would be the second implementation of the retry backoff, the rate-limit deferral and the prompt-delivery trigger — the three things the 2026-08-09 and 2026-08-10 sessions spent their length getting right.
+
+Extracting the machinery into a mixin shared by two queue tables was the alternative and is the more elegant shape. It was rejected for phase 3 on risk: it moves ~150 lines of a production delivery path guarded by 99 tests, in the same change that introduces five new models. One queue table with a nullable recipient is a smaller diff, and it leaves the mixin available later if a second queue is ever genuinely wanted.
+
+Keying the throttle on the destination rather than the recipient is a correction in its own right. The provider's limit is per chat or per number — WhatsApp allows one message per six seconds *to one person* — and `recipient_id` was only ever a proxy for that. Left as it was, every customer would have shared a single null recipient and throttled each other: one conversation would have paced them all.
+
+### Consequences
+
+The queue now carries customer-facing rows. It is still not the conversation store — those rows are transient delivery attempts that stop mattering once `sent`, while `midvex.conversation.message` is the durable history. That is exactly the distinction ADR-013 draws.
+
+`rule_notification_message_self` scopes plain users to `recipient_id.user_id = user.id`, so a delivery job with no recipient is invisible to them and visible to managers by company. That is the right default: a customer's message is not every staff member's business.

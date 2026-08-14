@@ -639,7 +639,23 @@ class NotificationMessage(models.Model):
 
     name = fields.Char(required=True, default=lambda self: _('Notification'))
     rule_id = fields.Many2one('midvex.notification.rule', ondelete='set null', index=True)
-    recipient_id = fields.Many2one('midvex.notification.recipient', required=True, ondelete='cascade', index=True)
+    # Optional since ADR-020. A recipient is a *staff member* linked to an
+    # account — it carries quiet hours, a mute switch and a link code — and a
+    # customer being replied to in a conversation is none of those things.
+    # Rows without one are delivery jobs raised by the conversation foundry,
+    # which addresses destination_external_id instead.
+    recipient_id = fields.Many2one('midvex.notification.recipient', ondelete='cascade', index=True)
+    destination_external_id = fields.Char(
+        string='Destination',
+        groups='midvex_o_notification_foundry.group_notification_manager',
+        help='Provider address to deliver to when there is no recipient record — a '
+             'customer phone number or chat id. Ignored when a recipient is set.')
+    # The provider-level address this message is going to, whichever way it was
+    # given. Stored and indexed because the throttle searches on it before every
+    # single send.
+    destination_key = fields.Char(
+        compute='_compute_destination_key', store=True, index=True,
+        groups='midvex_o_notification_foundry.group_notification_manager')
     account_id = fields.Many2one('midvex.notification.account', required=True, ondelete='cascade', index=True)
     company_id = fields.Many2one(related='account_id.company_id', store=True, index=True)
     # Was a free-text Char, which rendered as a text box on the form and let a
@@ -689,6 +705,41 @@ class NotificationMessage(models.Model):
     # message content beyond what troubleshooting needs, per NOTIFICATION_SECURITY.md.
     _METADATA_REDACT_KEYS = ('raw', 'body', 'text')
 
+    @api.depends('recipient_id.external_id', 'destination_external_id')
+    def _compute_destination_key(self):
+        """Where this message is actually going, at the provider's level.
+
+        Introduced so the rate limit can be keyed on the destination rather
+        than on the Odoo record that happens to name it. The provider's limit
+        is per chat or per number — WhatsApp allows one message every six
+        seconds to one person — and recipient_id was only ever a proxy for
+        that. It stops being one entirely once conversation replies, which have
+        no recipient, share the queue: they would all have keyed on the same
+        empty recordset and throttled each other.
+        """
+        for message in self:
+            message.destination_key = (
+                message.recipient_id.sudo().external_id or message.destination_external_id or False)
+
+    @api.constrains('destination_key')
+    def _check_has_a_destination(self):
+        """One of the two, always.
+
+        Dropping required=True from recipient_id would otherwise allow a
+        message addressed to nobody, which no adapter can send and which would
+        sit in the queue failing for a reason nothing states.
+
+        Constrained on the computed key rather than on the two fields that feed
+        it, deliberately: Odoo validates only the fields present in the write,
+        so a create() naming neither would have skipped a constraint listing
+        both — which is exactly the case this exists to catch. destination_key
+        is computed on every create, so it is always there to be checked.
+        """
+        for message in self:
+            if not message.sudo().destination_key:
+                raise ValidationError(_(
+                    'A notification needs either a recipient or a destination address.'))
+
     def _log(self, status, message_text, error_code=False, metadata=False):
         safe_metadata = {key: value for key, value in (metadata or {}).items()
                           if key not in self._METADATA_REDACT_KEYS}
@@ -705,7 +756,12 @@ class NotificationMessage(models.Model):
                 adapter = get_adapter(message.channel_code)
                 message_dto = {
                     'message_id': message.id,
-                    'recipient_external_id': message.recipient_id.external_id,
+                    # sudo: destination_key is manager-gated, and the adapter
+                    # needs the real address whoever pressed Retry. Read
+                    # unprivileged it comes back False and the send fails
+                    # claiming there is no recipient, which was already true of
+                    # recipient_id.external_id before this field existed.
+                    'recipient_external_id': message.sudo().destination_key,
                     'subject': message.subject,
                     'body': message.body,
                     'template_code': message.rule_id.template_id.code if message.rule_id else False,
@@ -828,9 +884,16 @@ class NotificationMessage(models.Model):
         releases = []
         Sent = self.sudo()
         chat_seconds = getattr(adapter, 'rate_limit_chat_seconds', 0)
-        if chat_seconds:
+        # Keyed on the destination, not the recipient record. The provider
+        # limits how fast we may talk to one chat or one number; which Odoo row
+        # names it is our business, not theirs. Since ADR-020 it also has to be
+        # this way: conversation replies carry no recipient, so keying on that
+        # would have every customer sharing one empty key and pacing each other.
+        destination = self.sudo().destination_key
+        if chat_seconds and destination:
             last = Sent.search([
-                ('recipient_id', '=', self.recipient_id.id),
+                ('destination_key', '=', destination),
+                ('account_id', '=', self.account_id.id),
                 ('state', '=', 'sent'), ('sent_at', '!=', False),
             ], order='sent_at desc', limit=1)
             if last and last.sent_at > now - timedelta(seconds=chat_seconds):
@@ -920,7 +983,11 @@ class NotificationMessage(models.Model):
         ], limit=self._batch_size(), order='id')
         holds = []
         for message in messages:
-            release = message.recipient_id._quiet_release_at(now)
+            # Quiet hours belong to a person who asked not to be woken. A
+            # conversation reply has no recipient record and no such wish — and
+            # _quiet_release_at calls ensure_one(), so asking an empty
+            # recordset would raise and take the whole batch down with it.
+            release = message.recipient_id._quiet_release_at(now) if message.recipient_id else False
             if release:
                 # Logged only when the hold is new. The cron runs every few
                 # minutes, and re-logging each pass would bury the real delivery
