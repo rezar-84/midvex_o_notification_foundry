@@ -255,3 +255,84 @@ python odoo/odoo-bin -c config/odoo.conf -d odoo19_dev --http-port=8099 --dev= \
 ```
 
 Then, in the UI: set an audience on `rule_invoice_posted`, post a customer invoice, and confirm the message reaches `sent` within seconds — `SELECT state, create_date, sent_at FROM midvex_notification_message ORDER BY id DESC LIMIT 5;`. `sent_at - create_date` is the number that proves the delivery path end to end against the real Telegram API, which is the one thing this session measured only against a tokenless account.
+
+## 2026-08-14 — The omnichannel pack, and WhatsApp as a real channel
+
+### Objective
+
+A 23-file omnichannel messaging specification pack appeared in `~/Projects/varsco_omnichannel_messaging_project/` on 2026-08-14, untracked and with no history. Its own merge map said it belonged in this repository. The ask was to review it and start building. Scope was agreed with the user as roadmap phases 0–2: freeze the contract here, then build WhatsApp as a working transport.
+
+### Read
+
+Root `AGENTS.md`, `~/Development/odoo19-dev/AGENTS.md`, the suite architecture, the foundry's PRD/architecture/data model/adapter contract, the Telegram implementation, `docs/SPRINT_BACKLOG.md`, and the whole 2026-08-01 → 2026-08-10 handoff log. Then all 23 pack files.
+
+### Decisions — ADR-013 through ADR-018
+
+Recorded in `docs/projects/notification_foundry/DECISIONS.md`, so only the surprising parts here.
+
+**The pack is wrong about the frontend.** It says "headless Next.js" in the brief, the live chat spec, the API spec and an ADR. There is no Next.js VARS site on this machine. `Websites/varsco_com` is TanStack Start + Vite + React on Bun, Lovable-connected — its own `AGENTS.md` warns that commits sync back to the Lovable editor and history must not be rewritten. Its `WhatsAppWidget.tsx` is a nine-language `wa.me` deep-link popover that Odoo never sees, which makes it the shell phase 5 absorbs rather than something to replace. Corrected on merge with the user's agreement rather than carried forward. ADR-016.
+
+**The pack proposes a second adapter registry.** It also says, in the same file, "do not invent an incompatible registry when reuse is possible." Reuse is possible. The contract is now the five methods `TelegramAdapter` already implements plus three optional additions with conservative defaults, so no existing adapter needs editing. The method-by-method mapping is in `conversation_foundry/ADAPTER_CONTRACT.md`. ADR-015.
+
+**Model names get the `midvex.` prefix.** `conversation.thread` claims a generic name in a registry shared with `mail` and `im_livechat`. ADR-014.
+
+**AGENTS.md contradicted the work.** It, `notification_foundry/PRD.md` and `notification_telegram/PRD.md` all list "inbound conversational commands beyond `/link`" as an explicit non-goal. Building inbound while that stood would have left the rules losing to the code, quietly. Superseded in writing, and narrowed rather than deleted: it still holds for the *notification* modules. ADR-018.
+
+### Files changed
+
+Two commits.
+
+`4a57b7b docs:` — six new project directories under `docs/projects/`, ADR-013…018, `AGENTS.md` reading order and scope note, `PROJECT_INDEX_NOTIFICATION.md`, Sprints 4–7 appended to `SPRINT_BACKLOG.md`, a stale `README.md` fixed (it never mentioned `midvex_o_notification_business`), and `notification_whatsapp/API_RESEARCH.md` filled in.
+
+`d2cb23d feat(whatsapp):` — `addons/midvex_o_notification_whatsapp/`, 23 files. Client, adapter, webhook controller, account extension, template mapping model, two fields on the message, one on the inbound event, views, security, channel data, 84-string Turkish catalogue, and 76 tests.
+
+### API research
+
+`notification_whatsapp/API_RESEARCH.md` was the blank template, which under this repo's channel-API rule blocks payload work. Verified against Meta's documentation on 2026-08-14 with URLs and dates recorded: Graph API v26.0 is latest (released 2026-07-29), v25.0 pinned as a per-account field with runway to 2028; System User tokens and their three scopes; both send payload shapes; `hub.challenge` verification and `X-Hub-Signature-256` over the raw body; inbound message and status envelopes; a thirty-entry error-code table mapped to the taxonomy; rate limits; and the 24-hour window.
+
+The window's duration is cited from error code `131047`, not from the overview page — the overview names the window without stating how long it is. That is the kind of thing worth not re-deriving.
+
+Also written: the credential onboarding and rotation runbook, because the module was built without credentials and somebody has to do those eight steps before a single message is delivered.
+
+### Things worth not rediscovering
+
+- **The inbound event model could not carry the dedupe key.** `external_id` looks like the obvious column, and for Telegram it holds the *chat* id — every message from one chat reuses it. A unique constraint there would have rejected the second message anybody ever sent the bot. `wa_event_key` is a separate column, NULL on Telegram rows, and Postgres treats NULLs as distinct.
+- **The key is not the wamid alone.** One outbound message produces three status notifications, all naming it. Keying on the wamid would have accepted `sent` and silently rejected `delivered` and `read`, leaving every message stuck one rung down.
+- **`read` arrives before `delivered`.** Routinely, not rarely. The ladder refuses to move backwards.
+- **The signature covers bytes, not meaning.** Verifying against `json.dumps(parsed)` fails silently in the safe direction until a payload's key order differs, at which point every genuine webhook is rejected. There is a test that asserts re-serialized JSON does *not* verify.
+- **Meta has no `setWebhook`.** The header's Register Webhook button now raises with an explanation rather than reporting success for a call it never made.
+- **Searching a Json column with `like` was the first attempt** at matching a status to its message. Replaced with a stored computed `wa_message_id` — indexed, exact, and it leaves the foundry's `action_process` untouched.
+
+### Verification
+
+- **196 tests, 0 failed, 3 errors** on a fresh `odoo19_wa_final`. Up from 120.
+- **The 3 errors are not mine.** A control run on `odoo19_wa_control` with this module *not installed* produced the identical three: `test_sale_and_invoice_templates_render`, `test_the_payment_template_renders`, `test_vendor_templates_render`, all failing to create an `account.move`/`account.payment` with no journal on a database with no chart of accounts. Environmental, and worth knowing before somebody spends an afternoon on it.
+- Installed cleanly into `odoo19_dev`, backed up first to `backups/odoo19_dev_pre_whatsapp.dump`. Schema confirmed by hand: `wa_event_key` and its unique constraint, `wa_message_id`, `wa_delivery_status`, five account columns, the mapping table, the channel row.
+- Secret scan clean over the new module and all of `docs/`.
+- `odoo19_dev` still fails to load `midvex_l10n_tr_marketplace_foundry` and `_trendyol`. Unchanged, different repository, item 5 from the last entry.
+
+### Risks and open questions
+
+- **Nothing here has ever spoken to Meta.** No credentials exist yet. Live delivery, a genuine signed webhook, real statuses and long-term token behaviour are all unproven, and no amount of fixture testing changes that.
+- **Inbound free text is stored and dropped.** It is deduped and acknowledged and nothing reads it, because `midvex_o_conversation_foundry` does not exist. That is the roadmap's phase-2 exit criterion exactly, but it means an inbound customer message currently produces a row and no reply. If a number goes live before phase 3, somebody must be watching Inbound Events by hand.
+- **Inbound message events stay `processed = False`** for the same reason. Status events are marked processed on every path, including ones that change nothing, so they cannot accumulate as a false alarm against the runbook's "unprocessed events" check. Message events genuinely are unprocessed and show as such.
+- **`v25.0` will age.** It is a field on the account, not a constant, so moving is a data change — but nothing reminds anyone. v25.0 is available until 2028-07-29.
+- **The previous entry's items 2, 3 and 4 are still open**, untouched: audiences on the shipped business rules, a real end-to-end Telegram delivery that has still never been observed, and the probe leftovers in `odoo19_dev` (posted invoice `INV/2026/00001` id 25, partner *Overdue Probe Ltd* id 348). The two production prerequisites on `erp` are also still unverified, and both block WhatsApp exactly as they block Telegram: no cron worker means nothing sends at all, and the live account's channel code recorded as `1` means no adapter resolves.
+
+### Migration
+
+None. `midvex_o_notification_whatsapp` is new. Its two additions to `midvex.notification.message` are a stored compute and a nullable Selection; `wa_event_key` is nullable on a table that had zero rows in `odoo19_dev` and whose Telegram rows would be unaffected regardless.
+
+### Exact next step
+
+The module cannot be validated further without credentials. When they exist, work the eight-step onboarding in `docs/projects/notification_whatsapp/API_RESEARCH.md` against a **dedicated test number**, then:
+
+```bash
+cd ~/Development/odoo19-dev && source .venv/bin/activate
+python odoo/odoo-bin -c config/odoo.conf -d odoo19_dev --http-port=8099 --dev= \
+  -u midvex_o_notification_whatsapp --stop-after-init
+```
+
+Then in the UI: create a WhatsApp account, enter the three credentials yourself, press **Test Connection** — it reads the phone number node and messages nobody, so it is safe to run first. The one number that proves the path is what `SELECT state, wa_delivery_status, sent_at FROM midvex_notification_message ORDER BY id DESC LIMIT 5;` shows after a real send: `wa_delivery_status` reaching `delivered` means the outbound call, the webhook, the signature check and the status ladder all worked, which is the whole chain this session could only prove one fixture at a time.
+
+Until then, the honest status is: built, tested against fixtures, and never once run against WhatsApp.

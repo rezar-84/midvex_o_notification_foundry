@@ -288,6 +288,62 @@ Error `131047` — "More than 24 hours have passed since recipient last replied"
 
 Outside the window, only approved template messages are deliverable. The adapter must check before sending, and the value belongs in a named constant with this citation beside it, not scattered as a literal.
 
+## Onboarding a number — the steps a human has to do
+
+Nothing below can be done from Odoo, and none of it needs a developer. It is
+written out because the module was built without credentials and somebody will
+have to do this before a single message is delivered.
+
+1. **Meta Business Manager** — have or create a Business account, and add the
+   WhatsApp Business Account (WABA) to it.
+2. **Add a phone number.** Use a number that is *not* currently in the WhatsApp
+   Business mobile app on someone's phone, and not a number the business cannot
+   afford to lose from that app. Coexistence is not assumed to work — ADR-005 —
+   so test with a dedicated number before migrating an important one.
+3. **App Dashboard → API Setup.** Record two values: the **WhatsApp Business
+   Account ID** and the **Phone number ID**. Both go on the Odoo account form's
+   WhatsApp page.
+4. **Business Settings → Users → System Users.** Create a system user, assign
+   the app and the WABA to it as assets, and generate a token with exactly
+   these permissions:
+   - `business_management`
+   - `whatsapp_business_messaging`
+   - `whatsapp_business_management`
+   The temporary token on the API Setup page is not suitable — Meta's own guide
+   says it "expires quickly".
+5. **Enter the credentials in Odoo**, on the account's Credentials page:
+   - access token → *Bot Token / API Key*
+   - app secret (App Dashboard → Settings → Basic) → *API Secret*
+   - a verify token you invent → *Webhook Secret*
+
+   Enter them yourself. They must never be pasted into a chat, a commit, a
+   handoff entry or a ticket.
+6. **Press Test Connection.** It reads the phone number node — no message is
+   sent to anybody. Success shows the verified business name.
+7. **Configure the callback.** Press *Show Callback URL* on the WhatsApp page,
+   then in App Dashboard → WhatsApp → Configuration paste that URL and the same
+   verify token, and **subscribe the WABA to the `messages` field**. Without
+   that subscription no inbound message and no delivery status ever arrives.
+   The instance must be reachable over public HTTPS; Meta will refuse anything
+   else.
+8. **Get templates approved** for every language you intend to send in, then
+   record each one under Configuration → WhatsApp Templates against the
+   matching notification template code.
+
+### Rotation
+
+Regenerate the system user's token in Business Settings and replace the value
+in the account's *Bot Token / API Key* field. The old token stops working when
+it is regenerated, so do the two together and press Test Connection after.
+
+To revoke without replacing: remove the system user's asset assignment, or
+delete the system user. Confirm the current exact procedure at the time —
+Meta moves this UI.
+
+**Do not** respond to an authentication failure by generating a fresh temporary
+dashboard token. It will work for a few hours and fail again, and the outage
+will look intermittent rather than caused.
+
 ## Endpoints still to verify before use
 
 - template management / approval status sync (only needed if template sync moves beyond manual identifiers);
