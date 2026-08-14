@@ -47,3 +47,63 @@
 - [ ] Verify requirements against Odoo's own `mail.mail`/`ir.mail_server` before implementation.
 - [ ] Implement `midvex_o_notification_email` adapter.
 - [ ] Register the Email channel and pass mocked adapter unit tests.
+
+---
+
+# Omnichannel Messaging
+
+Sprints 4 onward come from `docs/projects/omnichannel_messaging/ROADMAP.md`, which was
+merged into this repository on 2026-08-14 (ADR-013). Nothing above is superseded: the
+Email and Slack connectors and the open Sprint 2 items remain live work.
+
+One note on sequencing. The notification roadmap's phase 6 (WhatsApp/SMS) and the
+omnichannel roadmap's phases 1–2 are **the same work**, and are being done once, in
+`midvex_o_notification_whatsapp`. That is why WhatsApp jumps ahead of Email and Slack.
+
+## Sprint 4 — Contract freeze (roadmap phase 0) — done 2026-08-14
+
+- [x] Inspect the current foundry, the Telegram implementation, the WhatsApp doc stubs and `varsco_content_api`.
+- [x] Verify the current official Meta WhatsApp Cloud API documentation and record version, auth, webhook and error behavior in `docs/projects/notification_whatsapp/API_RESEARCH.md`.
+- [x] Merge the specification pack into `docs/projects/`, correcting the frontend stack error.
+- [x] Record ADR-013 through ADR-018.
+
+## Sprint 5 — WhatsApp notification MVP (roadmap phase 1)
+
+- [ ] `midvex_o_notification_whatsapp` addon: manifest, channel data, security, views.
+- [ ] Account model extension — WABA ID, phone number ID, display number, API version, app secret, verify token, test mode — on the existing `midvex.notification.account`.
+- [ ] `services/whatsapp_client.py` — one transport client, shared with the future conversation module (ADR-017).
+- [ ] `services/whatsapp_adapter.py` registered on `channel_code = 'whatsapp'`.
+- [ ] Test connection that proves token, asset assignment and phone number ID without messaging anyone.
+- [ ] Outbound approved-template send, and free-form text inside the window.
+- [ ] Semantic template → provider template mapping by company and language.
+- [ ] Error classification against the thirty-entry code table, with rate limits deferring rather than failing.
+- [ ] Fixture-based tests, no live API call.
+
+Exit: an Odoo event can send a WhatsApp transactional notification reliably.
+
+**Blocked on the user for live validation only.** No Meta credentials yet; everything above is
+buildable and testable against fixtures without them.
+
+## Sprint 6 — Inbound WhatsApp (roadmap phase 2)
+
+- [ ] `GET` webhook verification challenge (`hub.mode` / `hub.verify_token` / `hub.challenge`).
+- [ ] `POST` signature validation — HMAC-SHA256 over the **raw** body, constant-time compare, 403 on mismatch or missing header.
+- [ ] Store the inbound envelope before any processing; dedupe on the provider message id, which needs a unique constraint the model does not currently have.
+- [ ] Map `statuses[]` onto queued messages as a monotonic ladder that tolerates `read` arriving before `delivered`.
+- [ ] Unsupported message types stored safely rather than crashing the handler.
+- [ ] Fast 200 acknowledgement; no business work inside the request.
+
+Exit: an inbound message safely reaches a generic handler.
+
+Note the bounded scope: inbound free text is **stored and acknowledged only**. Nothing threads
+it, because there is no conversation model until Sprint 7. That is exactly the roadmap's phase-2
+exit criterion, and the acceptance criteria doc records the same bound.
+
+## Sprint 7 onward — Conversation Foundry and beyond
+
+Not started, not scheduled. `docs/projects/omnichannel_messaging/ROADMAP.md` phases 3–12:
+conversation foundry, CRM bridge and Odoo inbox, website live chat, web→WhatsApp handoff,
+mobile/PWA inbox, AI assist, offline AI, Telegram conversation, media, advanced routing.
+
+The roadmap's own rule: do not start AI, media, advanced routing or Telegram two-way work
+before the first WhatsApp milestone path is stable.
