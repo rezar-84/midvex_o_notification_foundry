@@ -1,0 +1,1074 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_conversation_foundry
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-14 21:49+0000\n"
+"PO-Revision-Date: 2026-08-14 21:49+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_session.py:0
+msgid "A %(session)s session cannot use a %(account)s account."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_message.py:0
+msgid ""
+"A message to or from a customer needs a session. Only internal notes and "
+"system entries have none."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "A session needs an address to reply to."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__ai
+msgid "AI"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__account_id
+msgid "Account"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__active
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__active
+msgid "Active"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__company_id
+msgid "Always the thread's. Derived rather than set so the two cannot drift."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "An empty message cannot be sent."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "An empty note cannot be saved."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_identity.py:0
+msgid "An identity needs a normalized identifier."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__archived
+msgid "Archived"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__assigned_user_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Assigned To"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Assigned to Me"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__assignment_event_ids
+msgid "Assignment Event"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Assignment History"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__audio
+msgid "Audio"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__automation
+msgid "Automation"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__body
+msgid "Body"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_thread.py:0
+msgid ""
+"Cannot assign a %(company)s conversation to a user who does not work for "
+"that company."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_identity.py:0
+msgid "Cannot identify a party without an identifier."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__actor_user_id
+msgid "Changed By"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_list
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Channel"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__channel_code
+msgid "Channel Code"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__metadata_json
+msgid ""
+"Channel-specific state that does not deserve a column — a web widget's token"
+" expiry, a provider conversation window. Never business data."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Channels"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_session__state__closed
+msgid "Closed"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__closed_at
+msgid "Closed At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__company_id
+msgid "Company"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_thread.py:0
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_thread_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Conversation"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_assignment_event
+msgid "Conversation Assignment Event"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_identity
+msgid "Conversation Identity"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_message
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_message_id
+msgid "Conversation Message"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_message__conversation_message_ids
+msgid "Conversation Messages"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_session
+msgid "Conversation Session"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_thread
+msgid "Conversation Thread"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "Conversation reply"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.actions.act_window,name:midvex_o_conversation_foundry.action_conversation_thread
+#: model:ir.ui.menu,name:midvex_o_conversation_foundry.menu_conversation_root
+msgid "Conversations"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_conversation_foundry.action_conversation_thread
+msgid ""
+"Conversations arrive from a channel — a customer messaging a connected\n"
+"        WhatsApp number, or the website chat widget. They are not created by hand."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__correlation_id
+msgid "Correlation"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__delivered
+msgid "Delivered"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__delivered_at
+msgid "Delivered At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__delivery_id
+msgid "Delivery Job"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__partner_id
+msgid ""
+"Derived from the identity, so linking a contact reaches every thread it has "
+"rather than one."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__direction
+msgid "Direction"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__display_identifier
+msgid "Display Identifier"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_message__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__document
+msgid "Document"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__email
+msgid "Email"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__author_user_id
+msgid ""
+"Empty for anything the customer sent, and for anything automation sent."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__error_code
+msgid "Error Code"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__error_message_safe
+msgid "Error Message Safe"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__external_recipient_id
+msgid "External Recipient"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__external_session_id
+msgid "External Session"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__failed
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__failed
+msgid "Failed"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__failed_at
+msgid "Failed At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__partner_id
+msgid ""
+"Filled in once somebody knows who this is. Empty is the normal state for a "
+"first-time enquiry, not an error."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__processing_state
+msgid ""
+"Finer than the `processed` flag, which cannot tell \"nothing to do with "
+"this\" apart from \"we have not got to it\". Ignored is a resting state; "
+"failed wants somebody."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "First Channel"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__first_channel_code
+msgid "First Channel Code"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__first_response_at
+msgid "First Response At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__first_seen_at
+msgid "First Seen At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__from_user_id
+msgid "From"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__inbound
+msgid "From Customer"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__frontend
+msgid "Frontend"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__generated_by_ai
+msgid "Generated By Ai"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__priority__1
+msgid "High"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_message__id
+msgid "ID"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.actions.act_window,name:midvex_o_conversation_foundry.action_conversation_identity
+#: model:ir.ui.menu,name:midvex_o_conversation_foundry.menu_conversation_identities
+msgid "Identities"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__identity_id
+msgid "Identity"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__identity_type
+msgid "Identity Type"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__ignored
+msgid "Ignored"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__image
+msgid "Image"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.ui.menu,name:midvex_o_conversation_foundry.menu_conversation_threads
+msgid "Inbox"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__interactive
+msgid "Interactive"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__internal
+msgid "Internal Note"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__language_code
+msgid "Language Code"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_list
+msgid "Last Activity"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__last_activity_at
+msgid "Last Activity At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Last Channel"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__last_channel_code
+msgid "Last Channel Code"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__last_message_at
+msgid "Last Message At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__last_seen_at
+msgid "Last Seen At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__location
+msgid "Location"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_identity_form
+msgid ""
+"Matching happens on the normalized identifier alone. A display name or a\n"
+"            username is the person's to change, so matching on one would reassign a\n"
+"            conversation the day they renamed themselves."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__message_ids
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__message_ids
+msgid "Message"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__message_count
+msgid "Message Count"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__message_type
+msgid "Message Type"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_list
+msgid "Messages"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__metadata_json
+msgid "Metadata Json"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__name
+msgid "Name"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__translated_body
+msgid ""
+"Never replaces the body. A translation is our reading of what they said, and"
+" the original is what they actually said."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__new
+msgid "New"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_conversation_foundry.action_conversation_thread
+msgid "No conversations yet"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__priority__0
+msgid "Normal"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__normalized_identifier
+msgid "Normalized Identifier"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_notification_inbound_event
+msgid "Notification Inbound Event"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_notification_message
+msgid "Notification Message"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__odoo
+msgid "Odoo"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_session__state__open
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__open
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Open"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__opened_at
+msgid "Opened At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__origin
+msgid "Origin"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__original_language
+msgid "Original Language"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__partner_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__partner_id
+msgid "Partner"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__priority
+msgid "Priority"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__processed
+msgid "Processed"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__processing
+msgid "Processing"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__processing_state
+msgid "Processing State"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__provider
+msgid "Provider"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__provider_identifier
+msgid "Provider Identifier"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__provider_message_id
+msgid "Provider Message"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__queued
+msgid "Queued"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__queued_at
+msgid "Queued At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__read
+msgid "Read"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__read_at
+msgid "Read At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__reason
+msgid "Reason"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__received
+msgid "Received"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Reopen"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Reply To"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__reply_to_message_id
+msgid "Reply To Message"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid ""
+"Replying from here is phase 4. The service API can already send —\n"
+"                <code>queue_outbound()</code> — but there is no compose box yet, so a\n"
+"                reply has to come from a channel module or the shell."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Resolve"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__resolved
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Resolved"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__resolved_at
+msgid "Resolved At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__retry_count
+msgid "Retry Count"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__error_message_safe
+msgid ""
+"Safe to show an agent: the provider's own explanation, never a token, a "
+"header or a stack trace."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__sent
+msgid "Sent"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__sent_at
+msgid "Sent At"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__session_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__session_ids
+msgid "Session"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__verified
+msgid ""
+"Set when the person proved they control this address — replied from it, or "
+"completed a channel linking flow. An unverified identity is a claim."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__reply_to_message_id
+msgid "Set when the provider tells us this was a reply to a specific message."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__state
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__state
+msgid "State"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__status
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Status"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__submitted
+msgid "Submitted"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__system
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__system
+msgid "System"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__telegram
+msgid "Telegram"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__template
+msgid "Template"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__text
+msgid "Text"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__display_identifier
+msgid ""
+"The address as the provider or the person themselves writes it. Shown to "
+"agents; never matched on."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__external_recipient_id
+msgid ""
+"The address to reply to on this channel. Copied onto every outbound delivery"
+" job, so it is what the provider actually receives."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__normalized_identifier
+msgid ""
+"The canonical form used for matching — E.164 for a phone number. Two "
+"spellings of one address must normalize to one value here or one person "
+"becomes two customers."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__account_id
+msgid ""
+"The channel account this leg speaks through — the same shared registry the "
+"notification foundry uses."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "The customer spoke last. Nobody has replied yet."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__unanswered
+msgid ""
+"The customer spoke last. What an agent filters their inbox by, so it is "
+"stored rather than computed on the fly."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_message_id
+msgid ""
+"The durable message this envelope produced. Empty on an event that produced "
+"none — a delivery status, or a type nothing reads yet."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__language_code
+msgid ""
+"The language this customer writes in, as first detected. Used to pick a "
+"provider template; never overwrites what they actually said."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__external_session_id
+msgid "The provider's own conversation id, where it has one."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__provider_message_id
+msgid ""
+"The provider's own id. What an inbound delivery status names, and nothing "
+"else, so it is the only way back to this row."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__provider_identifier
+msgid ""
+"The provider's own opaque id for this person, where it has one distinct from"
+" the address."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__delivery_id
+msgid ""
+"The queue row that carries this to the provider, with the retry, throttling "
+"and delivery logging the notification foundry already does."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_thread_id
+msgid "The thread this envelope was filed under, once it was processed."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_session.py:0
+msgid ""
+"This conversation belongs to %(thread)s but the channel account belongs to "
+"%(account)s. A conversation cannot send through another company's account."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_thread.py:0
+msgid ""
+"This conversation belongs to %(thread)s but the identity belongs to "
+"%(identity)s. A conversation cannot span companies."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "This conversation channel is closed; reopen it to reply."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.constraint,message:midvex_o_conversation_foundry.constraint_midvex_conversation_identity_identity_uniq
+msgid "This identity already exists for this company."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_message.py:0
+msgid "This message belongs to a different conversation than its session."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.constraint,message:midvex_o_conversation_foundry.constraint_midvex_conversation_message_provider_message_uniq
+msgid "This provider message has already been recorded on this session."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__thread_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__thread_ids
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__thread_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__thread_id
+msgid "Thread"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__correlation_id
+msgid ""
+"Ties this envelope to the log lines it produced. The runbook asks people to "
+"search by it, so it has to survive into the logs rather than only exist "
+"here."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__to_user_id
+msgid "To"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__outbound
+msgid "To Customer"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__translated_body
+msgid "Translated Body"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__translated_language
+msgid "Translated Language"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__unanswered
+msgid "Unanswered"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Unassigned"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_identity.py:0
+msgid "Unknown"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__priority__2
+msgid "Urgent"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__verification_source
+msgid "Verification Source"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__verified
+msgid "Verified"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__video
+msgid "Video"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__waiting_agent
+msgid "Waiting on Agent"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__waiting_customer
+msgid "Waiting on Customer"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Waiting on Us"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__web
+msgid "Web Chat"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__whatsapp
+msgid "WhatsApp"
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__first_response_at
+msgid ""
+"When an agent first replied. The number a supervisor actually cares about, "
+"and impossible to reconstruct later, so it is stamped once."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__origin
+msgid ""
+"Where this message came from, which is not the same question as who wrote "
+"it. Required for the audit FR-017 asks for."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__session_id
+msgid ""
+"Which channel leg carried this. Empty for an internal note, which was never "
+"carried anywhere."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__actor_user_id
+msgid ""
+"Who made the change, which is often neither of the two above — a supervisor "
+"reassigning someone else's work."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__identity_id
+msgid "Who the business is talking to, at the channel level."
+msgstr ""
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__author_user_id
+msgid "Written By"
+msgstr ""

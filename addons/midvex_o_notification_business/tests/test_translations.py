@@ -8,6 +8,7 @@ MODULES = (
     'midvex_o_notification_telegram',
     'midvex_o_notification_business',
     'midvex_o_notification_whatsapp',
+    'midvex_o_conversation_foundry',
 )
 
 

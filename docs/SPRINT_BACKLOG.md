@@ -105,11 +105,38 @@ exit criterion, and the acceptance criteria doc records the same bound. It also 
 message events stay `processed = False` — accurately, since nothing has processed them. If a
 number goes live before Sprint 7, somebody has to watch Inbound Events by hand.
 
-## Sprint 7 onward — Conversation Foundry and beyond
+## Sprint 7 — Conversation Foundry (roadmap phase 3) — built 2026-08-15
 
-Not started, not scheduled. `docs/projects/omnichannel_messaging/ROADMAP.md` phases 3–12:
-conversation foundry, CRM bridge and Odoo inbox, website live chat, web→WhatsApp handoff,
-mobile/PWA inbox, AI assist, offline AI, Telegram conversation, media, advanced routing.
+- [x] Thread, session, message, identity, assignment event — `midvex.conversation.*`.
+- [x] Status lifecycle with the transitions that matter: a resolved thread reopens when the customer replies; an unclaimed one stays in the unassigned queue.
+- [x] The company invariant enforced server-side on the session, which is the only record touching both the thread and the account.
+- [x] Service API — adapters and bridges call it; they never `create()` on the models.
+- [x] Outbound through the one delivery queue, not a second one (ADR-020).
+- [x] One shared inbound envelope store (ADR-019).
+- [x] ACLs and record rules extending the existing three-group ladder; history and audit append-only for everybody.
+- [x] 69 tests, provider-neutral against an in-memory fake channel.
+- [x] Turkish catalogue, 185 strings.
 
-The roadmap's own rule: do not start AI, media, advanced routing or Telegram two-way work
-before the first WhatsApp milestone path is stable.
+Exit: a provider-neutral conversation can be created and replied to. **Met.**
+
+## Sprint 8 — Wire WhatsApp to it
+
+Small, and the obvious next step. The webhook already parses inbound messages and
+already stores the envelope the conversation foundry now knows how to read; what is
+missing is the module that joins them.
+
+- [ ] `midvex_o_conversation_whatsapp`: normalize inbound into the conversation DTO, call `record_inbound`, and route `statuses[]` through `apply_status`.
+- [ ] The customer service window check before a free-form reply — outside 24 hours only an approved template is deliverable, and the agent needs telling before they type, not after.
+- [ ] Identity normalization to E.164, reusing the adapter's `normalize_identity`.
+
+After that, phase 4's first milestone is within reach: unknown person messages the
+number, a lead is created, an agent is notified, and the reply goes back.
+
+## Sprint 9 onward
+
+`docs/projects/omnichannel_messaging/ROADMAP.md` phases 4–12: CRM bridge and Odoo
+inbox proper, website live chat, web→WhatsApp handoff, mobile/PWA inbox, AI assist,
+offline AI, Telegram conversation, media, advanced routing.
+
+The roadmap's own rule still stands: do not start AI, media, advanced routing or
+Telegram two-way work before the first WhatsApp milestone path is stable.

@@ -244,3 +244,130 @@ class TestFailureHandling(RateLimitCase):
         message.write({'state': 'pending'})
         message.action_process()
         self.assertEqual(message.state, 'failed', 'max_attempts stopped being enforced')
+
+
+class TestDestinationAddressedMessages(RateLimitCase):
+    """Messages addressed to a raw destination rather than a staff recipient.
+
+    ADR-020 made recipient_id optional so conversation replies can share this
+    one queue. Everything below is the queue continuing to behave — the point
+    is that it does, for a row shaped differently from every row it saw before.
+    """
+
+    def _to(self, destination, key):
+        return self.Message.create({
+            'destination_external_id': destination, 'account_id': self.account.id,
+            'body': 'body %s' % key, 'idempotency_key': key,
+        })
+
+    def test_a_message_needs_a_recipient_or_a_destination(self):
+        """Dropping required=True must not allow a message addressed to nobody."""
+        from odoo.exceptions import ValidationError
+        with self.assertRaises(ValidationError):
+            self.Message.create({
+                'account_id': self.account.id, 'body': 'nowhere',
+                'idempotency_key': 'no-destination',
+            })
+
+    def test_a_recipient_whose_address_is_unknown_still_queues(self):
+        """Addressed to somebody we cannot yet reach is not addressed to nobody.
+
+        A recipient who has not finished linking has no external_id. Refusing
+        the message at create sounds stricter and is worse: the failure then
+        has no row, no log and nothing in the queue for anyone to find. It
+        queues, and the adapter says why at send.
+        """
+        unlinked = self.env['midvex.notification.recipient'].create({
+            'kind': 'group', 'name': 'Not yet linked', 'account_id': self.account.id,
+            'state': 'pending',
+        })
+        message = self.Message.create({
+            'recipient_id': unlinked.id, 'account_id': self.account.id,
+            'body': 'queued anyway', 'idempotency_key': 'dest-unlinked',
+        })
+        self.assertTrue(message.id)
+        self.assertFalse(message.sudo().destination_key)
+
+    def test_the_destination_reaches_the_adapter(self):
+        message = self._to('+905111111111', 'dest-1')
+        message.action_process()
+        self.assertEqual(message.state, 'sent')
+        self.assertEqual(self.adapter.send_calls[0]['recipient_external_id'], '+905111111111')
+
+    def test_a_recipient_still_wins_when_both_are_present(self):
+        """The recipient is the richer record; the raw field is the fallback."""
+        message = self.Message.create({
+            'recipient_id': self.person.id, 'destination_external_id': 'ignored',
+            'account_id': self.account.id, 'body': 'both', 'idempotency_key': 'dest-both',
+        })
+        self.assertEqual(message.sudo().destination_key, 'chat-person')
+
+    def test_two_destinations_do_not_throttle_each_other(self):
+        """The bug this keying change exists to prevent.
+
+        Keyed on recipient_id, every conversation reply would have shared one
+        empty recordset as its key — so one customer's message would have paced
+        every other customer's. Two different numbers must both go out.
+        """
+        first = self._to('+905111111111', 'dest-a')
+        second = self._to('+905222222222', 'dest-b')
+
+        self.Message.cron_process_pending()
+
+        self.assertEqual(first.state, 'sent')
+        self.assertEqual(second.state, 'sent')
+        self.assertEqual(len(self.adapter.send_calls), 2)
+
+    def test_one_destination_still_throttles_itself(self):
+        first = self._to('+905111111111', 'dest-c')
+        second = self._to('+905111111111', 'dest-d')
+
+        self.Message.cron_process_pending()
+
+        self.assertEqual(first.state, 'sent')
+        self.assertEqual(second.state, 'pending')
+        self.assertEqual(second.hold_reason, 'rate_limit')
+
+    def test_a_destination_and_a_recipient_sharing_an_address_throttle_together(self):
+        """Because the provider sees one chat, whatever Odoo calls it.
+
+        This is the correction hiding inside the keying change: the limit was
+        always per destination, and recipient_id was a proxy that happened to
+        work while every message had one.
+        """
+        recipient_message = self._message(self.person, 'dest-e')
+        destination_message = self._to('chat-person', 'dest-f')
+
+        self.Message.cron_process_pending()
+
+        self.assertEqual(recipient_message.state, 'sent')
+        self.assertEqual(destination_message.state, 'pending')
+        self.assertEqual(destination_message.hold_reason, 'rate_limit')
+
+    def test_quiet_hours_are_skipped_rather_than_crashing(self):
+        """_quiet_release_at calls ensure_one().
+
+        Asked of a message with no recipient it would raise inside the cron and
+        take the whole batch with it — every other pending message in that run,
+        for reasons having nothing to do with any of them.
+        """
+        message = self._to('+905111111111', 'dest-quiet')
+        self.Message.cron_process_pending()
+        self.assertEqual(message.state, 'sent')
+
+    def test_the_same_address_on_another_account_is_a_different_destination(self):
+        """Two companies' numbers are throttled by two different providers."""
+        other_account = self.env['midvex.notification.account'].create({
+            'name': 'Second throttled account', 'channel_id': self.channel.id,
+            'state': 'connected',
+        })
+        first = self._to('+905111111111', 'dest-g')
+        second = self.Message.create({
+            'destination_external_id': '+905111111111', 'account_id': other_account.id,
+            'body': 'other account', 'idempotency_key': 'dest-h',
+        })
+
+        self.Message.cron_process_pending()
+
+        self.assertEqual(first.state, 'sent')
+        self.assertEqual(second.state, 'sent')

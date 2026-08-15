@@ -1,0 +1,1084 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_conversation_foundry
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-14 14:32+0000\n"
+"PO-Revision-Date: 2026-08-14 14:32+0000\n"
+"Last-Translator: Midvex\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: tr\n"
+
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_session.py:0
+msgid "A %(session)s session cannot use a %(account)s account."
+msgstr "Bir %(session)s oturumu %(account)s hesabını kullanamaz."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_message.py:0
+msgid ""
+"A message to or from a customer needs a session. Only internal notes and "
+"system entries have none."
+msgstr "Müşteriye giden veya müşteriden gelen bir mesaj için oturum zorunludur. Yalnızca iç notların ve sistem kayıtlarının oturumu olmaz."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "A session needs an address to reply to."
+msgstr "Bir oturum için yanıt verilecek bir adres zorunludur."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__ai
+msgid "AI"
+msgstr "YZ"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__account_id
+msgid "Account"
+msgstr "Hesap"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__active
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__active
+msgid "Active"
+msgstr "Aktif"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__company_id
+msgid "Always the thread's. Derived rather than set so the two cannot drift."
+msgstr "Her zaman görüşmeninki. Ayarlanmak yerine türetilir, böylece ikisi birbirinden ayrışamaz."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "An empty message cannot be sent."
+msgstr "Boş mesaj gönderilemez."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "An empty note cannot be saved."
+msgstr "Boş not kaydedilemez."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_identity.py:0
+msgid "An identity needs a normalized identifier."
+msgstr "Bir kimlik için normalleştirilmiş tanımlayıcı zorunludur."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__archived
+msgid "Archived"
+msgstr "Arşivlendi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__assigned_user_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Assigned To"
+msgstr "Atanan"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Assigned to Me"
+msgstr "Bana Atananlar"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__assignment_event_ids
+msgid "Assignment Event"
+msgstr "Atama Olayı"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Assignment History"
+msgstr "Atama Geçmişi"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "At"
+msgstr "Zaman"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__audio
+msgid "Audio"
+msgstr "Ses"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__automation
+msgid "Automation"
+msgstr "Otomasyon"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__body
+msgid "Body"
+msgstr "İçerik"
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_thread.py:0
+msgid ""
+"Cannot assign a %(company)s conversation to a user who does not work for "
+"that company."
+msgstr "Bir %(company)s görüşmesi, o şirkette çalışmayan bir kullanıcıya atanamaz."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_identity.py:0
+msgid "Cannot identify a party without an identifier."
+msgstr "Tanımlayıcı olmadan bir taraf tanımlanamaz."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__actor_user_id
+msgid "Changed By"
+msgstr "Değiştiren"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_list
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Channel"
+msgstr "Kanal"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__channel_code
+msgid "Channel Code"
+msgstr "Kanal Kodu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__metadata_json
+msgid ""
+"Channel-specific state that does not deserve a column — a web widget's token"
+" expiry, a provider conversation window. Never business data."
+msgstr "Kendi sütununu hak etmeyen kanala özgü durum bilgisi — bir web bileşeninin belirteç süresi, bir sağlayıcının görüşme penceresi. Asla iş verisi değil."
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Channels"
+msgstr "Kanallar"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_session__state__closed
+msgid "Closed"
+msgstr "Kapalı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__closed_at
+msgid "Closed At"
+msgstr "Kapanma Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__company_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__company_id
+msgid "Company"
+msgstr "Şirket"
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_thread.py:0
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_thread_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Conversation"
+msgstr "Görüşme"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_assignment_event
+msgid "Conversation Assignment Event"
+msgstr "Görüşme Atama Olayı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_identity
+msgid "Conversation Identity"
+msgstr "Görüşme Kimliği"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_message
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_message_id
+msgid "Conversation Message"
+msgstr "Görüşme Mesajı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_message__conversation_message_ids
+msgid "Conversation Messages"
+msgstr "Görüşme Mesajları"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_session
+msgid "Conversation Session"
+msgstr "Görüşme Oturumu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_conversation_thread
+msgid "Conversation Thread"
+msgstr "Görüşme Konusu"
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "Conversation reply"
+msgstr "Görüşme yanıtı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.actions.act_window,name:midvex_o_conversation_foundry.action_conversation_thread
+#: model:ir.ui.menu,name:midvex_o_conversation_foundry.menu_conversation_root
+msgid "Conversations"
+msgstr "Görüşmeler"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_conversation_foundry.action_conversation_thread
+msgid ""
+"Conversations arrive from a channel — a customer messaging a connected\n"
+"        WhatsApp number, or the website chat widget. They are not created by hand."
+msgstr ""
+"Görüşmeler bir kanaldan gelir — bağlı bir WhatsApp numarasına yazan bir\n"
+"        müşteri ya da web sitesi sohbet bileşeni. Elle oluşturulmazlar."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__correlation_id
+msgid "Correlation"
+msgstr "İlişkilendirme"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__create_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__create_uid
+msgid "Created by"
+msgstr "Tarafından oluşturuldu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__create_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__create_date
+msgid "Created on"
+msgstr "Oluşturulma tarihi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__delivered
+msgid "Delivered"
+msgstr "İletildi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__delivered_at
+msgid "Delivered At"
+msgstr "İletilme Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__delivery_id
+msgid "Delivery Job"
+msgstr "Teslimat İşi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__partner_id
+msgid ""
+"Derived from the identity, so linking a contact reaches every thread it has "
+"rather than one."
+msgstr "Kimlikten türetilir; böylece bir kişiyi bağlamak tek bir görüşmeye değil, o kimliğin tüm görüşmelerine ulaşır."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__direction
+msgid "Direction"
+msgstr "Yön"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__display_identifier
+msgid "Display Identifier"
+msgstr "Görünen Tanımlayıcı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_message__display_name
+msgid "Display Name"
+msgstr "Görünen Ad"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__document
+msgid "Document"
+msgstr "Belge"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__email
+msgid "Email"
+msgstr "E-posta"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__author_user_id
+msgid ""
+"Empty for anything the customer sent, and for anything automation sent."
+msgstr "Müşterinin gönderdiği ve otomasyonun gönderdiği her şey için boştur."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__error_code
+msgid "Error Code"
+msgstr "Hata Kodu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__error_message_safe
+msgid "Error Message Safe"
+msgstr "Güvenli Hata Mesajı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__external_recipient_id
+msgid "External Recipient"
+msgstr "Dış Alıcı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__external_session_id
+msgid "External Session"
+msgstr "Dış Oturum"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__failed
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__failed
+msgid "Failed"
+msgstr "Başarısız"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__failed_at
+msgid "Failed At"
+msgstr "Başarısızlık Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__partner_id
+msgid ""
+"Filled in once somebody knows who this is. Empty is the normal state for a "
+"first-time enquiry, not an error."
+msgstr "Bu kişinin kim olduğu öğrenildiğinde doldurulur. İlk kez gelen bir talep için boş olması normaldir, hata değildir."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__processing_state
+msgid ""
+"Finer than the `processed` flag, which cannot tell \"nothing to do with "
+"this\" apart from \"we have not got to it\". Ignored is a resting state; "
+"failed wants somebody."
+msgstr "`processed` bayrağından daha ayrıntılıdır; o bayrak \"bununla ilgili yapılacak bir şey yok\" ile \"henüz sırası gelmedi\" durumlarını ayırt edemez. Yok sayıldı bir durağan durumdur; başarısız birini bekler."
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "First Channel"
+msgstr "İlk Kanal"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__first_channel_code
+msgid "First Channel Code"
+msgstr "İlk Kanal Kodu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__first_response_at
+msgid "First Response At"
+msgstr "İlk Yanıt Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__first_seen_at
+msgid "First Seen At"
+msgstr "İlk Görülme"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__from_user_id
+msgid "From"
+msgstr "Kimden"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__inbound
+msgid "From Customer"
+msgstr "Müşteriden"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__frontend
+msgid "Frontend"
+msgstr "Ön Yüz"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__generated_by_ai
+msgid "Generated By Ai"
+msgstr "YZ Tarafından Üretildi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__priority__1
+msgid "High"
+msgstr "Yüksek"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_message__id
+msgid "ID"
+msgstr "ID"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.actions.act_window,name:midvex_o_conversation_foundry.action_conversation_identity
+#: model:ir.ui.menu,name:midvex_o_conversation_foundry.menu_conversation_identities
+msgid "Identities"
+msgstr "Kimlikler"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__identity_id
+msgid "Identity"
+msgstr "Kimlik"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__identity_type
+msgid "Identity Type"
+msgstr "Kimlik Türü"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__ignored
+msgid "Ignored"
+msgstr "Yok Sayıldı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__image
+msgid "Image"
+msgstr "Görsel"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.ui.menu,name:midvex_o_conversation_foundry.menu_conversation_threads
+msgid "Inbox"
+msgstr "Gelen Kutusu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__interactive
+msgid "Interactive"
+msgstr "Etkileşimli"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__internal
+msgid "Internal Note"
+msgstr "İç Not"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__language_code
+msgid "Language Code"
+msgstr "Dil Kodu"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_list
+msgid "Last Activity"
+msgstr "Son Etkinlik"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__last_activity_at
+msgid "Last Activity At"
+msgstr "Son Etkinlik Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Last Channel"
+msgstr "Son Kanal"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__last_channel_code
+msgid "Last Channel Code"
+msgstr "Son Kanal Kodu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__last_message_at
+msgid "Last Message At"
+msgstr "Son Mesaj Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__last_seen_at
+msgid "Last Seen At"
+msgstr "Son Görülme"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__write_uid
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__write_uid
+msgid "Last Updated by"
+msgstr "Son güncelleyen"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__write_date
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__write_date
+msgid "Last Updated on"
+msgstr "Son güncellenme tarihi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__location
+msgid "Location"
+msgstr "Konum"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_identity_form
+msgid ""
+"Matching happens on the normalized identifier alone. A display name or a\n"
+"            username is the person's to change, so matching on one would reassign a\n"
+"            conversation the day they renamed themselves."
+msgstr ""
+"Eşleştirme yalnızca normalleştirilmiş tanımlayıcı üzerinden yapılır. Görünen ad ya da\n"
+"            kullanıcı adı kişinin değiştirebileceği bir şeydir; bunlardan biriyle eşleştirmek,\n"
+"            kişi adını değiştirdiği gün görüşmeyi başkasına devrederdi."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__message_ids
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__message_ids
+msgid "Message"
+msgstr "Mesaj"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__message_count
+msgid "Message Count"
+msgstr "Mesaj Sayısı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__message_type
+msgid "Message Type"
+msgstr "Mesaj Türü"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_list
+msgid "Messages"
+msgstr "Mesajlar"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__metadata_json
+msgid "Metadata Json"
+msgstr "Meta Veri (JSON)"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__name
+msgid "Name"
+msgstr "Ad"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__translated_body
+msgid ""
+"Never replaces the body. A translation is our reading of what they said, and"
+" the original is what they actually said."
+msgstr "İçeriğin yerine asla geçmez. Çeviri, söylediklerini bizim okuyuşumuzdur; özgün metin ise gerçekten söyledikleridir."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__new
+msgid "New"
+msgstr "Yeni"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.actions.act_window,help:midvex_o_conversation_foundry.action_conversation_thread
+msgid "No conversations yet"
+msgstr "Henüz görüşme yok"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__priority__0
+msgid "Normal"
+msgstr "Normal"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__normalized_identifier
+msgid "Normalized Identifier"
+msgstr "Normalleştirilmiş Tanımlayıcı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_notification_inbound_event
+msgid "Notification Inbound Event"
+msgstr "Gelen Bildirim Olayı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model,name:midvex_o_conversation_foundry.model_midvex_notification_message
+msgid "Notification Message"
+msgstr "Bildirim Mesajı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__odoo
+msgid "Odoo"
+msgstr "Odoo"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_session__state__open
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__open
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Open"
+msgstr "Açık"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__opened_at
+msgid "Opened At"
+msgstr "Açılma Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__origin
+msgid "Origin"
+msgstr "Kaynak"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__original_language
+msgid "Original Language"
+msgstr "Özgün Dil"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__partner_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__partner_id
+msgid "Partner"
+msgstr "İş Ortağı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__priority
+msgid "Priority"
+msgstr "Öncelik"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__processed
+msgid "Processed"
+msgstr "İşlendi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__processing
+msgid "Processing"
+msgstr "İşleniyor"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__processing_state
+msgid "Processing State"
+msgstr "İşleme Durumu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__origin__provider
+msgid "Provider"
+msgstr "Sağlayıcı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__provider_identifier
+msgid "Provider Identifier"
+msgstr "Sağlayıcı Tanımlayıcısı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__provider_message_id
+msgid "Provider Message"
+msgstr "Sağlayıcı Mesajı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__queued
+msgid "Queued"
+msgstr "Kuyrukta"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__queued_at
+msgid "Queued At"
+msgstr "Kuyruğa Alınma Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__read
+msgid "Read"
+msgstr "Okundu"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__read_at
+msgid "Read At"
+msgstr "Okunma Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__reason
+msgid "Reason"
+msgstr "Gerekçe"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_notification_inbound_event__processing_state__received
+msgid "Received"
+msgstr "Alındı"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Reopen"
+msgstr "Yeniden Aç"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Reply To"
+msgstr "Yanıt Adresi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__reply_to_message_id
+msgid "Reply To Message"
+msgstr "Yanıtlanan Mesaj"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid ""
+"Replying from here is phase 4. The service API can already send —\n"
+"                <code>queue_outbound()</code> — but there is no compose box yet, so a\n"
+"                reply has to come from a channel module or the shell."
+msgstr ""
+"Buradan yanıtlamak 4. aşamadır. Servis API'si zaten gönderebiliyor —\n"
+"                <code>queue_outbound()</code> — ancak henüz bir yazma kutusu yok; bu\n"
+"                nedenle yanıtın bir kanal modülünden veya kabuktan gelmesi gerekir."
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "Resolve"
+msgstr "Çöz"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__resolved
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Resolved"
+msgstr "Çözüldü"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__resolved_at
+msgid "Resolved At"
+msgstr "Çözülme Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__retry_count
+msgid "Retry Count"
+msgstr "Yeniden Deneme Sayısı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__error_message_safe
+msgid ""
+"Safe to show an agent: the provider's own explanation, never a token, a "
+"header or a stack trace."
+msgstr "Bir temsilciye gösterilmesi güvenlidir: sağlayıcının kendi açıklaması; asla bir belirteç, başlık veya hata yığını değil."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__sent
+msgid "Sent"
+msgstr "Gönderildi"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__sent_at
+msgid "Sent At"
+msgstr "Gönderilme Zamanı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__session_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__session_ids
+msgid "Session"
+msgstr "Oturum"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__verified
+msgid ""
+"Set when the person proved they control this address — replied from it, or "
+"completed a channel linking flow. An unverified identity is a claim."
+msgstr "Kişi bu adresi kontrol ettiğini kanıtladığında işaretlenir — oradan yanıt vermiş ya da bir kanal bağlama akışını tamamlamıştır. Doğrulanmamış bir kimlik yalnızca bir iddiadır."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__reply_to_message_id
+msgid "Set when the provider tells us this was a reply to a specific message."
+msgstr "Sağlayıcı bunun belirli bir mesaja yanıt olduğunu bildirdiğinde ayarlanır."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__state
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__state
+msgid "State"
+msgstr "Durum"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__status
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Status"
+msgstr "Durum"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__state__submitted
+msgid "Submitted"
+msgstr "İletildi (Sağlayıcıya)"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__system
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__system
+msgid "System"
+msgstr "Sistem"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__telegram
+msgid "Telegram"
+msgstr "Telegram"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__template
+msgid "Template"
+msgstr "Şablon"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__text
+msgid "Text"
+msgstr "Metin"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__display_identifier
+msgid ""
+"The address as the provider or the person themselves writes it. Shown to "
+"agents; never matched on."
+msgstr "Adresin, sağlayıcının ya da kişinin kendisinin yazdığı hâli. Temsilcilere gösterilir; eşleştirmede asla kullanılmaz."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__external_recipient_id
+msgid ""
+"The address to reply to on this channel. Copied onto every outbound delivery"
+" job, so it is what the provider actually receives."
+msgstr "Bu kanalda yanıt verilecek adres. Giden her teslimat işine kopyalanır, dolayısıyla sağlayıcının gerçekten aldığı değer budur."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__normalized_identifier
+msgid ""
+"The canonical form used for matching — E.164 for a phone number. Two "
+"spellings of one address must normalize to one value here or one person "
+"becomes two customers."
+msgstr "Eşleştirmede kullanılan kanonik biçim — telefon numaraları için E.164. Bir adresin iki farklı yazımı burada tek bir değere normalleşmelidir; aksi hâlde bir kişi iki müşteriye dönüşür."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__account_id
+msgid ""
+"The channel account this leg speaks through — the same shared registry the "
+"notification foundry uses."
+msgstr "Bu bacağın üzerinden konuştuğu kanal hesabı — bildirim altyapısının kullandığı ortak kayıt defterinin aynısı."
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_form
+msgid "The customer spoke last. Nobody has replied yet."
+msgstr "Son sözü müşteri söyledi. Henüz kimse yanıtlamadı."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__unanswered
+msgid ""
+"The customer spoke last. What an agent filters their inbox by, so it is "
+"stored rather than computed on the fly."
+msgstr "Son sözü müşteri söyledi. Temsilcinin gelen kutusunu filtrelediği alan olduğundan, anlık hesaplanmak yerine saklanır."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_message_id
+msgid ""
+"The durable message this envelope produced. Empty on an event that produced "
+"none — a delivery status, or a type nothing reads yet."
+msgstr "Bu zarfın ürettiği kalıcı mesaj. Hiç mesaj üretmeyen bir olayda boştur — bir teslimat durumu ya da henüz hiçbir şeyin okumadığı bir tür."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__language_code
+msgid ""
+"The language this customer writes in, as first detected. Used to pick a "
+"provider template; never overwrites what they actually said."
+msgstr "Bu müşterinin yazdığı dil, ilk algılandığı hâliyle. Sağlayıcı şablonu seçmek için kullanılır; söylediklerinin üzerine asla yazmaz."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_session__external_session_id
+msgid "The provider's own conversation id, where it has one."
+msgstr "Sağlayıcının kendi görüşme kimliği, varsa."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__provider_message_id
+msgid ""
+"The provider's own id. What an inbound delivery status names, and nothing "
+"else, so it is the only way back to this row."
+msgstr "Sağlayıcının kendi kimliği. Gelen bir teslimat durumunun andığı tek şey budur, dolayısıyla bu kayda geri dönmenin tek yolu odur."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_identity__provider_identifier
+msgid ""
+"The provider's own opaque id for this person, where it has one distinct from"
+" the address."
+msgstr "Sağlayıcının bu kişi için kullandığı, adresten ayrı bir kimliği varsa o."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__delivery_id
+msgid ""
+"The queue row that carries this to the provider, with the retry, throttling "
+"and delivery logging the notification foundry already does."
+msgstr "Bunu sağlayıcıya taşıyan kuyruk kaydı; bildirim altyapısının hâlihazırda yaptığı yeniden deneme, hız sınırlama ve teslimat günlüğü ile birlikte."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__conversation_thread_id
+msgid "The thread this envelope was filed under, once it was processed."
+msgstr "İşlendikten sonra bu zarfın altına kaydedildiği görüşme."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_session.py:0
+msgid ""
+"This conversation belongs to %(thread)s but the channel account belongs to "
+"%(account)s. A conversation cannot send through another company's account."
+msgstr "Bu görüşme %(thread)s şirketine, kanal hesabı ise %(account)s şirketine ait. Bir görüşme başka bir şirketin hesabı üzerinden gönderim yapamaz."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_thread.py:0
+msgid ""
+"This conversation belongs to %(thread)s but the identity belongs to "
+"%(identity)s. A conversation cannot span companies."
+msgstr "Bu görüşme %(thread)s şirketine, kimlik ise %(identity)s şirketine ait. Bir görüşme şirketler arasında paylaşılamaz."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/services/conversation.py:0
+msgid "This conversation channel is closed; reopen it to reply."
+msgstr "Bu görüşme kanalı kapalı; yanıtlamak için yeniden açın."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.constraint,message:midvex_o_conversation_foundry.constraint_midvex_conversation_identity_identity_uniq
+msgid "This identity already exists for this company."
+msgstr "Bu kimlik bu şirket için zaten mevcut."
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_message.py:0
+msgid "This message belongs to a different conversation than its session."
+msgstr "Bu mesaj, oturumundan farklı bir görüşmeye ait."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.constraint,message:midvex_o_conversation_foundry.constraint_midvex_conversation_message_provider_message_uniq
+msgid "This provider message has already been recorded on this session."
+msgstr "Bu sağlayıcı mesajı bu oturumda zaten kaydedilmiş."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__thread_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__thread_ids
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__thread_id
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_session__thread_id
+msgid "Thread"
+msgstr "Görüşme"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_notification_inbound_event__correlation_id
+msgid ""
+"Ties this envelope to the log lines it produced. The runbook asks people to "
+"search by it, so it has to survive into the logs rather than only exist "
+"here."
+msgstr "Bu zarfı ürettiği günlük satırlarına bağlar. Çalıştırma kılavuzu bu değerle arama yapılmasını istediğinden, yalnızca burada durmak yerine günlüklere de geçmesi gerekir."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__to_user_id
+msgid "To"
+msgstr "Kime"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__direction__outbound
+msgid "To Customer"
+msgstr "Müşteriye"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__translated_body
+msgid "Translated Body"
+msgstr "Çevrilmiş İçerik"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__translated_language
+msgid "Translated Language"
+msgstr "Çeviri Dili"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_thread__unanswered
+msgid "Unanswered"
+msgstr "Yanıtlanmamış"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Unassigned"
+msgstr "Atanmamış"
+
+#. module: midvex_o_conversation_foundry
+#. odoo-python
+#: code:addons/midvex_o_conversation_foundry/models/conversation_identity.py:0
+msgid "Unknown"
+msgstr "Bilinmiyor"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__priority__2
+msgid "Urgent"
+msgstr "Acil"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__verification_source
+msgid "Verification Source"
+msgstr "Doğrulama Kaynağı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_identity__verified
+msgid "Verified"
+msgstr "Doğrulandı"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_message__message_type__video
+msgid "Video"
+msgstr "Video"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__waiting_agent
+msgid "Waiting on Agent"
+msgstr "Temsilci Bekleniyor"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_thread__status__waiting_customer
+msgid "Waiting on Customer"
+msgstr "Müşteri Bekleniyor"
+
+#. module: midvex_o_conversation_foundry
+#: model_terms:ir.ui.view,arch_db:midvex_o_conversation_foundry.view_conversation_thread_search
+msgid "Waiting on Us"
+msgstr "Bizde Bekleyenler"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__web
+msgid "Web Chat"
+msgstr "Web Sohbeti"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields.selection,name:midvex_o_conversation_foundry.selection__midvex_conversation_identity__identity_type__whatsapp
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__first_response_at
+msgid ""
+"When an agent first replied. The number a supervisor actually cares about, "
+"and impossible to reconstruct later, so it is stamped once."
+msgstr "Bir temsilcinin ilk yanıt verdiği an. Bir yöneticinin gerçekten önemsediği değer ve sonradan yeniden üretilmesi imkânsız olduğundan, bir kez damgalanır."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__origin
+msgid ""
+"Where this message came from, which is not the same question as who wrote "
+"it. Required for the audit FR-017 asks for."
+msgstr "Bu mesajın nereden geldiği — kimin yazdığı sorusuyla aynı şey değildir. FR-017 gereği tutulan denetim kaydı için zorunludur."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_message__session_id
+msgid ""
+"Which channel leg carried this. Empty for an internal note, which was never "
+"carried anywhere."
+msgstr "Bunu hangi kanal bacağının taşıdığı. Hiçbir yere taşınmamış olan iç notlar için boştur."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_assignment_event__actor_user_id
+msgid ""
+"Who made the change, which is often neither of the two above — a supervisor "
+"reassigning someone else's work."
+msgstr "Değişikliği kimin yaptığı — çoğu zaman yukarıdaki ikisinden de biri değildir; örneğin başkasının işini yeniden atayan bir yönetici."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,help:midvex_o_conversation_foundry.field_midvex_conversation_thread__identity_id
+msgid "Who the business is talking to, at the channel level."
+msgstr "İşletmenin kanal düzeyinde kiminle konuştuğu."
+
+#. module: midvex_o_conversation_foundry
+#: model:ir.model.fields,field_description:midvex_o_conversation_foundry.field_midvex_conversation_message__author_user_id
+msgid "Written By"
+msgstr "Yazan"

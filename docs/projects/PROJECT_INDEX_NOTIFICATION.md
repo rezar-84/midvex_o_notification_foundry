@@ -6,7 +6,7 @@
 |---|---|---:|---|
 | Notification Foundry | `midvex_o_notification_foundry` | Implemented (MVP) | `notification_foundry/` |
 | Telegram Connector | `midvex_o_notification_telegram` | Implemented (MVP) | `notification_telegram/` |
-| WhatsApp Connector | `midvex_o_notification_whatsapp` | In progress | `notification_whatsapp/` |
+| WhatsApp Connector | `midvex_o_notification_whatsapp` | Implemented, never run live | `notification_whatsapp/` |
 | Email Connector | `midvex_o_notification_email` | Planned | `notification_email/` |
 | Slack Connector | `midvex_o_notification_slack` | Planned | `notification_slack/` |
 
@@ -15,7 +15,7 @@
 | Project | Module | Status | Docs |
 |---|---|---:|---|
 | Omnichannel Messaging | *(umbrella)* | Documented | `omnichannel_messaging/` |
-| Conversation Foundry | `midvex_o_conversation_foundry` | Documented, not started | `conversation_foundry/` |
+| Conversation Foundry | `midvex_o_conversation_foundry` | Implemented (phase 3) | `conversation_foundry/` |
 | WhatsApp Conversation | `midvex_o_conversation_whatsapp` | Documented, not started | `conversation_whatsapp/` |
 | Website Live Chat | `midvex_o_conversation_webchat` | Documented, not started | `conversation_webchat/` |
 | Telegram Conversation | `midvex_o_conversation_telegram` | Documented, not started | `conversation_telegram/` |
