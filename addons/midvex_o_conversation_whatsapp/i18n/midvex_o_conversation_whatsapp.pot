@@ -1,0 +1,77 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_conversation_whatsapp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-15 04:52+0000\n"
+"PO-Revision-Date: 2026-08-15 04:52+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model,name:midvex_o_conversation_whatsapp.model_midvex_conversation_session
+msgid "Conversation Session"
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_notification_inbound_event__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_notification_inbound_event__id
+msgid "ID"
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model,name:midvex_o_conversation_whatsapp.model_midvex_notification_inbound_event
+msgid "Notification Inbound Event"
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_conversation_whatsapp/models/conversation_session.py:0
+msgid ""
+"This customer has not written on WhatsApp yet, so there is no open messaging"
+" window. A business-initiated message must be a pre-approved template."
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_conversation_whatsapp/models/conversation_session.py:0
+msgid ""
+"WhatsApp's 24-hour customer service window for this conversation closed at "
+"%(closed)s. Only a pre-approved template can be delivered now — a free-form "
+"reply would be rejected by the provider."
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_closes_at
+msgid "Whatsapp Window Closes At"
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_open
+msgid "Whatsapp Window Open"
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,help:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_closes_at
+msgid ""
+"When the 24-hour customer service window shuts. Empty on channels that have "
+"no such window, and on a session the customer has never written to."
+msgstr ""
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,help:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_open
+msgid "Whether a free-form reply is currently deliverable on this session."
+msgstr ""

@@ -81,6 +81,21 @@ class ConversationSession(models.Model):
                     'A %(session)s session cannot use a %(account)s account.',
                     session=session.channel_code, account=account_code))
 
+    def check_outbound_allowed(self, message_type='text'):
+        """Whether this channel will carry a reply of this kind right now.
+
+        A no-op here, and it has to be: the foundry is provider-neutral and
+        cannot know that WhatsApp closes a messaging window 24 hours after the
+        customer last spoke, or that Telegram does not.
+
+        Channel modules override it and raise a readable UserError. The seam is
+        here rather than in the adapter's `send` because the answer belongs to
+        the agent *before* they type — a reply refused after they have written
+        it, by a provider error code, is a worse experience than a form that
+        says the window is closed and a template is needed.
+        """
+        return True
+
     def action_close(self):
         for session in self:
             session.write({'state': 'closed', 'closed_at': fields.Datetime.now()})

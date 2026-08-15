@@ -1,0 +1,79 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* midvex_o_conversation_whatsapp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-14 14:32+0000\n"
+"PO-Revision-Date: 2026-08-14 14:32+0000\n"
+"Last-Translator: Midvex\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: tr\n"
+
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model,name:midvex_o_conversation_whatsapp.model_midvex_conversation_session
+msgid "Conversation Session"
+msgstr "Görüşme Oturumu"
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__display_name
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_notification_inbound_event__display_name
+msgid "Display Name"
+msgstr "Görünen Ad"
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__id
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_notification_inbound_event__id
+msgid "ID"
+msgstr "ID"
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model,name:midvex_o_conversation_whatsapp.model_midvex_notification_inbound_event
+msgid "Notification Inbound Event"
+msgstr "Gelen Bildirim Olayı"
+
+#. module: midvex_o_conversation_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_conversation_whatsapp/models/conversation_session.py:0
+msgid ""
+"This customer has not written on WhatsApp yet, so there is no open messaging"
+" window. A business-initiated message must be a pre-approved template."
+msgstr "Bu müşteri WhatsApp üzerinden henüz yazmadı, dolayısıyla açık bir mesajlaşma penceresi yok. İşletme tarafından başlatılan bir mesaj, önceden onaylanmış bir şablon olmalıdır."
+
+#. module: midvex_o_conversation_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_conversation_whatsapp/models/conversation_session.py:0
+msgid ""
+"WhatsApp's 24-hour customer service window for this conversation closed at "
+"%(closed)s. Only a pre-approved template can be delivered now — a free-form "
+"reply would be rejected by the provider."
+msgstr "WhatsApp'in bu görüşme için geçerli 24 saatlik müşteri hizmetleri penceresi %(closed)s tarihinde kapandı. Artık yalnızca önceden onaylanmış bir şablon iletilebilir; serbest metin bir yanıt sağlayıcı tarafından reddedilirdi."
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_closes_at
+msgid "Whatsapp Window Closes At"
+msgstr "WhatsApp Penceresi Kapanış Zamanı"
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_open
+msgid "Whatsapp Window Open"
+msgstr "WhatsApp Penceresi Açık"
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,help:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_closes_at
+msgid ""
+"When the 24-hour customer service window shuts. Empty on channels that have "
+"no such window, and on a session the customer has never written to."
+msgstr "24 saatlik müşteri hizmetleri penceresinin kapandığı an. Böyle bir penceresi olmayan kanallarda ve müşterinin hiç yazmadığı oturumlarda boştur."
+
+#. module: midvex_o_conversation_whatsapp
+#: model:ir.model.fields,help:midvex_o_conversation_whatsapp.field_midvex_conversation_session__whatsapp_window_open
+msgid "Whether a free-form reply is currently deliverable on this session."
+msgstr "Bu oturumda şu anda serbest metin bir yanıtın iletilebilir olup olmadığı."

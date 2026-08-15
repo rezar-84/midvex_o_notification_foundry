@@ -28,6 +28,16 @@ def new_correlation_id():
     return uuid.uuid4().hex
 
 
+def _normalized_message_type(Message, provider_type):
+    """A value the message_type Selection can actually hold.
+
+    Read off the field rather than hard-coded, so a channel module that adds a
+    type does not have to remember to update a list here as well.
+    """
+    known = dict(Message._fields['message_type'].selection)
+    return provider_type if provider_type in known else 'other'
+
+
 def ensure_identity(env, company, identity_type, normalized_identifier,
                     display_identifier=None, provider_identifier=None):
     return env['midvex.conversation.identity'].find_or_create(
@@ -118,11 +128,18 @@ def record_inbound(env, session, inbound, inbound_event=None):
 
     thread = session.thread_id
     when = inbound.get('timestamp') or fields.Datetime.now()
+    provider_type = inbound.get('message_type') or 'text'
     message = Message.create({
         'thread_id': thread.id,
         'session_id': session.id,
         'direction': 'inbound',
-        'message_type': inbound.get('message_type') or 'text',
+        # Coerced here rather than trusted from the channel. Providers invent
+        # message types — WhatsApp alone sends stickers, reactions and orders —
+        # and a Selection cannot hold a value it has never heard of. Left to the
+        # ORM this raises, which would crash the webhook on a sticker and lose
+        # every message batched alongside it.
+        'message_type': _normalized_message_type(Message, provider_type),
+        'provider_message_type': provider_type,
         'body': inbound.get('body') or False,
         'original_language': inbound.get('language_hint') or False,
         'provider_message_id': provider_message_id or False,
@@ -161,6 +178,11 @@ def queue_outbound(env, session, body, author=None, message_type='text',
         raise UserError(_('This conversation channel is closed; reopen it to reply.'))
     if not (body or '').strip():
         raise UserError(_('An empty message cannot be sent.'))
+    # Channel policy, asked before anything is written. A WhatsApp session
+    # whose 24-hour window has closed refuses here rather than queueing a
+    # message the provider will reject with 131047 — which would leave a
+    # failed reply in the thread and an agent wondering what they did wrong.
+    session.check_outbound_allowed(message_type)
 
     thread = session.thread_id
     Message = env['midvex.conversation.message'].sudo()
