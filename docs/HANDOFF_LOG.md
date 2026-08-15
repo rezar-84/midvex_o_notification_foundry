@@ -386,3 +386,72 @@ No count is written here on purpose. The 2026-08-10 entry recorded "11 commits a
 ```bash
 git rev-list --count origin/main..HEAD
 ```
+
+## 2026-08-15 — Phase 3: somewhere to put what a customer says
+
+### Objective
+
+Build the Conversation Foundry. Until this, inbound free text was stored in an envelope and dropped — there was no thread, no identity, no assignment, no read state, nowhere for it to go.
+
+### Two decisions settled before any code
+
+Both had been flagged in `docs/projects/conversation_foundry/` as needing an ADR first, which turned out to be right: each of them changes what the module is.
+
+**ADR-019 — one inbound envelope store, shared.** The webhook is already shared: Meta delivers a number's callbacks to exactly one URL, so `/notification/whatsapp/webhook/<id>` receives customer messages and delivery statuses through the same door and writes both before parsing either. A second table would mean that controller choosing which one an event belongs in at the moment it knows least, and would split the `wa_event_key` dedupe space in two — a redelivery landing in the other table would be accepted twice.
+
+**ADR-020 — replies go out through the one delivery queue.** `AGENTS.md` is unambiguous that channel modules must not write their own queue, retry or log logic. A conversation foundry with its own drain would have been the largest violation of that rule in the repository, and a second implementation of the three things the 2026-08-09 and 2026-08-10 sessions spent their length getting right.
+
+Extracting the machinery into a mixin shared by two queue tables is the more elegant shape and was rejected on risk: moving ~150 lines of a production delivery path guarded by 99 tests, in the same change that introduces five new models. One queue with a nullable recipient is a much smaller diff and leaves the mixin available later.
+
+### The queue change, landed separately
+
+`7afc033`, on its own so the delivery path was provably green before anything sat on it.
+
+`recipient_id` is now optional, `destination_external_id` addresses a customer directly, and a computed `destination_key` resolves to whichever was given.
+
+**The throttle now keys on that destination rather than on `recipient_id`, and that is a correction rather than an accommodation.** The provider limits how fast we may talk to one chat or one number; `recipient_id` was only ever a proxy for it. The proxy breaks completely the moment conversation replies share the queue — every one of them has no recipient, so keyed the old way they would all have shared a single empty key and paced each other. One customer's reply would have throttled every other customer's. There is a test for exactly that, and another for the flip side: a recipient and a raw destination naming the same address *do* throttle together, because the provider sees one chat whatever Odoo calls it.
+
+Quiet hours are skipped when there is no recipient — not a special case, since quiet hours belong to a person who asked not to be woken and a customer never did. It also stops `_quiet_release_at`'s `ensure_one()` raising inside the cron and taking the rest of the batch with it.
+
+### Things worth not rediscovering
+
+- **A constrain listing two fields does not fire when a create names neither.** Odoo validates only the fields present in the write, so the "has a destination" check skipped exactly the case it existed to catch. It now triggers on the computed key, which is always present, while *checking* the two fields.
+- **…and checking the key instead of the fields was itself wrong.** It refused a message to a recipient whose linking is unfinished. Addressed-to-somebody-we-cannot-yet-reach is not addressed-to-nobody: refusing at create leaves the failure with no row, no log and nothing in the queue for anyone to find. Both mistakes were made here in sequence; both are now pinned by tests.
+- **The inbound status transition first read only `new` and `waiting_customer`.** So a customer replying to a thread already `open` — the ordinary case of an ongoing exchange — left `status` saying nothing was owed while `unanswered` said otherwise. Two fields disagreeing about the same fact is how an inbox filter starts hiding work.
+- **`expand` is no longer a valid attribute on a search view's `<group>` in Odoo 19.** It fails at module load with a RelaxNG error pointing at the wrong line. The house pattern is bare `<filter>` elements after a `<separator/>`.
+- **A view that loads is not a view that renders.** Checked again with `get_views` for every new view; a modifier naming a field absent from the arch passes install and fails when somebody opens the form.
+
+### Verification
+
+- **291 tests, 0 failed**, fresh `odoo19_p3_final2`. Up from 213. Conversation foundry 69; the foundry gained 11.
+- Same 3 pre-existing chart-of-accounts errors, unchanged and independently confirmed earlier.
+- Installed into `odoo19_dev`, backed up first to `backups/odoo19_dev_pre_conversation.dump`. Five tables, five record rules, `recipient_id` nullable and foundry at `19.0.1.6.0`, all confirmed by hand.
+- Secret scan clean.
+
+### Risks and open questions
+
+- **No channel is wired to it.** The foundry is provider-neutral and tested against an in-memory fake, which is deliberate — but it means nothing real flows through it yet. `midvex_o_conversation_whatsapp` is the next step and is small: the webhook already parses inbound messages and already stores the envelope this now knows how to read.
+- **The inbox has no compose box.** Replying is a service call (`queue_outbound`). The views list, filter, assign, resolve and reopen; typing a reply in the UI is phase 4.
+- **`_compute_unanswered` depends on `message_ids.direction` and `create_date`.** It recomputes over a thread's whole message list. Fine at the volumes this will see for a long time, and worth remembering if a thread ever runs to thousands.
+- Everything from the previous entries still stands: no Meta credentials, the old handoff's items 2–4, and both `erp` prerequisites.
+
+### Migration
+
+`19.0.1.6.0` backfills `destination_key`. A new stored computed column is populated on upgrade anyway, so it is belt and braces — it exists because a NULL key is invisible to the throttle's search, which would mean every historical row silently stopped counting toward the rate limit.
+
+### Exact next step
+
+Wire WhatsApp to the foundry. The pieces are all present:
+
+```python
+from odoo.addons.midvex_o_conversation_foundry.services import conversation
+
+identity = conversation.ensure_identity(env, company, 'whatsapp', adapter.normalize_identity(sender))
+thread   = conversation.ensure_thread(env, company, identity)
+session  = conversation.open_session(env, thread, account, identity.normalized_identifier)
+conversation.record_inbound(env, session, normalized_inbound_dto, inbound_event=event)
+```
+
+The webhook's `messages[]` branch is currently inert by design; that is where the four lines go. `statuses[]` should additionally call `conversation.apply_status`. Then the first milestone is one CRM bridge away.
+
+Still local. `git rev-list --count origin/main..HEAD`.
