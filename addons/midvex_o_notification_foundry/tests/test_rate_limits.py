@@ -269,6 +269,25 @@ class TestDestinationAddressedMessages(RateLimitCase):
                 'idempotency_key': 'no-destination',
             })
 
+    def test_a_recipient_whose_address_is_unknown_still_queues(self):
+        """Addressed to somebody we cannot yet reach is not addressed to nobody.
+
+        A recipient who has not finished linking has no external_id. Refusing
+        the message at create sounds stricter and is worse: the failure then
+        has no row, no log and nothing in the queue for anyone to find. It
+        queues, and the adapter says why at send.
+        """
+        unlinked = self.env['midvex.notification.recipient'].create({
+            'kind': 'group', 'name': 'Not yet linked', 'account_id': self.account.id,
+            'state': 'pending',
+        })
+        message = self.Message.create({
+            'recipient_id': unlinked.id, 'account_id': self.account.id,
+            'body': 'queued anyway', 'idempotency_key': 'dest-unlinked',
+        })
+        self.assertTrue(message.id)
+        self.assertFalse(message.sudo().destination_key)
+
     def test_the_destination_reaches_the_adapter(self):
         message = self._to('+905111111111', 'dest-1')
         message.action_process()

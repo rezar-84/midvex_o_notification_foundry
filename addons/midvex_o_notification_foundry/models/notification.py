@@ -733,10 +733,18 @@ class NotificationMessage(models.Model):
         it, deliberately: Odoo validates only the fields present in the write,
         so a create() naming neither would have skipped a constraint listing
         both — which is exactly the case this exists to catch. destination_key
-        is computed on every create, so it is always there to be checked.
+        is computed on every create, so it is always there to trigger on.
+
+        But the *check* is on the two fields, not on the key. A message to a
+        recipient whose external_id is not filled in yet is addressed to
+        somebody whose address we do not know — which is a configuration
+        problem a person fixes, not a malformed record. It queues, and
+        quarantines at send saying so. Checking the key instead refused it at
+        create, which sounds stricter and is worse: the failure then has no
+        row, no log and nothing in the queue for anyone to find.
         """
         for message in self:
-            if not message.sudo().destination_key:
+            if not message.recipient_id and not message.destination_external_id:
                 raise ValidationError(_(
                     'A notification needs either a recipient or a destination address.'))
 

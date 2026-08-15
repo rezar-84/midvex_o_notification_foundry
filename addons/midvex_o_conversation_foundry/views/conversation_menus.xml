@@ -1,0 +1,25 @@
+<odoo>
+
+  <!-- Under the existing Notifications root rather than a second app tile.
+       The two foundries are siblings in the architecture, but to somebody
+       using Odoo they are one area of the business: messages going out, and
+       messages coming in. -->
+  <menuitem id="menu_conversation_root"
+            name="Conversations"
+            parent="midvex_o_notification_foundry.menu_notification_root"
+            sequence="5"/>
+
+  <menuitem id="menu_conversation_threads"
+            name="Inbox"
+            parent="menu_conversation_root"
+            action="action_conversation_thread"
+            sequence="10"/>
+
+  <menuitem id="menu_conversation_identities"
+            name="Identities"
+            parent="menu_conversation_root"
+            action="action_conversation_identity"
+            sequence="20"
+            groups="midvex_o_notification_foundry.group_notification_manager"/>
+
+</odoo>
