@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 14:32+0000\n"
-"PO-Revision-Date: 2026-08-14 14:32+0000\n"
+"POT-Creation-Date: 2026-08-15 04:44+0000\n"
+"PO-Revision-Date: 2026-08-15 04:44+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -25,6 +25,15 @@ msgid ""
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"<strong>This company has no WhatsApp account yet.</strong>\n"
+"                Credentials belong to an account, and each company has its own\n"
+"                branded number — so there is nothing here to fill in until one\n"
+"                exists."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #. odoo-python
 #: code:addons/midvex_o_notification_whatsapp/models/whatsapp_account.py:0
 msgid ""
@@ -33,9 +42,22 @@ msgid ""
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"A string you invent. Paste the same value into the Meta App Dashboard when "
+"you set the callback URL."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #. odoo-python
 #: code:addons/midvex_o_notification_whatsapp/models/whatsapp_template_map.py:0
 msgid "A template mapping needs a language code."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_api_key
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Access Token"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -46,6 +68,12 @@ msgstr ""
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__active
 msgid "Active"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_api_secret
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "App Secret"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -74,7 +102,14 @@ msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "Business Account"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_callback_url
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Callback URL"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -109,6 +144,22 @@ msgid "Company"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model:ir.model,name:midvex_o_notification_whatsapp.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_state
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Connection"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Create WhatsApp Account"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__create_uid
 msgid "Created by"
 msgstr ""
@@ -116,6 +167,11 @@ msgstr ""
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Credentials"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -136,11 +192,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_inbound_event__display_name
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_message__display_name
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__display_name
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_display_number
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_display_number
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "Display Number"
 msgstr ""
 
@@ -151,6 +210,8 @@ msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_api_version
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_api_version
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "Graph API Version"
 msgstr ""
 
@@ -159,12 +220,23 @@ msgstr ""
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_inbound_event__id
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_message__id
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__id
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__id
 msgid "ID"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__language_code
 msgid "Language Code"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_last_error
+msgid "Last Error"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_last_test_at
+msgid "Last Tested"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -175,6 +247,11 @@ msgstr ""
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Last tested:"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -189,10 +266,18 @@ msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_test_mode
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_res_config_settings__wa_test_mode
 msgid ""
 "Marks this account as pointing at a test number. Does not change how "
 "messages are sent — it exists so a production number is never mistaken for a"
 " sandbox one in the account list."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Marks this as a test number. Does not change how messages are sent — it "
+"exists so a production number is never mistaken for a sandbox one."
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -216,6 +301,13 @@ msgstr ""
 msgid ""
 "Meta language and locale code, e.g. en_US or tr_TR. A template approved in "
 "one language cannot be sent as another — they are separate approvals."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Meta requires HTTPS and will refuse this URL. Set\n"
+"                <code>web.base.url</code> to the instance's public HTTPS address first."
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -247,6 +339,11 @@ msgid "Odoo Side"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Open Account"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
 msgid ""
 "Outside the 24-hour customer service window WhatsApp delivers only\n"
@@ -254,6 +351,22 @@ msgid ""
 "            mapped here is sent as that provider template; one that is not is sent as\n"
 "            plain text, which the provider will reject unless the customer messaged\n"
 "            recently."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Outside the 24-hour customer service window only templates Meta approved in "
+"advance are delivered. Each mapping ties one notification template to one "
+"approved provider template, in one language."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Paste this into the App Dashboard under WhatsApp > Configuration together "
+"with the Verify Token, then subscribe the WhatsApp Business Account to the "
+"\"messages\" field. Meta has no API for setting it."
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -268,11 +381,21 @@ msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_phone_number_id
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_phone_number_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "Phone Number ID"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Pinned deliberately, so a provider release cannot change behaviour without a"
+" decision. Changing it here is a data change, not a code release."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_api_version
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_res_config_settings__wa_api_version
 msgid ""
 "Pinned rather than tracking latest, so a provider release cannot change "
 "behaviour without a decision. Moving version is a change here, not a code "
@@ -341,6 +464,27 @@ msgid "Show Callback URL"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Signs inbound webhooks. Without it every callback is rejected: this endpoint"
+" fails closed, because an unverified payload can create records on behalf of"
+" a customer."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Status"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"System User token with business_management, whatsapp_business_messaging and "
+"whatsapp_business_management. The temporary token from the App Dashboard "
+"expires quickly and is not suitable for production."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__template_id
 msgid "Template"
 msgstr ""
@@ -352,24 +496,65 @@ msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_template_ids
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_template_count
 #: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "Template Mappings"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Templates"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Test Connection"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Test Connection reads the phone number node. It messages nobody, so it\n"
+"                is safe to press before anything else is configured."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_test_mode
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_test_mode
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "Test Mode"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"The WABA ID from the App Dashboard. Inbound payloads carry it as entry[].id."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_business_account_id
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_res_config_settings__wa_business_account_id
 msgid ""
 "The WABA ID from the Meta App Dashboard. Inbound webhook payloads carry it "
 "as entry[].id."
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_res_config_settings__wa_account_id
+msgid "The WhatsApp account for the company you are currently in."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/res_config_settings.py:0
+msgid ""
+"The WhatsApp channel record is missing. Upgrade the module and try again."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_phone_number_id
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_res_config_settings__wa_phone_number_id
 msgid ""
 "The business phone number ID from the Meta App Dashboard. This is the ID "
 "used in API calls, not the phone number itself."
@@ -396,6 +581,7 @@ msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_display_number
+#: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_res_config_settings__wa_display_number
 msgid ""
 "The number customers see. Informational only; API calls use the phone number"
 " ID."
@@ -404,6 +590,12 @@ msgstr ""
 #. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,help:midvex_o_notification_whatsapp.field_midvex_notification_whatsapp_template__provider_template_name
 msgid "The template name exactly as approved in the Meta App Dashboard."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/res_config_settings.py:0
+msgid "There is no WhatsApp account for this company yet."
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
@@ -417,6 +609,18 @@ msgid "This account already maps that template for that language."
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "This release was written against"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid ""
+"Used in every API call, and what resolves an inbound message to this "
+"company. Not the phone number itself."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields.selection,name:midvex_o_notification_whatsapp.selection__midvex_notification_whatsapp_template__provider_category__utility
 msgid "Utility"
 msgstr ""
@@ -427,13 +631,54 @@ msgid "Variables"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_webhook_secret
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "Verify Token"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_default_api_version
+msgid "Version This Release Was Written Against"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_callback_is_https
+msgid "Wa Callback Is Https"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_has_account
+msgid "Wa Has Account"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "What customers see. Informational only."
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:midvex.notification.channel,name:midvex_o_notification_whatsapp.channel_whatsapp
 #: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "WhatsApp"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/res_config_settings.py:0
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_account_id
+msgid "WhatsApp Account"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
+msgid "WhatsApp Business Account"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_midvex_notification_account__wa_business_account_id
+#: model:ir.model.fields,field_description:midvex_o_notification_whatsapp.field_res_config_settings__wa_business_account_id
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "WhatsApp Business Account ID"
 msgstr ""
 
@@ -478,17 +723,26 @@ msgid "WhatsApp webhook"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
+#. odoo-python
+#: code:addons/midvex_o_notification_whatsapp/models/res_config_settings.py:0
+msgid "WhatsApp — %s"
+msgstr ""
+
+#. module: midvex_o_notification_whatsapp
 #: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "e.g. +90 541 834 09 08"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "e.g. 102290129340398"
 msgstr ""
 
 #. module: midvex_o_notification_whatsapp
 #: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_notification_account_form_whatsapp
+#: model_terms:ir.ui.view,arch_db:midvex_o_notification_whatsapp.view_res_config_settings_whatsapp
 msgid "e.g. 106540352242922"
 msgstr ""
 
