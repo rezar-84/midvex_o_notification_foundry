@@ -47,8 +47,17 @@ class ConversationMessage(models.Model):
     message_type = fields.Selection(
         [('text', 'Text'), ('template', 'Template'), ('image', 'Image'),
          ('document', 'Document'), ('audio', 'Audio'), ('video', 'Video'),
-         ('location', 'Location'), ('interactive', 'Interactive'), ('system', 'System')],
-        default='text', required=True)
+         ('location', 'Location'), ('interactive', 'Interactive'),
+         ('system', 'System'), ('other', 'Other')],
+        default='text', required=True,
+        help='Normalized across channels. Anything a provider sends that does not map '
+             'onto one of these is `other`, with the provider\'s own word kept beside '
+             'it.')
+    provider_message_type = fields.Char(
+        readonly=True,
+        help="The provider's own name for this kind of message — sticker, reaction, "
+             'order. Kept because `other` alone cannot tell an agent what arrived, and '
+             'because it is what a later phase would backfill against.')
     body = fields.Text()
     original_language = fields.Char(readonly=True)
     translated_body = fields.Text(

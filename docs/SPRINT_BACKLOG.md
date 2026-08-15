@@ -119,15 +119,20 @@ number goes live before Sprint 7, somebody has to watch Inbound Events by hand.
 
 Exit: a provider-neutral conversation can be created and replied to. **Met.**
 
-## Sprint 8 — Wire WhatsApp to it
+## Sprint 8 — Wire WhatsApp to it — built 2026-08-15
 
-Small, and the obvious next step. The webhook already parses inbound messages and
-already stores the envelope the conversation foundry now knows how to read; what is
-missing is the module that joins them.
+- [x] `midvex_o_conversation_whatsapp`: inbound normalized into the conversation DTO, `record_inbound` called, `statuses[]` routed through `apply_status`.
+- [x] The customer service window checked before a free-form reply, not after the provider rejects it with 131047. Read from inbound messages, so replying does not extend the window the customer opened.
+- [x] Identity normalization to E.164, reusing the adapter's `normalize_identity`.
+- [x] Unknown provider message types coerced to `other` rather than crashing the webhook — a sticker used to take every batched message down with it.
+- [x] 37 tests, including Meta's published payloads run through the real adapter.
 
-- [ ] `midvex_o_conversation_whatsapp`: normalize inbound into the conversation DTO, call `record_inbound`, and route `statuses[]` through `apply_status`.
-- [ ] The customer service window check before a free-form reply — outside 24 hours only an approved template is deliverable, and the agent needs telling before they type, not after.
-- [ ] Identity normalization to E.164, reusing the adapter's `normalize_identity`.
+Exit: a customer messaging a connected number becomes a conversation an agent can
+see and reply to. **Met, against fixtures.**
+
+- [ ] **The same live validation.** Still the one thing credentials would unblock, and
+      now it would prove the whole chain in one go: a real message in, a thread, a
+      reply out, and `read` coming back.
 
 After that, phase 4's first milestone is within reach: unknown person messages the
 number, a lead is created, an agent is notified, and the reply goes back.

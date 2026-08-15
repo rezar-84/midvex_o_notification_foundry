@@ -1,0 +1,111 @@
+<odoo>
+
+  <record id="view_res_config_settings_whatsapp" model="ir.ui.view">
+    <field name="name">res.config.settings.form.whatsapp</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <app string="WhatsApp" name="midvex_o_notification_whatsapp"
+             logo="/midvex_o_notification_foundry/static/description/icon.png"
+             groups="midvex_o_notification_foundry.group_notification_manager">
+
+          <!-- Nothing to configure until the company has an account. Saying so
+               beats showing a page of empty fields that silently write nowhere. -->
+          <block title="WhatsApp Business Account" invisible="wa_has_account">
+            <div class="alert alert-info" role="alert">
+              <p>
+                <strong>This company has no WhatsApp account yet.</strong>
+                Credentials belong to an account, and each company has its own
+                branded number — so there is nothing here to fill in until one
+                exists.
+              </p>
+              <button name="action_wa_create_account" type="object"
+                      string="Create WhatsApp Account" class="btn-primary"/>
+            </div>
+          </block>
+
+          <block title="Credentials" invisible="not wa_has_account"
+                 groups="midvex_o_notification_foundry.group_notification_admin">
+            <setting string="Access Token"
+                     help="System User token with business_management, whatsapp_business_messaging and whatsapp_business_management. The temporary token from the App Dashboard expires quickly and is not suitable for production.">
+              <field name="wa_api_key" password="True"/>
+            </setting>
+            <setting string="App Secret"
+                     help="Signs inbound webhooks. Without it every callback is rejected: this endpoint fails closed, because an unverified payload can create records on behalf of a customer.">
+              <field name="wa_api_secret" password="True"/>
+            </setting>
+            <setting string="Verify Token"
+                     help="A string you invent. Paste the same value into the Meta App Dashboard when you set the callback URL.">
+              <field name="wa_webhook_secret" password="True"/>
+            </setting>
+          </block>
+
+          <block title="Business Account" invisible="not wa_has_account">
+            <setting string="WhatsApp Business Account ID"
+                     help="The WABA ID from the App Dashboard. Inbound payloads carry it as entry[].id.">
+              <field name="wa_business_account_id" placeholder="e.g. 102290129340398"/>
+            </setting>
+            <setting string="Phone Number ID"
+                     help="Used in every API call, and what resolves an inbound message to this company. Not the phone number itself.">
+              <field name="wa_phone_number_id" placeholder="e.g. 106540352242922"/>
+            </setting>
+            <setting string="Display Number"
+                     help="What customers see. Informational only.">
+              <field name="wa_display_number" placeholder="e.g. +90 541 834 09 08"/>
+            </setting>
+            <setting string="Graph API Version"
+                     help="Pinned deliberately, so a provider release cannot change behaviour without a decision. Changing it here is a data change, not a code release.">
+              <field name="wa_api_version"/>
+              <div class="text-muted">
+                This release was written against <field name="wa_default_api_version" readonly="1" nolabel="1" class="oe_inline"/>.
+              </div>
+            </setting>
+            <setting string="Test Mode"
+                     help="Marks this as a test number. Does not change how messages are sent — it exists so a production number is never mistaken for a sandbox one.">
+              <field name="wa_test_mode"/>
+            </setting>
+          </block>
+
+          <block title="Status" invisible="not wa_has_account">
+            <setting string="Connection">
+              <field name="wa_state" readonly="1"/>
+              <div class="text-muted">
+                Last tested: <field name="wa_last_test_at" readonly="1" nolabel="1" class="oe_inline"/>
+              </div>
+              <div class="mt8">
+                <button name="action_wa_test_connection" type="object"
+                        string="Test Connection" class="btn-primary"/>
+                <button name="action_wa_open_account" type="object"
+                        string="Open Account" class="btn-secondary ms-2"/>
+                <button name="action_wa_open_templates" type="object"
+                        string="Templates" class="btn-secondary ms-2"/>
+              </div>
+              <div class="alert alert-danger mt8" role="alert" invisible="wa_state != 'error'">
+                <field name="wa_last_error" readonly="1" nolabel="1"/>
+              </div>
+              <div class="text-muted mt4">
+                Test Connection reads the phone number node. It messages nobody, so it
+                is safe to press before anything else is configured.
+              </div>
+            </setting>
+            <setting string="Callback URL"
+                     help="Paste this into the App Dashboard under WhatsApp &gt; Configuration together with the Verify Token, then subscribe the WhatsApp Business Account to the &quot;messages&quot; field. Meta has no API for setting it.">
+              <field name="wa_callback_url" readonly="1"/>
+              <div class="alert alert-warning mt4" role="alert" invisible="wa_callback_is_https">
+                Meta requires HTTPS and will refuse this URL. Set
+                <code>web.base.url</code> to the instance's public HTTPS address first.
+              </div>
+            </setting>
+            <setting string="Template Mappings"
+                     help="Outside the 24-hour customer service window only templates Meta approved in advance are delivered. Each mapping ties one notification template to one approved provider template, in one language.">
+              <field name="wa_template_count" readonly="1"/>
+            </setting>
+          </block>
+
+        </app>
+      </xpath>
+    </field>
+  </record>
+
+</odoo>

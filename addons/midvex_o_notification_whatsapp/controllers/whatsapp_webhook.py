@@ -152,6 +152,29 @@ class WhatsAppWebhookController(Controller):
         if event.get('event_type') == 'status':
             self._apply_status(account, event, inbound)
 
+        # The seam the conversation foundry fills in. A no-op without it, so
+        # this module installs and runs alone exactly as it did before —
+        # customer messages are stored, acknowledged and read by nothing, which
+        # is the roadmap's phase-2 behaviour and remains correct on its own.
+        #
+        # A model hook rather than controller inheritance: controllers are
+        # matched by route and the last one loaded wins, which makes the
+        # ordering of two modules' routes something you have to reason about.
+        # A model method is merged by Odoo the ordinary way and can be extended
+        # by any number of channel bridges.
+        try:
+            inbound.process_conversation_event(account, event)
+        except Exception:
+            # Threading a message must never make the webhook fail. A non-200
+            # has Meta redeliver, and a redelivery of something we already
+            # stored is deduped away — so the retry could not fix it and the
+            # envelope would be the only record left. It is already stored;
+            # this logs loudly and acknowledges.
+            _logger.exception(
+                'WhatsApp inbound event %s could not be threaded for account %s',
+                inbound.id, account.id)
+            inbound.write({'error_message': 'Conversation processing failed.'})
+
     def _store(self, account, event, error_message=False):
         """Record the envelope, or None when it is a duplicate.
 

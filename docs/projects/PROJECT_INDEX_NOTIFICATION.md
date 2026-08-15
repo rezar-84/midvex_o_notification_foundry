@@ -16,7 +16,7 @@
 |---|---|---:|---|
 | Omnichannel Messaging | *(umbrella)* | Documented | `omnichannel_messaging/` |
 | Conversation Foundry | `midvex_o_conversation_foundry` | Implemented (phase 3) | `conversation_foundry/` |
-| WhatsApp Conversation | `midvex_o_conversation_whatsapp` | Documented, not started | `conversation_whatsapp/` |
+| WhatsApp Conversation | `midvex_o_conversation_whatsapp` | Implemented, never run live | `conversation_whatsapp/` |
 | Website Live Chat | `midvex_o_conversation_webchat` | Documented, not started | `conversation_webchat/` |
 | Telegram Conversation | `midvex_o_conversation_telegram` | Documented, not started | `conversation_telegram/` |
 | Messaging API | `varsco_messaging_api` | Documented, not started | `messaging_api/` |

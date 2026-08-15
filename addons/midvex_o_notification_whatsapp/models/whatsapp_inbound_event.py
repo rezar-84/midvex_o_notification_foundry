@@ -32,6 +32,21 @@ class NotificationInboundEvent(models.Model):
         'UNIQUE (account_id, wa_event_key)',
         'This WhatsApp event has already been recorded.')
 
+    def process_conversation_event(self, account, event):
+        """Hand a parsed webhook event to whatever threads conversations.
+
+        A no-op here, and deliberately so. Without `midvex_o_conversation_foundry`
+        installed there is nowhere for a customer's message to go, and this
+        module on its own is still correct: the envelope is stored, deduped and
+        acknowledged, delivery statuses update the queue, and free text is read
+        by nothing. That is the roadmap's phase-2 exit criterion exactly.
+
+        `midvex_o_conversation_whatsapp` overrides this to build the thread.
+        Extending it further — a second bridge, an analytics hook — is ordinary
+        model inheritance and needs no change here.
+        """
+        return False
+
     @staticmethod
     def build_wa_event_key(event):
         """The dedupe key for one parsed event, or None when it has no identity.
