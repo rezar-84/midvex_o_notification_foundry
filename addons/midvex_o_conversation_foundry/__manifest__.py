@@ -1,6 +1,6 @@
 {
     'name': 'Midvex Conversation Foundry',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'summary': 'Provider-neutral two-way customer conversations for Odoo',
     'category': 'Productivity',
     'author': 'Midvex',

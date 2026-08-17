@@ -455,3 +455,65 @@ conversation.record_inbound(env, session, normalized_inbound_dto, inbound_event=
 The webhook's `messages[]` branch is currently inert by design; that is where the four lines go. `statuses[]` should additionally call `conversation.apply_status`. Then the first milestone is one CRM bridge away.
 
 Still local. `git rev-list --count origin/main..HEAD`.
+
+## 2026-08-17 — Apps-list icons for the two conversation modules
+
+Reported as "the conversation module doesn't have an icon". Cosmetic, and the
+smaller of the two icon problems this repo has already hit.
+
+### What was actually missing
+
+The August 10 entry above records the distinction and it applies again, in the
+other direction. There are two icons:
+
+| Where | Comes from | conversation_foundry |
+|---|---|---|
+| Apps list card (Settings → Apps) | `static/description/icon.png` | ❌ absent — the placeholder |
+| Home screen tile | `web_icon` on a root `ir.ui.menu` | n/a — has no root menu |
+
+Last time the PNG existed and the `web_icon` did not. This time neither module
+had a PNG at all. `midvex_o_conversation_foundry` and
+`midvex_o_conversation_whatsapp` were the only conversation addons with no
+`static/` directory whatsoever, so both cards drew Odoo's generic placeholder.
+
+### What was not done, deliberately
+
+No `web_icon`, no `application: True`, no re-parenting. "Conversations" is a
+child of `menu_notification_root` by an explicit decision recorded in the
+comment at the top of `conversation_menus.xml` — outgoing messages and incoming
+messages are one area of the business to whoever uses them. A module with no
+root menu has no tile, so there was nothing for a `web_icon` to attach to. The
+user was offered the second-tile option and declined it.
+
+### Files
+
+- `addons/midvex_o_conversation_foundry/static/description/icon.svg` + `icon.png`
+- `addons/midvex_o_conversation_whatsapp/static/description/icon.svg` + `icon.png`
+- both `__manifest__.py`: `19.0.1.0.0` → `19.0.1.0.1`
+- both channel `CHANGELOG.md`
+
+Same rounded square, same `#5B4B9E → #3D3270` gradient as the notification
+foundry, with two speech bubbles instead of the bell — inbound white, outbound
+in the house accent `#F0663F`, and WhatsApp green `#25D366` on the connector.
+The outbound bubble is drawn twice, once filled *and* stroked in the background
+colour, so it cuts a clean gap where it overlaps the white one; stroking the
+final shape shows the seam between the rectangle and its tail.
+
+As with the foundry, `icon.svg` is the editable master and Odoo reads nothing
+but the PNG. Re-render with:
+
+```bash
+inkscape --export-type=png --export-width=256 --export-height=256 \
+  --export-filename=static/description/icon.png static/description/icon.svg
+```
+
+### Exact next step
+
+Not validated in a database — this touches no Python, XML or data file, and the
+version bumps are signalling only. `ir.module.module.icon` is set when the
+module list is scanned, so the cards refresh on **Update Apps List** or a
+restart; no `-u` is required. Confirm the two cards in Settings → Apps, then
+return to the compose box in the inbox (phase 4), which is still the real open
+item from the previous entry.
+
+Still local. `git rev-list --count origin/main..HEAD`.

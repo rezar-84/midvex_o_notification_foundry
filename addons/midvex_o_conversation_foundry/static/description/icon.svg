@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5B4B9E"/>
+      <stop offset="1" stop-color="#3D3270"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Same rounded square and gradient as midvex_o_notification_foundry: the
+       two foundries are one area of the business to whoever uses them, so the
+       cards should read as a family. The glyph is what differs - a bell for
+       messages going out, two bubbles for messages coming back. -->
+  <rect x="0" y="0" width="256" height="256" rx="56" fill="url(#bg)"/>
+
+  <!-- Inbound bubble: the customer's message, tail to the left. -->
+  <g fill="#FFFFFF">
+    <rect x="30" y="48" width="136" height="96" rx="24"/>
+    <polygon points="58,142 44,182 96,142"/>
+  </g>
+  <g fill="#3D3270">
+    <circle cx="66" cy="90" r="11"/>
+    <circle cx="98" cy="90" r="11"/>
+    <circle cx="130" cy="90" r="11"/>
+  </g>
+
+  <!-- Outbound bubble, tail to the right. Drawn twice: once filled and
+       stroked in the background colour to cut a clean 7px gap where it
+       overlaps the white bubble, then again in the accent colour on top.
+       Stroking the final shape instead would show the seam between the
+       rectangle and its tail. -->
+  <g fill="#3D3270" stroke="#3D3270" stroke-width="14" stroke-linejoin="round">
+    <rect x="106" y="112" width="124" height="88" rx="24"/>
+    <polygon points="200,198 212,232 160,198"/>
+  </g>
+  <g fill="#F0663F">
+    <rect x="106" y="112" width="124" height="88" rx="24"/>
+    <polygon points="200,198 212,232 160,198"/>
+  </g>
+</svg>

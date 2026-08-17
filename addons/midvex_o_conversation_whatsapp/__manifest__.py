@@ -1,6 +1,6 @@
 {
     'name': 'Midvex WhatsApp Conversations',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'summary': 'Two-way WhatsApp customer conversations',
     'category': 'Productivity',
     'author': 'Midvex',
