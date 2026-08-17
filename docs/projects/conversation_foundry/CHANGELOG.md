@@ -1,5 +1,21 @@
 # Changelog — Conversation Foundry
 
+## 19.0.1.0.1 — 2026-08-17
+
+Cosmetic only. The module had no `static/description/icon.png`, so its card in
+Settings → Apps fell back to Odoo's generic placeholder.
+
+Added `icon.svg` (the editable master, read by nothing) and the `icon.png`
+rendered from it: the notification foundry's rounded square and purple gradient,
+with two speech bubbles in place of the bell — one inbound in white, one
+outbound in the house accent.
+
+No `web_icon` and no `application` flag. Conversations stays a menu under the
+Notifications root by design, so there is no home-screen tile for an icon to sit
+on; only the Apps list card was missing artwork. Odoo reads the card icon from
+disk when the module list is scanned, so **no module upgrade is needed** — an
+*Update Apps List* (or a restart) is enough.
+
 ## 19.0.1.0.0 — 2026-08-15
 
 First implementation. Roadmap phase 3: a provider-neutral conversation can be

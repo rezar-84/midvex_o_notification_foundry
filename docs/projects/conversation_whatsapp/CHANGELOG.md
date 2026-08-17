@@ -1,5 +1,14 @@
 # Changelog — WhatsApp Conversation Connector
 
+## 19.0.1.0.1 — 2026-08-17
+
+Cosmetic only. Added `static/description/icon.svg` and `icon.png`, replacing the
+generic placeholder on the Apps list card. Same two-bubble glyph as the
+conversation foundry with the outbound bubble in WhatsApp green — an adapter
+should look like a variant of the foundry it plugs into.
+
+No upgrade needed; the card icon is read from disk on *Update Apps List*.
+
 ## 19.0.1.0.0 — 2026-08-15
 
 The bridge. A customer messaging a connected WhatsApp number now becomes a
