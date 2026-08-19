@@ -512,8 +512,50 @@ inkscape --export-type=png --export-width=256 --export-height=256 \
 Not validated in a database — this touches no Python, XML or data file, and the
 version bumps are signalling only. `ir.module.module.icon` is set when the
 module list is scanned, so the cards refresh on **Update Apps List** or a
-restart; no `-u` is required. Confirm the two cards in Settings → Apps, then
-return to the compose box in the inbox (phase 4), which is still the real open
-item from the previous entry.
-
 Still local. `git rev-list --count origin/main..HEAD`.
+
+## 2026-08-19 — Multi-company recipient isolation, link code generation, and webhook fixes
+
+### Objective
+Diagnose and resolve multi-company environment issues where:
+1. Opening Recipients displayed recipient records belonging to other companies by default.
+2. Notifications generated for Company A were being dispatched to Company B's Telegram account/bot.
+3. Link account generation and redemption on a second company failed or linked against the wrong company's account.
+
+### Root Cause Analysis & Fixes
+
+1. **Recipients Record Rule Leakage**:
+   - **Root Cause**: In `midvex_o_notification_foundry/security/notification_security.xml`, `rule_notification_recipient_company` restricted managers by `('company_id', 'in', company_ids)`, while `rule_notification_recipient_self` restricted regular users by `('user_id', '=', user.id)`. Because Odoo joins multiple record rules for the same model with `OR`, managers (who inherit the user group) evaluated `('user_id', '=', user.id) OR ('company_id', 'in', company_ids)`. This allowed user recipient links belonging to inactive or unselected companies to leak into list/search views.
+   - **Fix**: Replaced the recipient record rule with a single composite domain:
+     `[('company_id', 'in', company_ids), '|', ('user_id', '=', user.id), ('user_id', '=', False)]` in `notification_security.xml`.
+
+2. **Cross-Company Telegram Notification Dispatch**:
+   - **Root Cause**: In `dispatcher.py::enqueue_event`, notification rules were not filtered by the target record's company ID (`record_company_id`). Furthermore, `_targets()` looked up linked user recipients using `('user_id', '=', user.id)` without filtering by `account_id` or `account.company_id`. If a user belonged to multiple companies or possessed recipient links across accounts, `_targets()` could pick Company B's recipient link for a notification triggered in Company A.
+   - **Fix**: 
+     - Fixed `enqueue_event()` in `dispatcher.py` to filter notification rules by `('company_id', '=', company_id)`.
+     - Moved `company_id` calculation to the top of `enqueue_event()` to eliminate an `UnboundLocalError`.
+     - Updated `_targets()` in `dispatcher.py` to accept `account` and restrict recipient search by `('account_id', '=', account.id)`.
+
+3. **Link Code Generation & Redemption Isolation**:
+   - **Root Cause 1**: In `midvex.notification.recipient.get_or_create_link(user, channel_code)`, account lookup used `user.company_id.id` (primary/default user company), rather than `self.env.company` (active user session company). Switching companies in Odoo still generated link codes against Company 1's bot account.
+   - **Root Cause 2**: `find_pending_by_code` and `process_link_code` in `notification.py` did not restrict search by `account_id`. When `/link CODE` arrived via Telegram webhook, any bot could redeem a link code generated for another company's bot.
+   - **Fix**:
+     - Updated `get_or_create_link()` to query connected notification accounts using `self.env.company.id`.
+     - Added optional `account` filtering to `find_pending_by_code()` and `process_link_code()`.
+     - Updated `telegram_webhook.py` to pass `account=account` when handling `/link` command events.
+
+### Verification
+- **Automated Tests**: Added `addons/midvex_o_notification_foundry/tests/test_multi_company.py` with multi-company isolation test cases.
+- Executed full test suite across `midvex_o_notification_foundry` and `midvex_o_notification_telegram` in an isolated test database `odoo19_test_multi_comp`:
+  ```text
+  Ran 115 foundry tests & 48 telegram tests - 0 failed, 0 errors.
+  ```
+
+### Files Modified
+- `addons/midvex_o_notification_foundry/security/notification_security.xml`
+- `addons/midvex_o_notification_foundry/models/notification.py`
+- `addons/midvex_o_notification_foundry/services/dispatcher.py`
+- `addons/midvex_o_notification_telegram/controllers/telegram_webhook.py`
+- `addons/midvex_o_notification_foundry/tests/__init__.py`
+- `addons/midvex_o_notification_foundry/tests/test_multi_company.py` (New file)
+

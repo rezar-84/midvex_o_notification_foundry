@@ -26,10 +26,12 @@ _TRIGGERS = {'created': 'on_create', 'updated': 'on_write', 'scheduled': 'on_sch
 
 def enqueue_event(env, model_name, record, event_code, rule_id=None):
     trigger = _TRIGGERS.get(event_code, 'on_write')
+    company_id = _record_company_id(record, env)
     domain = [
         ('active', '=', True),
         ('model_id.model', '=', model_name),
         ('trigger', '=', trigger),
+        ('company_id', '=', company_id),
     ]
     # A scheduled rule owns its automation and names itself in the call, so it
     # must not drag its siblings in: "due soon" and "overdue" watch the same
@@ -42,7 +44,6 @@ def enqueue_event(env, model_name, record, event_code, rule_id=None):
     Recipient = env['midvex.notification.recipient']
     Account = env['midvex.notification.account']
     created = Message
-    company_id = _record_company_id(record, env)
     # An on_create rule fires once per record, so the record id alone makes the
     # event unique. An on_write rule fires on every change, and without
     # something that varies per change every one of them collapses onto the
@@ -74,7 +75,7 @@ def enqueue_event(env, model_name, record, event_code, rule_id=None):
             ], limit=1)
             if not account:
                 continue
-            for recipient, token in _targets(Recipient, rule, users, channel):
+            for recipient, token in _targets(Recipient, rule, users, channel, account=account):
                 # The token, not the recipient id, keys idempotency: for a user
                 # it stays the user id, which is the format already written to
                 # every existing row. Keying on the recipient instead would
@@ -132,7 +133,7 @@ def _render_for(template, record, recipient):
     return template.with_context(lang=lang).render(record)
 
 
-def _targets(Recipient, rule, users, channel):
+def _targets(Recipient, rule, users, channel, account=None):
     """Every (recipient, idempotency token) this rule delivers to on a channel.
 
     Two kinds, resolved differently: audience users are looked up to find the
@@ -140,7 +141,7 @@ def _targets(Recipient, rule, users, channel):
     on the rule itself.
     """
     for user in users:
-        recipient = Recipient.search([
+        domain = [
             ('user_id', '=', user.id),
             ('channel_code', '=', channel.code),
             ('state', '=', 'linked'),
@@ -148,7 +149,10 @@ def _targets(Recipient, rule, users, channel):
             # queued and held: a burst of alerts should not arrive the moment
             # someone unmutes.
             ('muted', '=', False),
-        ], limit=1)
+        ]
+        if account:
+            domain.append(('account_id', '=', account.id))
+        recipient = Recipient.search(domain, limit=1)
         if recipient:
             yield recipient, str(user.id)
 
@@ -157,4 +161,6 @@ def _targets(Recipient, rule, users, channel):
     for recipient in rule.audience_recipient_ids:
         if (recipient.channel_code == channel.code
                 and recipient.state == 'linked' and not recipient.muted):
+            if account and recipient.account_id != account:
+                continue
             yield recipient, 'chat%s' % recipient.id

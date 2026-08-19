@@ -237,8 +237,9 @@ class NotificationRecipient(models.Model):
 
     @api.model
     def get_or_create_link(self, user, channel_code):
+        company = self.env.company
         account = self.env['midvex.notification.account'].search([
-            ('channel_code', '=', channel_code), ('company_id', '=', user.company_id.id),
+            ('channel_code', '=', channel_code), ('company_id', '=', company.id),
             ('active', '=', True), ('state', '=', 'connected')], limit=1)
         if not account:
             raise UserError(_('No connected %s account is configured for your company.') % channel_code)
@@ -249,7 +250,7 @@ class NotificationRecipient(models.Model):
         return recipient
 
     @api.model
-    def find_pending_by_code(self, code):
+    def find_pending_by_code(self, code, account=None):
         """The recipient a live link code belongs to, without redeeming it.
 
         Split out from process_link_code so a caller can tell *why* a code was
@@ -258,15 +259,18 @@ class NotificationRecipient(models.Model):
         """
         if not code:
             return self.browse()
-        return self.sudo().search([
+        domain = [
             ('link_code', '=', code), ('state', '=', 'pending'),
-            ('link_code_expires_at', '>=', fields.Datetime.now())], limit=1)
+            ('link_code_expires_at', '>=', fields.Datetime.now())]
+        if account:
+            domain.append(('account_id', '=', account.id))
+        return self.sudo().search(domain, limit=1)
 
     @api.model
-    def process_link_code(self, code, external_id, external_username=None, chat_title=None):
+    def process_link_code(self, code, external_id, external_username=None, chat_title=None, account=None):
         if not external_id:
             return False
-        recipient = self.find_pending_by_code(code)
+        recipient = self.find_pending_by_code(code, account=account)
         if not recipient:
             return False
         values = {

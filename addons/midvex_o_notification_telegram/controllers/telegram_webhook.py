@@ -65,7 +65,7 @@ class TelegramWebhookController(Controller):
             code = event.get('command_args')
             if not code:
                 return False, False, _("Send the code with the command, like: /link ABC12345")
-            pending = Recipient.sudo().find_pending_by_code(code)
+            pending = Recipient.sudo().find_pending_by_code(code, account=account)
             if not pending:
                 return False, 'Link code was invalid, already used, or expired.', _(
                     "That code was not accepted. It may have expired (codes last 15 "
@@ -85,7 +85,7 @@ class TelegramWebhookController(Controller):
                               "bot in a direct message, not in a group.")
                 return False, 'Link code used in the wrong kind of chat.', reply
             recipient = Recipient.sudo().process_link_code(
-                code, external_id, event.get('external_username'), event.get('chat_title'))
+                code, external_id, event.get('external_username'), event.get('chat_title'), account=account)
             if not recipient:
                 return False, 'Link code could not be redeemed.', _(
                     "That code could not be redeemed. Generate a fresh one in Odoo and "
